@@ -2,23 +2,27 @@ import { createClient, isSupabaseConfigured } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { LogOut, User, Trophy, Clock, Target } from "lucide-react"
+import { LogOut, User, Trophy, Clock, Target, BookOpen } from "lucide-react"
 import { signOut } from "@/lib/actions"
 import ProblemGrid from "@/components/problem-grid"
-import ProblemFilters from "@/components/problem-filters"
+import LearningPaths from "@/components/learning-paths"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 export default async function DashboardPage() {
   // If Supabase is not configured, show setup message
   if (!isSupabaseConfigured) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
-        <h1 className="text-2xl font-bold mb-4 text-foreground">Connect Supabase to get started</h1>
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4 text-foreground">Connect Supabase to get started</h1>
+          <p className="text-muted-foreground">Please configure your Supabase environment variables.</p>
+        </div>
       </div>
     )
   }
 
   // Get the user from the server
-  const supabase = createClient()
+  const supabase = await createClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
@@ -29,13 +33,24 @@ export default async function DashboardPage() {
   }
 
   // Get user profile data
-  const { data: userProfile } = await supabase.from("users").select("*").eq("id", user.id).single()
+  let userProfile = null
+  let userStats = null
+  
+  try {
+    // Check if supabase client has the expected methods (not a dummy client)
+    if (supabase && typeof supabase.from === 'function') {
+      const profileResponse = await supabase.from("users").select("*").eq("id", user.id).single()
+      userProfile = profileResponse.data
 
-  // Get user statistics
-  const { data: userStats } = await supabase.from("user_progress").select("status").eq("user_id", user.id)
+      const statsResponse = await supabase.from("user_progress").select("status").eq("user_id", user.id)
+      userStats = statsResponse.data
+    }
+  } catch (error) {
+    console.error("Error fetching user data:", error)
+  }
 
   const totalAttempted = userStats?.length || 0
-  const totalSolved = userStats?.filter((stat) => stat.status === "solved").length || 0
+  const totalSolved = userStats?.filter((stat: any) => stat.status === "solved").length || 0
 
   return (
     <div className="min-h-screen bg-background">
@@ -69,12 +84,12 @@ export default async function DashboardPage() {
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-foreground mb-2">Welcome back, {userProfile?.first_name}!</h2>
           <p className="text-muted-foreground">
-            Continue your competitive programming journey with our practice problems.
+            Continue your competitive programming journey with our structured learning paths and practice problems.
           </p>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <Card className="border-border">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Problems Solved</CardTitle>
@@ -111,20 +126,46 @@ export default async function DashboardPage() {
               <p className="text-xs text-muted-foreground">Days in a row</p>
             </CardContent>
           </Card>
+
+          <Card className="border-border">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Learning Paths</CardTitle>
+              <BookOpen className="h-4 w-4 text-primary" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-foreground">1</div>
+              <p className="text-xs text-muted-foreground">Available paths</p>
+            </CardContent>
+          </Card>
         </div>
 
-        {/* Problem Bank Section */}
-        <div className="space-y-6">
-          <div>
-            <h3 className="text-2xl font-bold text-foreground mb-2">Practice Problems</h3>
-            <p className="text-muted-foreground">
-              Browse and solve problems to improve your competitive programming skills.
-            </p>
-          </div>
+        {/* Main Content Tabs */}
+        <Tabs defaultValue="learning" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="learning" className="flex items-center gap-2">
+              <BookOpen className="h-4 w-4" />
+              Learning Paths
+            </TabsTrigger>
+            <TabsTrigger value="practice" className="flex items-center gap-2">
+              <Target className="h-4 w-4" />
+              Practice Problems
+            </TabsTrigger>
+          </TabsList>
 
-          <ProblemFilters />
-          <ProblemGrid userId={user.id} />
-        </div>
+          <TabsContent value="learning" className="space-y-6">
+            <LearningPaths userId={user.id} />
+          </TabsContent>
+
+          <TabsContent value="practice" className="space-y-6">
+            <div>
+              <h3 className="text-2xl font-bold text-foreground mb-2">Practice Problems</h3>
+              <p className="text-muted-foreground">
+                Browse and solve problems to improve your competitive programming skills.
+              </p>
+            </div>
+            <ProblemGrid userId={user.id} />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   )

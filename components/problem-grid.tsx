@@ -16,10 +16,12 @@ interface Problem {
   points: number
   time_limit: number
   categories: {
+    id: string
     name: string
     color: string
   }
   difficulty_levels: {
+    id: string
     name: string
     level: number
     color: string
@@ -39,6 +41,7 @@ export default function ProblemGrid({ userId }: ProblemGridProps) {
   const [problems, setProblems] = useState<Problem[]>([])
   const [filteredProblems, setFilteredProblems] = useState<Problem[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     fetchProblems()
@@ -46,6 +49,9 @@ export default function ProblemGrid({ userId }: ProblemGridProps) {
 
   const fetchProblems = async () => {
     try {
+      setLoading(true)
+      setError(null)
+
       const { data, error } = await supabase
         .from("problems")
         .select(`
@@ -55,11 +61,11 @@ export default function ProblemGrid({ userId }: ProblemGridProps) {
           user_progress!left (status, best_score, attempts)
         `)
         .eq("is_active", true)
-        .eq("user_progress.user_id", userId)
         .order("created_at", { ascending: false })
 
       if (error) {
         console.error("Error fetching problems:", error)
+        setError(error.message)
         return
       }
 
@@ -67,6 +73,7 @@ export default function ProblemGrid({ userId }: ProblemGridProps) {
       setFilteredProblems(data || [])
     } catch (error) {
       console.error("Error fetching problems:", error)
+      setError("Failed to fetch problems")
     } finally {
       setLoading(false)
     }
@@ -79,6 +86,11 @@ export default function ProblemGrid({ userId }: ProblemGridProps) {
       difficulty: string
       status: string
     }) => {
+      // Don't apply filters if problems haven't been loaded yet
+      if (problems.length === 0) {
+        return
+      }
+
       let filtered = [...problems]
 
       // Search filter
@@ -91,25 +103,25 @@ export default function ProblemGrid({ userId }: ProblemGridProps) {
         )
       }
 
-      // Category filter
-      if (filters.category) {
+      // Category filter - only apply if not "all"
+      if (filters.category && filters.category !== "all") {
         filtered = filtered.filter((problem) => problem.categories?.id === filters.category)
       }
 
-      // Difficulty filter
-      if (filters.difficulty) {
+      // Difficulty filter - only apply if not "all"
+      if (filters.difficulty && filters.difficulty !== "all") {
         filtered = filtered.filter((problem) => problem.difficulty_levels?.id === filters.difficulty)
       }
 
-      // Status filter
-      if (filters.status) {
+      // Status filter - only apply if not "all"
+      if (filters.status && filters.status !== "all") {
         filtered = filtered.filter((problem) => {
           const userProgress = problem.user_progress?.[0]
           const status = userProgress?.status || "not_attempted"
           return status === filters.status
         })
       }
-
+      
       setFilteredProblems(filtered)
     },
     [problems],
@@ -149,21 +161,26 @@ export default function ProblemGrid({ userId }: ProblemGridProps) {
 
   if (loading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {[...Array(6)].map((_, i) => (
-          <Card key={i} className="border-border animate-pulse">
-            <CardHeader>
-              <div className="h-4 bg-muted rounded w-3/4"></div>
-              <div className="h-3 bg-muted rounded w-1/2"></div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <div className="h-3 bg-muted rounded"></div>
-                <div className="h-3 bg-muted rounded w-5/6"></div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+      <div className="space-y-6">
+        <div className="text-center py-12">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading problems...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div className="text-center py-12">
+          <div className="h-12 w-12 text-red-500 mx-auto mb-4">⚠️</div>
+          <h3 className="text-lg font-medium text-foreground mb-2">Error loading problems</h3>
+          <p className="text-muted-foreground mb-4">{error}</p>
+          <Button onClick={fetchProblems} variant="outline">
+            Try Again
+          </Button>
+        </div>
       </div>
     )
   }
@@ -176,7 +193,11 @@ export default function ProblemGrid({ userId }: ProblemGridProps) {
         <div className="text-center py-12">
           <Target className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
           <h3 className="text-lg font-medium text-foreground mb-2">No problems found</h3>
-          <p className="text-muted-foreground">Try adjusting your filters or search terms.</p>
+          <p className="text-muted-foreground">
+            {problems.length === 0 
+              ? "No problems are available in the database." 
+              : "Try adjusting your filters or search terms."}
+          </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

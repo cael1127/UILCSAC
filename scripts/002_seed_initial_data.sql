@@ -1,5 +1,6 @@
 -- Seeding initial data for UIL CS Academy
 -- Seed initial data for UIL Computer Science Academy
+-- CORRECTED VERSION - All problems have consistent column structure
 
 -- Insert difficulty levels
 INSERT INTO difficulty_levels (name, level, color) VALUES
@@ -24,7 +25,7 @@ INSERT INTO categories (name, description, color) VALUES
 ('Implementation', 'Straightforward implementation problems', '#6b7280')
 ON CONFLICT (name) DO NOTHING;
 
--- Insert sample problems
+-- Insert sample problems (FIXED - All have consistent column structure)
 INSERT INTO problems (title, description, input_format, output_format, constraints, sample_input, sample_output, explanation, category_id, difficulty_id, time_limit, memory_limit, points) VALUES
 (
     'Two Sum',

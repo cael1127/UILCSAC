@@ -7,12 +7,14 @@ import { ArrowLeft, Clock, Trophy, Target, Code } from "lucide-react"
 import Link from "next/link"
 
 interface ProblemPageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 export default async function ProblemPage({ params }: ProblemPageProps) {
+  const { id } = await params
+  
   if (!isSupabaseConfigured) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
@@ -21,7 +23,7 @@ export default async function ProblemPage({ params }: ProblemPageProps) {
     )
   }
 
-  const supabase = createClient()
+  const supabase = await createClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
@@ -39,7 +41,7 @@ export default async function ProblemPage({ params }: ProblemPageProps) {
       difficulty_levels (name, level, color),
       user_progress!left (status, best_score, attempts)
     `)
-    .eq("id", params.id)
+    .eq("id", id)
     .eq("user_progress.user_id", user.id)
     .single()
 

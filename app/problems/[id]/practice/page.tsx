@@ -3,12 +3,14 @@ import { redirect, notFound } from "next/navigation"
 import PracticeInterface from "@/components/practice-interface"
 
 interface PracticePageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 export default async function PracticePage({ params }: PracticePageProps) {
+  const { id } = await params
+  
   if (!isSupabaseConfigured) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
@@ -17,7 +19,7 @@ export default async function PracticePage({ params }: PracticePageProps) {
     )
   }
 
-  const supabase = createClient()
+  const supabase = await createClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
@@ -36,7 +38,7 @@ export default async function PracticePage({ params }: PracticePageProps) {
       user_progress!left (status, best_score, attempts),
       test_cases (id, input, expected_output, is_sample, points)
     `)
-    .eq("id", params.id)
+    .eq("id", id)
     .eq("user_progress.user_id", user.id)
     .single()
 
