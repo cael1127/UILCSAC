@@ -133,11 +133,11 @@ export default function ProblemGrid({ userId }: ProblemGridProps) {
 
     switch (status) {
       case "solved":
-        return <Badge className="bg-green-500/10 text-green-700 border-green-500/20">Solved</Badge>
+        return <Badge className="bg-success/10 text-success border-success/20">Solved</Badge>
       case "attempted":
-        return <Badge className="bg-yellow-500/10 text-yellow-700 border-yellow-500/20">Attempted</Badge>
+        return <Badge className="bg-warning/10 text-warning border-warning/20">Attempted</Badge>
       default:
-        return <Badge variant="outline">Not Attempted</Badge>
+        return <Badge variant="outline" className="border-slate-gray/30 text-slate-gray">Not Attempted</Badge>
     }
   }
 
@@ -145,15 +145,15 @@ export default function ProblemGrid({ userId }: ProblemGridProps) {
     if (!difficulty) return null
 
     const colors: Record<string, string> = {
-      Beginner: "bg-green-500/10 text-green-700 border-green-500/20",
-      Easy: "bg-blue-500/10 text-blue-700 border-blue-500/20",
-      Medium: "bg-yellow-500/10 text-yellow-700 border-yellow-500/20",
-      Hard: "bg-red-500/10 text-red-700 border-red-500/20",
-      Expert: "bg-purple-500/10 text-purple-700 border-purple-500/20",
+      Beginner: "bg-success/10 text-success border-success/20",
+      Easy: "bg-info/10 text-info border-info/20",
+      Medium: "bg-warning/10 text-warning border-warning/20",
+      Hard: "bg-destructive/10 text-destructive border-destructive/20",
+      Expert: "bg-ut-orange/10 text-ut-orange border-ut-orange/20",
     }
 
     return (
-      <Badge className={colors[difficulty.name] || "bg-gray-500/10 text-gray-700 border-gray-500/20"}>
+      <Badge className={colors[difficulty.name] || "bg-slate-gray/10 text-slate-gray border-slate-gray/20"}>
         {difficulty.name}
       </Badge>
     )
@@ -163,8 +163,8 @@ export default function ProblemGrid({ userId }: ProblemGridProps) {
     return (
       <div className="space-y-6">
         <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading problems...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-ut-orange mx-auto mb-4"></div>
+          <p className="text-dim-gray">Loading problems...</p>
         </div>
       </div>
     )
@@ -174,10 +174,10 @@ export default function ProblemGrid({ userId }: ProblemGridProps) {
     return (
       <div className="space-y-6">
         <div className="text-center py-12">
-          <div className="h-12 w-12 text-red-500 mx-auto mb-4">⚠️</div>
-          <h3 className="text-lg font-medium text-foreground mb-2">Error loading problems</h3>
-          <p className="text-muted-foreground mb-4">{error}</p>
-          <Button onClick={fetchProblems} variant="outline">
+          <div className="h-12 w-12 text-destructive mx-auto mb-4">⚠️</div>
+          <h3 className="text-lg font-medium text-smoky-black mb-2">Error loading problems</h3>
+          <p className="text-dim-gray mb-4">{error}</p>
+          <Button onClick={fetchProblems} variant="outline" className="border-slate-gray text-slate-gray hover:bg-slate-gray hover:text-white">
             Try Again
           </Button>
         </div>
@@ -191,55 +191,72 @@ export default function ProblemGrid({ userId }: ProblemGridProps) {
 
       {filteredProblems.length === 0 ? (
         <div className="text-center py-12">
-          <Target className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-foreground mb-2">No problems found</h3>
-          <p className="text-muted-foreground">
+          <Target className="h-12 w-12 text-slate-gray mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-smoky-black mb-2">No problems found</h3>
+          <p className="text-dim-gray">
             {problems.length === 0 
               ? "No problems are available in the database." 
               : "Try adjusting your filters or search terms."}
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {filteredProblems.map((problem) => (
-            <Card key={problem.id} className="border-border hover:shadow-md transition-shadow">
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="space-y-1 flex-1">
-                    <CardTitle className="text-lg line-clamp-2">{problem.title}</CardTitle>
-                    <div className="flex items-center gap-2 flex-wrap">
-                      {getDifficultyBadge(problem.difficulty_levels)}
-                      {getStatusBadge(problem)}
-                    </div>
-                  </div>
+            <Card key={problem.id} className="card-ut hover-lift group">
+              <CardHeader className="pb-4">
+                <div className="flex items-center justify-between mb-3">
+                  {getDifficultyBadge(problem.difficulty_levels)}
+                  {getStatusBadge(problem)}
                 </div>
-                <CardDescription className="line-clamp-3">{problem.description.substring(0, 150)}...</CardDescription>
+                <CardTitle className="text-lg text-smoky-black group-hover:text-ut-orange transition-colors line-clamp-2">
+                  {problem.title}
+                </CardTitle>
+                <CardDescription className="text-dim-gray line-clamp-3">
+                  {problem.description}
+                </CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-1">
-                      <Trophy className="h-4 w-4" />
-                      <span>{problem.points} pts</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Clock className="h-4 w-4" />
-                      <span>{problem.time_limit / 1000}s</span>
-                    </div>
+              <CardContent className="pt-0">
+                {/* Problem Stats */}
+                <div className="flex items-center space-x-4 mb-4 text-sm text-dim-gray">
+                  <div className="flex items-center space-x-1">
+                    <Trophy className="h-4 w-4" />
+                    <span>{problem.points} pts</span>
+                  </div>
+                  <div className="flex items-center space-x-1">
+                    <Clock className="h-4 w-4" />
+                    <span>{Math.round(problem.time_limit / 1000)}s</span>
+                  </div>
+                  <div className="flex items-center space-x-1">
+                    <Target className="h-4 w-4" />
+                    <span>{problem.categories?.name || 'General'}</span>
                   </div>
                 </div>
 
-                {problem.categories && (
-                  <div className="mb-4">
-                    <Badge variant="outline" className="text-xs">
-                      {problem.categories.name}
-                    </Badge>
+                {/* User Progress */}
+                {problem.user_progress?.[0] && (
+                  <div className="mb-4 p-3 bg-slate-gray/5 rounded-lg border border-slate-gray/20">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-dim-gray">Best Score:</span>
+                      <span className="font-medium text-smoky-black">
+                        {problem.user_progress[0].best_score || 0}/{problem.points}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-sm mt-1">
+                      <span className="text-dim-gray">Attempts:</span>
+                      <span className="font-medium text-smoky-black">
+                        {problem.user_progress[0].attempts || 0}
+                      </span>
+                    </div>
                   </div>
                 )}
 
-                <Button asChild className="w-full">
+                {/* Action Button */}
+                <Button 
+                  asChild 
+                  className="w-full bg-ut-orange hover:bg-ut-orange/90 text-smoky-black font-semibold"
+                >
                   <Link href={`/problems/${problem.id}`}>
-                    Solve Problem
+                    {problem.user_progress?.[0] ? 'Continue Problem' : 'Start Problem'}
                     <ChevronRight className="h-4 w-4 ml-2" />
                   </Link>
                 </Button>

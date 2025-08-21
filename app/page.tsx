@@ -1,111 +1,133 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Code2, Trophy, BarChart3, Users } from "lucide-react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import AutoLogout from "@/components/auto-logout"
+import ThemeSwitcher from "@/components/theme-switcher"
 
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-background">
+      {/* Auto-logout component */}
+      <AutoLogout />
+      
+      {/* Theme Switcher */}
+      <ThemeSwitcher />
+      
       {/* Hero Section */}
-      <div className="relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-          <div className="text-center">
-            <div className="flex justify-center mb-8">
-              <div className="flex items-center justify-center w-16 h-16 bg-primary rounded-xl">
-                <Code2 className="h-8 w-8 text-primary-foreground" />
-              </div>
-            </div>
-            <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6">UIL CS Academy</h1>
-            <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
-              Master competitive programming with our comprehensive platform designed for UIL Computer Science
-              competitions. Practice problems, track progress, and excel in competitions.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground">
-                <Link href="/auth/sign-up">Get Started</Link>
-              </Button>
-              <Button asChild variant="outline" size="lg">
-                <Link href="/auth/login">Sign In</Link>
-              </Button>
-            </div>
+      <div className="gradient-ut text-white py-20 px-4">
+        <div className="max-w-4xl mx-auto text-center">
+          <h1 className="text-5xl md:text-6xl font-bold mb-6">
+            UIL CS Academy
+          </h1>
+          <p className="text-xl md:text-2xl mb-8 text-white/90 max-w-2xl mx-auto">
+            Master competitive programming with our comprehensive platform designed for UIL Computer Science competitions
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold">
+              <Link href="/auth/sign-up">Get Started</Link>
+            </Button>
+            <Button asChild variant="outline" size="lg" className="border-white text-white hover:bg-white hover:text-foreground">
+              <Link href="/auth/login">Start Learning</Link>
+            </Button>
           </div>
         </div>
       </div>
 
       {/* Features Section */}
-      <div className="py-24 bg-card">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="py-20 px-4">
+        <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-card-foreground mb-4">Everything you need to succeed</h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Our platform provides all the tools and resources you need to excel in UIL Computer Science competitions.
+            <h2 className="text-4xl font-bold text-foreground mb-4">
+              Why Choose UIL CS Academy?
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Comprehensive tools and resources to excel in competitive programming
             </p>
           </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <Card className="border-border bg-background">
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            <Card className="card-ut hover-lift">
               <CardHeader>
-                <div className="flex items-center justify-center w-12 h-12 bg-primary/10 rounded-lg mb-4">
-                  <Code2 className="h-6 w-6 text-primary" />
+                <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+                  <span className="text-2xl">💻</span>
                 </div>
-                <CardTitle className="text-xl">Practice Problems</CardTitle>
+                <CardTitle>Web-Based Java Execution</CardTitle>
                 <CardDescription>
-                  Extensive collection of UIL-style problems with detailed explanations and test cases.
+                  Write, test, and run Java code directly in your browser without local installation
                 </CardDescription>
               </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  Practice coding problems with instant feedback and real-time execution. Perfect for learning and competition preparation.
+                </p>
+              </CardContent>
             </Card>
 
-            <Card className="border-border bg-background">
+            <Card className="card-ut hover-lift">
               <CardHeader>
-                <div className="flex items-center justify-center w-12 h-12 bg-secondary/10 rounded-lg mb-4">
-                  <Trophy className="h-6 w-6 text-secondary" />
+                <div className="w-12 h-12 bg-secondary/10 rounded-lg flex items-center justify-center mb-4">
+                  <span className="text-2xl">📚</span>
                 </div>
-                <CardTitle className="text-xl">Competition Ready</CardTitle>
+                <CardTitle>Structured Learning Paths</CardTitle>
                 <CardDescription>
-                  Timed practice sessions that simulate real UIL competition environments.
+                  Progressive curriculum designed specifically for UIL competition success
                 </CardDescription>
               </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  Follow carefully crafted learning modules that build your skills from fundamentals to advanced competitive programming techniques.
+                </p>
+              </CardContent>
             </Card>
 
-            <Card className="border-border bg-background">
+            <Card className="card-ut hover-lift">
               <CardHeader>
-                <div className="flex items-center justify-center w-12 h-12 bg-primary/10 rounded-lg mb-4">
-                  <BarChart3 className="h-6 w-6 text-primary" />
+                <div className="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+                  <span className="text-2xl">🏆</span>
                 </div>
-                <CardTitle className="text-xl">Progress Analytics</CardTitle>
+                <CardTitle>Competition Practice</CardTitle>
                 <CardDescription>
-                  Track your improvement with detailed analytics and performance insights.
+                  Extensive problem database with real UIL-style questions
                 </CardDescription>
               </CardHeader>
-            </Card>
-
-            <Card className="border-border bg-background">
-              <CardHeader>
-                <div className="flex items-center justify-center w-12 h-12 bg-secondary/10 rounded-lg mb-4">
-                  <Users className="h-6 w-6 text-secondary" />
-                </div>
-                <CardTitle className="text-xl">Teacher Tools</CardTitle>
-                <CardDescription>
-                  Comprehensive tools for teachers to manage students and track class progress.
-                </CardDescription>
-              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  Access hundreds of practice problems with varying difficulty levels to prepare for any UIL Computer Science competition.
+                </p>
+              </CardContent>
             </Card>
           </div>
         </div>
       </div>
 
       {/* CTA Section */}
-      <div className="py-24">
-        <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-foreground mb-4">Ready to start your journey?</h2>
-          <p className="text-lg text-muted-foreground mb-8">
-            Join thousands of students already improving their competitive programming skills.
+      <div className="bg-foreground py-16 px-4">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-3xl md:text-4xl font-bold text-background mb-6">
+            Ready to Dominate UIL Competitions?
+          </h2>
+          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+            Join thousands of students who have improved their competitive programming skills with our platform
           </p>
-          <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground">
-            <Link href="/auth/sign-up">Create Your Account</Link>
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold">
+              <Link href="/auth/sign-up">Start Free Today</Link>
+              </Button>
+            <Button asChild variant="outline" size="lg" className="border-muted-foreground text-muted-foreground hover:bg-muted-foreground hover:text-background">
+              <Link href="/auth/login">Sign In</Link>
+            </Button>
+          </div>
         </div>
       </div>
+
+      {/* Footer */}
+      <footer className="bg-muted py-8 px-4">
+        <div className="max-w-6xl mx-auto text-center">
+          <p className="text-muted-foreground">
+            © 2024 UIL CS Academy. Built for competitive programming excellence.
+          </p>
+        </div>
+      </footer>
     </div>
   )
 }

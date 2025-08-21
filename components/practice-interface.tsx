@@ -126,47 +126,524 @@ export default function PracticeInterface({ problem, userId }: PracticeInterface
   // Set default code templates
   useEffect(() => {
     if (!code) {
-      const templates: Record<string, string> = {
-        java: `import java.util.*;
+      const templates = getProblemSpecificTemplates(language)
+      if (templates) {
+        setCode(templates)
+      }
+    }
+  }, [language])
+
+  const getProblemSpecificTemplates = (lang: string) => {
+    const title = problem.title.toLowerCase()
+    const description = problem.description.toLowerCase()
+    
+    if (lang === "java") {
+      // Two Sum variations
+      if (title.includes('two sum') || title.includes('2sum') || description.includes('two sum')) {
+        return `import java.util.*;
 
 public class Solution {
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
+    public int[] twoSum(int[] nums, int target) {
+        // TODO: Implement the two sum algorithm
+        // Given an array of integers nums and an integer target,
+        // return indices of the two numbers such that they add up to target.
+        // You may assume that each input would have exactly one solution,
+        // and you may not use the same element twice.
+        // You can return the answer in any order.
         
-        // Your code here
+        // Example 1:
+        // Input: nums = [2, 7, 11, 15], target = 9
+        // Output: [0, 1]
+        // Explanation: Because nums[0] + nums[1] == 9, we return [0, 1].
         
-        sc.close();
+        return new int[]{};
     }
-}`,
-        python: `# Your code here
-`,
-        cpp: `#include <iostream>
+    
+    // Main method for testing
+    public static void main(String[] args) {
+        Solution solution = new Solution();
+        
+        // Test cases
+        int[] nums1 = {2, 7, 11, 15};
+        int target1 = 9;
+        int[] result1 = solution.twoSum(nums1, target1);
+        System.out.println("Test 1: " + Arrays.toString(result1));
+        
+        int[] nums2 = {3, 2, 4};
+        int target2 = 6;
+        int[] result2 = solution.twoSum(nums2, target2);
+        System.out.println("Test 2: " + Arrays.toString(result2));
+    }
+}`
+      }
+      
+      // Palindrome variations
+      if (title.includes('palindrome') || description.includes('palindrome')) {
+        return `import java.util.*;
+
+public class Solution {
+    public boolean isPalindrome(String s) {
+        // TODO: Implement palindrome check
+        // A phrase is a palindrome if, after converting all uppercase letters into lowercase letters
+        // and removing all non-alphanumeric characters, it reads the same forward and backward.
+        // Alphanumeric characters include letters and numbers.
+        // Given a string s, return true if it is a palindrome, or false otherwise.
+        
+        // Example 1:
+        // Input: s = "A man, a plan, a canal: Panama"
+        // Output: true
+        // Explanation: "amanaplanacanalpanama" is a palindrome.
+        
+        return false;
+    }
+    
+    // Main method for testing
+    public static void main(String[] args) {
+        Solution solution = new Solution();
+        
+        // Test cases
+        String test1 = "A man, a plan, a canal: Panama";
+        System.out.println("Test 1: " + solution.isPalindrome(test1));
+        
+        String test2 = "race a car";
+        System.out.println("Test 2: " + solution.isPalindrome(test2));
+    }
+}`
+      }
+      
+      // Fibonacci variations
+      if (title.includes('fibonacci') || title.includes('fib') || description.includes('fibonacci')) {
+        return `import java.util.*;
+
+public class Solution {
+    public int fibonacci(int n) {
+        // TODO: Implement fibonacci calculation
+        // The Fibonacci numbers, commonly denoted F(n) form a sequence, called the Fibonacci sequence,
+        // such that each number is the sum of the two preceding ones, starting from 0 and 1.
+        // That is, F(0) = 0, F(1) = 1, F(n) = F(n - 1) + F(n - 2) for n > 1.
+        // Given n, calculate F(n).
+        
+        // Example 1:
+        // Input: n = 2
+        // Output: 1
+        // Explanation: F(2) = F(1) + F(0) = 1 + 0 = 1.
+        
+        return 0;
+    }
+    
+    // Main method for testing
+    public static void main(String[] args) {
+        Solution solution = new Solution();
+        
+        // Test cases
+        System.out.println("Test 1: F(0) = " + solution.fibonacci(0));
+        System.out.println("Test 2: F(1) = " + solution.fibonacci(1));
+        System.out.println("Test 3: F(5) = " + solution.fibonacci(5));
+        System.out.println("Test 4: F(10) = " + solution.fibonacci(10));
+    }
+}`
+      }
+      
+      // Array sorting problems
+      if (title.includes('array') || title.includes('sort') || description.includes('array') || description.includes('sort')) {
+        return `import java.util.*;
+
+public class Solution {
+    public int[] sortArray(int[] nums) {
+        // TODO: Implement array sorting algorithm
+        // Given an array of integers nums, sort the array in ascending order and return it.
+        // You must solve the problem without using any built-in sort functions.
+        
+        // Example 1:
+        // Input: nums = [5, 2, 3, 1]
+        // Output: [1, 2, 3, 5]
+        
+        return new int[]{};
+    }
+    
+    // Main method for testing
+    public static void main(String[] args) {
+        Solution solution = new Solution();
+        
+        // Test cases
+        int[] nums1 = {5, 2, 3, 1};
+        int[] result1 = solution.sortArray(nums1);
+        System.out.println("Test 1: " + Arrays.toString(result1));
+        
+        int[] nums2 = {5, 1, 1, 2, 0, 0};
+        int[] result2 = solution.sortArray(nums2);
+        System.out.println("Test 2: " + Arrays.toString(result2));
+    }
+}`
+      }
+      
+      // String problems
+      if (title.includes('string') || title.includes('reverse') || description.includes('string') || description.includes('reverse')) {
+        return `import java.util.*;
+
+public class Solution {
+    public String reverseString(String s) {
+        // TODO: Implement string reversal
+        // Write a function that reverses a string. The input string is given as an array of characters s.
+        // You must do this by modifying the input array in-place with O(1) extra memory.
+        
+        // Example 1:
+        // Input: s = "hello"
+        // Output: "olleh"
+        
+        return "";
+    }
+    
+    // Main method for testing
+    public static void main(String[] args) {
+        Solution solution = new Solution();
+        
+        // Test cases
+        String test1 = "hello";
+        System.out.println("Test 1: " + solution.reverseString(test1));
+        
+        String test2 = "Hannah";
+        System.out.println("Test 2: " + solution.reverseString(test2));
+    }
+}`
+      }
+      
+      // Math problems
+      if (title.includes('math') || title.includes('prime') || title.includes('factor') || description.includes('math') || description.includes('prime')) {
+        return `import java.util.*;
+
+public class Solution {
+    public boolean isPrime(int n) {
+        // TODO: Implement prime number check
+        // Given an integer n, return true if n is a prime number, and false otherwise.
+        // A prime number is a natural number greater than 1 that is not a product of two smaller natural numbers.
+        
+        // Example 1:
+        // Input: n = 2
+        // Output: true
+        // Explanation: 2 is a prime number.
+        
+        return false;
+    }
+    
+    // Main method for testing
+    public static void main(String[] args) {
+        Solution solution = new Solution();
+        
+        // Test cases
+        System.out.println("Test 1: isPrime(2) = " + solution.isPrime(2));
+        System.out.println("Test 2: isPrime(4) = " + solution.isPrime(4));
+        System.out.println("Test 3: isPrime(17) = " + solution.isPrime(17));
+    }
+}`
+      }
+      
+      // Tree/Graph problems
+      if (title.includes('tree') || title.includes('graph') || title.includes('node') || description.includes('tree') || description.includes('graph')) {
+        return `import java.util.*;
+
+public class Solution {
+    // Definition for a binary tree node.
+    public class TreeNode {
+        int val;
+        TreeNode left;
+        TreeNode right;
+        TreeNode() {}
+        TreeNode(int val) { this.val = val; }
+        TreeNode(int val, TreeNode left, TreeNode right) {
+            this.val = val;
+            this.left = left;
+            this.right = right;
+        }
+    }
+    
+    public int maxDepth(TreeNode root) {
+        // TODO: Implement maximum depth calculation
+        // Given the root of a binary tree, return its maximum depth.
+        // A binary tree's maximum depth is the number of nodes along the longest path
+        // from the root node down to the farthest leaf node.
+        
+        // Example 1:
+        // Input: root = [3,9,20,null,null,15,7]
+        // Output: 3
+        
+        return 0;
+    }
+    
+    // Main method for testing
+    public static void main(String[] args) {
+        Solution solution = new Solution();
+        
+        // Test cases
+        // Note: You'll need to create tree structures for testing
+        System.out.println("Test 1: maxDepth(null) = " + solution.maxDepth(null));
+    }
+}`
+      }
+      
+      // Dynamic Programming problems
+      if (title.includes('dp') || title.includes('dynamic') || title.includes('memo') || description.includes('dynamic programming')) {
+        return `import java.util.*;
+
+public class Solution {
+    public int climbStairs(int n) {
+        // TODO: Implement climbing stairs solution
+        // You are climbing a staircase. It takes n steps to reach the top.
+        // Each time you can either climb 1 or 2 steps. In how many distinct ways can you climb to the top?
+        
+        // Example 1:
+        // Input: n = 2
+        // Output: 2
+        // Explanation: There are two ways to climb to the top.
+        // 1. 1 step + 1 step
+        // 2. 2 steps
+        
+        return 0;
+    }
+    
+    // Main method for testing
+    public static void main(String[] args) {
+        Solution solution = new Solution();
+        
+        // Test cases
+        System.out.println("Test 1: climbStairs(2) = " + solution.climbStairs(2));
+        System.out.println("Test 2: climbStairs(3) = " + solution.climbStairs(3));
+        System.out.println("Test 3: climbStairs(4) = " + solution.climbStairs(4));
+    }
+}`
+      }
+      
+      // Default Java template
+      return `import java.util.*;
+
+public class Solution {
+    public String solve(String input) {
+        // TODO: Implement your solution here
+        // Problem: ${problem.title}
+        // 
+        // ${problem.description}
+        // 
+        // Return the expected output based on the problem description.
+        // Make sure to handle edge cases and validate your input.
+        
+        return "";
+    }
+    
+    // Main method for testing
+    public static void main(String[] args) {
+        Solution solution = new Solution();
+        
+        // Test cases
+        String test1 = "test input";
+        System.out.println("Test 1: " + solution.solve(test1));
+    }
+}`
+    }
+    
+    // Python templates
+    if (lang === "python") {
+      if (title.includes('two sum') || title.includes('2sum') || description.includes('two sum')) {
+        return `class Solution:
+    def twoSum(self, nums: List[int], target: int) -> List[int]:
+        # TODO: Implement the two sum algorithm
+        # Given an array of integers nums and an integer target,
+        # return indices of the two numbers such that they add up to target.
+        
+        return []
+    
+    # Test cases
+    def test(self):
+        solution = Solution()
+        nums1 = [2, 7, 11, 15]
+        target1 = 9
+        result1 = solution.twoSum(nums1, target1)
+        print(f"Test 1: {result1}")
+        
+        nums2 = [3, 2, 4]
+        target2 = 6
+        result2 = solution.twoSum(nums2, target2)
+        print(f"Test 2: {result2}")
+
+if __name__ == "__main__":
+    solution = Solution()
+    solution.test()`
+      }
+      
+      return `# TODO: Implement your solution here
+# Problem: ${problem.title}
+# 
+# ${problem.description}
+
+class Solution:
+    def solve(self, input_str: str) -> str:
+        # Your solution here
+        return ""
+
+# Test cases
+if __name__ == "__main__":
+    solution = Solution()
+    test_input = "test input"
+    result = solution.solve(test_input)
+    print(f"Result: {result}")`
+    }
+    
+    // C++ templates
+    if (lang === "cpp") {
+      if (title.includes('two sum') || title.includes('2sum') || description.includes('two sum')) {
+        return `#include <iostream>
 #include <vector>
 #include <algorithm>
 using namespace std;
 
-int main() {
-    // Your code here
-    
-    return 0;
-}`,
-        javascript: `// Your code here
-const readline = require('readline');
-const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-});
-
-rl.on('line', (input) => {
-    // Process input
-});`,
-      }
-
-      if (templates[language]) {
-        setCode(templates[language])
-      }
+class Solution {
+public:
+    vector<int> twoSum(vector<int>& nums, int target) {
+        // TODO: Implement the two sum algorithm
+        // Given an array of integers nums and an integer target,
+        // return indices of the two numbers such that they add up to target.
+        
+        return {};
     }
-  }, [language])
+    
+    // Test cases
+    void test() {
+        vector<int> nums1 = {2, 7, 11, 15};
+        int target1 = 9;
+        vector<int> result1 = twoSum(nums1, target1);
+        cout << "Test 1: [";
+        for (int i = 0; i < result1.size(); i++) {
+            cout << result1[i];
+            if (i < result1.size() - 1) cout << ", ";
+        }
+        cout << "]" << endl;
+    }
+};
+
+int main() {
+    Solution solution;
+    solution.test();
+    return 0;
+}`
+      }
+      
+      return `#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+class Solution {
+public:
+    string solve(string input) {
+        // TODO: Implement your solution here
+        // Problem: ${problem.title}
+        // 
+        // ${problem.description}
+        
+        return "";
+    }
+    
+    void test() {
+        string test_input = "test input";
+        string result = solve(test_input);
+        cout << "Result: " << result << endl;
+    }
+};
+
+int main() {
+    Solution solution;
+    solution.test();
+    return 0;
+}`
+    }
+    
+    // JavaScript templates
+    if (lang === "javascript") {
+      if (title.includes('two sum') || title.includes('2sum') || description.includes('two sum')) {
+        return `class Solution {
+    twoSum(nums, target) {
+        // TODO: Implement the two sum algorithm
+        // Given an array of integers nums and an integer target,
+        // return indices of the two numbers such that they add up to target.
+        
+        return [];
+    }
+    
+    // Test cases
+    test() {
+        const nums1 = [2, 7, 11, 15];
+        const target1 = 9;
+        const result1 = this.twoSum(nums1, target1);
+        console.log("Test 1:", result1);
+        
+        const nums2 = [3, 2, 4];
+        const target2 = 6;
+        const result2 = this.twoSum(nums2, target2);
+        console.log("Test 2:", result2);
+    }
+}
+
+// Run tests
+const solution = new Solution();
+solution.test();`
+      }
+      
+      return `// TODO: Implement your solution here
+// Problem: ${problem.title}
+// 
+// ${problem.description}
+
+class Solution {
+    solve(input) {
+        // Your solution here
+        return "";
+    }
+    
+    test() {
+        const testInput = "test input";
+        const result = this.solve(testInput);
+        console.log("Result:", result);
+    }
+}
+
+// Run tests
+const solution = new Solution();
+solution.test();`
+    }
+    
+    return null
+  }
+
+  const getTemplateType = () => {
+    const title = problem.title.toLowerCase()
+    const description = problem.description.toLowerCase()
+    
+    if (title.includes('two sum') || title.includes('2sum') || description.includes('two sum')) return "Two Sum Algorithm"
+    if (title.includes('palindrome') || description.includes('palindrome')) return "Palindrome Check"
+    if (title.includes('fibonacci') || title.includes('fib') || description.includes('fibonacci')) return "Fibonacci Sequence"
+    if (title.includes('array') || title.includes('sort') || description.includes('array') || description.includes('sort')) return "Array Sorting"
+    if (title.includes('string') || title.includes('reverse') || description.includes('string') || description.includes('reverse')) return "String Manipulation"
+    if (title.includes('math') || title.includes('prime') || description.includes('math') || description.includes('prime')) return "Mathematical Algorithm"
+    if (title.includes('tree') || title.includes('graph') || description.includes('tree') || description.includes('graph')) return "Tree/Graph Traversal"
+    if (title.includes('dp') || title.includes('dynamic') || description.includes('dynamic programming')) return "Dynamic Programming"
+    
+    return "Custom Problem"
+  }
+
+  const getFunctionSignature = () => {
+    const title = problem.title.toLowerCase()
+    const description = problem.description.toLowerCase()
+    
+    if (title.includes('two sum') || title.includes('2sum') || description.includes('two sum')) return "twoSum(int[] nums, int target)"
+    if (title.includes('palindrome') || description.includes('palindrome')) return "isPalindrome(String s)"
+    if (title.includes('fibonacci') || title.includes('fib') || description.includes('fibonacci')) return "fibonacci(int n)"
+    if (title.includes('array') || title.includes('sort') || description.includes('array') || description.includes('sort')) return "sortArray(int[] nums)"
+    if (title.includes('string') || title.includes('reverse') || description.includes('string') || description.includes('reverse')) return "reverseString(String s)"
+    if (title.includes('math') || title.includes('prime') || description.includes('math') || description.includes('prime')) return "isPrime(int n)"
+    if (title.includes('tree') || title.includes('graph') || description.includes('tree') || description.includes('graph')) return "maxDepth(TreeNode root)"
+    if (title.includes('dp') || title.includes('dynamic') || description.includes('dynamic programming')) return "climbStairs(int n)"
+    
+    return "solve(String input)"
+  }
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60)
@@ -416,6 +893,43 @@ rl.on('line', (input) => {
                 </div>
               </CardHeader>
               <CardContent className="flex-1 p-0">
+                <div className="p-4 border-b border-border">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="text-sm text-muted-foreground">
+                      <strong>Template:</strong> {getTemplateType()} • 
+                      <strong>Function:</strong> {getFunctionSignature()}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        onClick={() => {
+                          const template = getProblemSpecificTemplates(language)
+                          if (template) setCode(template)
+                        }}
+                        variant="outline"
+                        size="sm"
+                        className="flex items-center gap-2"
+                      >
+                        <ArrowLeft className="h-4 w-4" />
+                        Load Template
+                      </Button>
+                      <Button
+                        onClick={() => setCode("")}
+                        variant="ghost"
+                        size="sm"
+                        className="flex items-center gap-2"
+                      >
+                        <XCircle className="h-4 w-4" />
+                        Clear
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="bg-blue-50 dark:bg-blue-950/20 p-3 rounded-md border border-blue-200 dark:border-blue-800">
+                    <p className="text-xs text-blue-800 dark:text-blue-200">
+                      <strong>Instructions:</strong> Implement the required function that returns the correct answer. 
+                      Your code will be tested against multiple test cases. Make sure to handle edge cases properly.
+                    </p>
+                  </div>
+                </div>
                 <CodeEditor value={code} onChange={setCode} language={language} height="400px" theme={editorTheme} />
               </CardContent>
             </Card>

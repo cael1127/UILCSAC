@@ -101,16 +101,42 @@ export default function LearningPaths({ userId }: LearningPathsProps) {
     }
   }
 
-  const getDifficultyBadge = (level: number) => {
-    const difficulties = [
-      { name: "Beginner", color: "bg-green-500/10 text-green-700 border-green-500/20" },
-      { name: "Easy", color: "bg-blue-500/10 text-blue-700 border-blue-500/20" },
-      { name: "Medium", color: "bg-yellow-500/10 text-yellow-700 border-yellow-500/20" },
-      { name: "Hard", color: "bg-red-500/10 text-red-700 border-red-500/20" },
-      { name: "Expert", color: "bg-purple-500/10 text-purple-700 border-purple-500/20" }
-    ]
+  const getPathProgress = (pathId: string) => {
+    const progress = userProgress.find(p => p.learning_path_id === pathId)
+    const pathModulesCount = pathModules.filter(m => m.learning_path_id === pathId).length
+    
+    if (!progress) {
+      return {
+        isStarted: false,
+        isCompleted: false,
+        completed: 0,
+        total: pathModulesCount,
+        percentage: 0
+      }
+    }
 
-    const difficulty = difficulties[Math.min(level - 1, difficulties.length - 1)]
+    const completed = progress.completed_modules || 0
+    const total = pathModulesCount
+    const percentage = total > 0 ? Math.round((completed / total) * 100) : 0
+
+    return {
+      isStarted: true,
+      isCompleted: progress.is_completed || false,
+      completed,
+      total,
+      percentage
+    }
+  }
+
+  const getDifficultyBadge = (difficultyLevel: number) => {
+    const difficulties = {
+      1: { name: "Beginner", color: "bg-success/10 text-success border-success/20" },
+      2: { name: "Intermediate", color: "bg-warning/10 text-warning border-warning/20" },
+      3: { name: "Advanced", color: "bg-destructive/10 text-destructive border-destructive/20" }
+    }
+
+    const difficulty = difficulties[difficultyLevel as keyof typeof difficulties] || difficulties[1]
+
     return (
       <Badge className={difficulty.color}>
         {difficulty.name}
@@ -118,64 +144,46 @@ export default function LearningPaths({ userId }: LearningPathsProps) {
     )
   }
 
-  const getPathProgress = (pathId: string) => {
-    const progress = userProgress.find(p => p.learning_path_id === pathId)
-    if (!progress) return { completed: 0, total: 0, percentage: 0, isStarted: false }
-    
-    const totalModules = pathModules.filter(m => m.learning_path_id === pathId).length
-    const percentage = totalModules > 0 ? (progress.completed_modules / totalModules) * 100 : 0
-    
-    return {
-      completed: progress.completed_modules,
-      total: totalModules,
-      percentage: Math.round(percentage),
-      isStarted: true,
-      isCompleted: progress.is_completed
-    }
-  }
-
   const startLearningPath = async (pathId: string) => {
     try {
-      // Check if user already has progress for this path
-      const existingProgress = userProgress.find(p => p.learning_path_id === pathId)
-      
-      if (!existingProgress) {
-        // Get first module of the path
-        const firstModule = pathModules
-          .filter(m => m.learning_path_id === pathId)
-          .sort((a, b) => a.order_index - b.order_index)[0]
+      // Get the first module of this path
+      const firstModule = pathModules
+        .filter(m => m.learning_path_id === pathId)
+        .sort((a, b) => a.order_index - b.order_index)[0]
 
-        if (firstModule) {
-          const { error } = await supabase
-            .from("user_learning_progress")
-            .insert({
-              user_id: userId,
-              learning_path_id: pathId,
-              current_module_id: firstModule.id,
-              completed_modules: 0,
-              total_score: 0
-            })
-
-          if (error) {
-            console.error("Error starting learning path:", error)
-            alert(`Error starting learning path: ${error.message}`)
-            return
-          }
-
-          // Refresh progress
-          fetchLearningPaths()
-        } else {
-          console.error("No first module found for path:", pathId)
-          alert("Error: No modules found for this learning path")
-          return
-        }
+      if (!firstModule) {
+        console.error("No modules found for this learning path")
+        return
       }
 
-      // Navigate to the learning path overview
-      window.location.href = `/learning/${pathId}`
+      // Create or update user progress
+      const { error } = await supabase
+        .from("user_learning_progress")
+        .upsert({
+          user_id: userId,
+          learning_path_id: pathId,
+          current_module_id: firstModule.id,
+          completed_modules: 0,
+          total_score: 0,
+          started_at: new Date().toISOString(),
+          last_accessed: new Date().toISOString(),
+          is_completed: false
+        })
+
+      if (error) {
+        console.error("Error starting learning path:", error)
+        return
+      }
+
+      // Refresh the data
+      fetchLearningPaths()
+
+      // Navigate to the first module
+      if (typeof window !== 'undefined') {
+        window.location.href = `/learning/${pathId}/module/${firstModule.id}`
+      }
     } catch (error) {
       console.error("Error starting learning path:", error)
-      alert(`Error starting learning path: ${error instanceof Error ? error.message : 'Unknown error'}`)
     }
   }
 
@@ -183,8 +191,8 @@ export default function LearningPaths({ userId }: LearningPathsProps) {
     return (
       <div className="space-y-6">
         <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading learning paths...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-ut-orange mx-auto mb-4"></div>
+          <p className="text-dim-gray">Loading learning paths...</p>
         </div>
       </div>
     )
@@ -192,9 +200,9 @@ export default function LearningPaths({ userId }: LearningPathsProps) {
 
   return (
     <div className="space-y-6">
-      <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold text-foreground mb-4">Learning Paths</h2>
-        <p className="text-muted-foreground max-w-2xl mx-auto">
+      <div className="text-center">
+        <h2 className="text-2xl font-bold text-smoky-black mb-2">Structured Learning Paths</h2>
+        <p className="text-dim-gray max-w-2xl mx-auto">
           Choose a structured learning path to master Java programming from fundamentals to advanced algorithms. 
           Each path includes multiple choice questions, coding challenges, and hands-on practice.
         </p>
@@ -206,31 +214,31 @@ export default function LearningPaths({ userId }: LearningPathsProps) {
           const pathModulesCount = pathModules.filter(m => m.learning_path_id === path.id).length
           
           return (
-            <Card key={path.id} className="border-border hover:shadow-md transition-shadow">
+            <Card key={path.id} className="card-ut hover-lift">
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div className="space-y-2 flex-1">
                     <div className="flex items-center gap-2">
-                      <BookOpen className="h-5 w-5 text-primary" />
-                      <CardTitle className="text-xl">{path.name}</CardTitle>
+                      <BookOpen className="h-5 w-5 text-ut-orange" />
+                      <CardTitle className="text-xl text-smoky-black">{path.name}</CardTitle>
                     </div>
                     <div className="flex items-center gap-2">
                       {getDifficultyBadge(path.difficulty_level)}
-                      <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                      <div className="flex items-center gap-1 text-sm text-dim-gray">
                         <Clock className="h-4 w-4" />
                         <span>{path.estimated_hours}h</span>
                       </div>
-                      <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                      <div className="flex items-center gap-1 text-sm text-dim-gray">
                         <Trophy className="h-4 w-4" />
                         <span>{pathModulesCount} modules</span>
                       </div>
                     </div>
                   </div>
                   {progress.isCompleted && (
-                    <CheckCircle className="h-6 w-6 text-green-500" />
+                    <CheckCircle className="h-6 w-6 text-success" />
                   )}
                 </div>
-                <CardDescription className="text-base">
+                <CardDescription className="text-base text-dim-gray">
                   {path.description}
                 </CardDescription>
               </CardHeader>
@@ -239,11 +247,11 @@ export default function LearningPaths({ userId }: LearningPathsProps) {
                 {progress.isStarted && (
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
-                      <span>Progress</span>
-                      <span>{progress.completed}/{progress.total} modules</span>
+                      <span className="text-smoky-black">Progress</span>
+                      <span className="text-smoky-black">{progress.completed}/{progress.total} modules</span>
                     </div>
                     <Progress value={progress.percentage} className="h-2" />
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs text-dim-gray">
                       {progress.percentage}% complete
                     </p>
                   </div>
@@ -252,8 +260,25 @@ export default function LearningPaths({ userId }: LearningPathsProps) {
                 <div className="flex gap-2">
                   {progress.isStarted ? (
                     <Button 
-                      onClick={() => startLearningPath(path.id)}
-                      className="flex-1"
+                      onClick={() => {
+                        // Navigate to the current module the user is working on
+                        const userPathProgress = userProgress.find(p => p.learning_path_id === path.id)
+                        if (userPathProgress?.current_module_id) {
+                          if (typeof window !== 'undefined') {
+                            window.location.href = `/learning/${path.id}/module/${userPathProgress.current_module_id}`
+                          }
+                        } else {
+                          // Fallback to first module if no current module
+                          const firstModule = pathModules
+                            .filter(m => m.learning_path_id === path.id)
+                            .sort((a, b) => a.order_index - b.order_index)[0]
+                          
+                          if (firstModule && typeof window !== 'undefined') {
+                            window.location.href = `/learning/${path.id}/module/${firstModule.id}`
+                          }
+                        }
+                      }}
+                      className="flex-1 bg-ut-orange hover:bg-ut-orange/90 text-smoky-black font-semibold"
                       variant="outline"
                     >
                       <Play className="h-4 w-4 mr-2" />
@@ -262,14 +287,14 @@ export default function LearningPaths({ userId }: LearningPathsProps) {
                   ) : (
                     <Button 
                       onClick={() => startLearningPath(path.id)}
-                      className="flex-1"
+                      className="flex-1 bg-ut-orange hover:bg-ut-orange/90 text-smoky-black font-semibold"
                     >
                       <Play className="h-4 w-4 mr-2" />
                       Start Learning
                     </Button>
                   )}
                   
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" className="border-slate-gray text-slate-gray hover:bg-slate-gray hover:text-white">
                     <BookOpen className="h-4 w-4 mr-2" />
                     Preview
                   </Button>
@@ -282,9 +307,9 @@ export default function LearningPaths({ userId }: LearningPathsProps) {
 
       {learningPaths.length === 0 && (
         <div className="text-center py-12">
-          <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-foreground mb-2">No learning paths available</h3>
-          <p className="text-muted-foreground">Learning paths will be available soon.</p>
+          <BookOpen className="h-12 w-12 text-slate-gray mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-smoky-black mb-2">No learning paths available</h3>
+          <p className="text-dim-gray">Learning paths will be available soon.</p>
         </div>
       )}
     </div>

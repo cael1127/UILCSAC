@@ -9,3 +9,16 @@ export const isSupabaseConfigured =
 
 // Create a singleton instance of the Supabase client for Client Components
 export const supabase = createClientComponentClient()
+
+// Add debugging for development
+if (process.env.NODE_ENV === 'development') {
+  console.log('Supabase Configuration Status:', {
+    url: process.env.NEXT_PUBLIC_SUPABASE_URL ? '✅ Set' : '❌ Missing',
+    anonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? '✅ Set' : '❌ Missing',
+    configured: isSupabaseConfigured
+  })
+  
+  if (isSupabaseConfigured) {
+    console.log('Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL)
+  }
+}

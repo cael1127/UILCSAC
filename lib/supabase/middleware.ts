@@ -35,23 +35,42 @@ export async function updateSession(request: NextRequest) {
   // Refresh session if expired - required for Server Components
   await supabase.auth.getSession()
 
-  // Protected routes - redirect to login if not authenticated
+  // Define route patterns
   const isAuthRoute =
     request.nextUrl.pathname.startsWith("/auth/login") ||
     request.nextUrl.pathname.startsWith("/auth/sign-up") ||
+    request.nextUrl.pathname.startsWith("/auth/sign-up-confirmation") ||
+    request.nextUrl.pathname.startsWith("/auth/sign-in-success") ||
     request.nextUrl.pathname === "/auth/callback"
 
   const isPublicRoute = request.nextUrl.pathname === "/"
+  const isApiRoute = request.nextUrl.pathname.startsWith("/api/")
+  const isStaticRoute = request.nextUrl.pathname.startsWith("/_next/") ||
+    request.nextUrl.pathname.startsWith("/favicon.ico")
 
-  if (!isAuthRoute && !isPublicRoute) {
-    const {
-      data: { session },
-    } = await supabase.auth.getSession()
+  // Skip middleware for static and API routes
+  if (isStaticRoute || isApiRoute) {
+    return res
+  }
 
-    if (!session) {
-      const redirectUrl = new URL("/auth/login", request.url)
-      return NextResponse.redirect(redirectUrl)
-    }
+  // For auth routes, don't check authentication
+  if (isAuthRoute) {
+    return res
+  }
+
+  // For public routes, allow access but don't redirect
+  if (isPublicRoute) {
+    return res
+  }
+
+  // For all other routes, check authentication
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+
+  if (!session) {
+    const redirectUrl = new URL("/auth/login", request.url)
+    return NextResponse.redirect(redirectUrl)
   }
 
   return res

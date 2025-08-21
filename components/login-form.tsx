@@ -15,7 +15,7 @@ export default function LoginForm() {
   const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [message, setMessage] = useState<string | null>(null)
+
   const router = useRouter()
 
   useEffect(() => {
@@ -23,18 +23,18 @@ export default function LoginForm() {
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession()
       if (session) {
-        router.push("/dashboard")
+        // Don't auto-redirect, let user choose to stay or go to dashboard
+        console.log("User already has an active session")
       }
     }
     
     checkSession()
-  }, [router])
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError(null)
-    setMessage(null)
 
     try {
       const { error } = await supabase.auth.signInWithPassword({
@@ -45,8 +45,8 @@ export default function LoginForm() {
       if (error) {
         setError(error.message)
       } else {
-        setMessage("Login successful! Redirecting...")
-        router.push("/dashboard")
+        // Redirect to success page
+        router.push("/auth/sign-in-success")
       }
     } catch (error) {
       setError("An unexpected error occurred")
@@ -71,11 +71,7 @@ export default function LoginForm() {
             </Alert>
           )}
           
-          {message && (
-            <Alert>
-              <AlertDescription>{message}</AlertDescription>
-            </Alert>
-          )}
+
 
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
@@ -105,11 +101,19 @@ export default function LoginForm() {
             {loading ? "Signing in..." : "Sign In"}
           </Button>
 
-          <div className="text-center text-sm">
-            <span className="text-muted-foreground">Don't have an account? </span>
-            <Link href="/auth/sign-up" className="text-primary hover:underline">
-              Sign up
-            </Link>
+          <div className="text-center text-sm space-y-2">
+            <div>
+              <span className="text-muted-foreground">Don't have an account? </span>
+              <Link href="/auth/sign-up" className="text-primary hover:underline">
+                Sign up
+              </Link>
+            </div>
+            <div>
+              <span className="text-muted-foreground">Already logged in? </span>
+              <Link href="/dashboard" className="text-primary hover:underline">
+                Go to Dashboard
+              </Link>
+            </div>
           </div>
         </form>
       </CardContent>

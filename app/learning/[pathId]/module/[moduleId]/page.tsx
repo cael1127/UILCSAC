@@ -12,6 +12,8 @@ interface LearningModulePageProps {
 export default async function LearningModulePage({ params }: LearningModulePageProps) {
   const { pathId, moduleId } = await params
   
+  console.log("Learning module page params:", { pathId, moduleId })
+  
   // Get the user from the server
   const supabase = await createClient()
   const {
@@ -23,18 +25,46 @@ export default async function LearningModulePage({ params }: LearningModulePageP
     redirect("/auth/login")
   }
 
+  // Verify the module exists
+  const { data: module, error: moduleError } = await supabase
+    .from("path_modules")
+    .select("*")
+    .eq("id", moduleId)
+    .eq("learning_path_id", pathId)
+    .single()
+
+  console.log("Module query result:", { module, moduleError })
+
+  if (moduleError || !module) {
+    console.error("Module not found:", moduleError)
+    redirect("/dashboard")
+  }
+
   // Verify the user has access to this learning path
-  const { data: userProgress } = await supabase
+  const { data: userProgress, error: userProgressError } = await supabase
     .from("user_learning_progress")
     .select("*")
     .eq("user_id", user.id)
     .eq("learning_path_id", pathId)
     .single()
 
-  // If user hasn't started this path, redirect to dashboard
-  if (!userProgress) {
+  // If there's an error or user hasn't started this path, redirect to dashboard
+  if (userProgressError || !userProgress) {
+    console.error("User progress error:", userProgressError)
     redirect("/dashboard")
   }
+
+  // Debug: Check if questions exist for this module
+  const { data: questionCount, error: questionCountError } = await supabase
+    .from("questions")
+    .select("id", { count: "exact" })
+    .eq("path_module_id", moduleId)
+    .eq("is_active", true)
+
+  console.log("Question count for module:", { 
+    count: questionCount?.length || 0, 
+    error: questionCountError 
+  })
 
   return (
     <div className="min-h-screen bg-background">

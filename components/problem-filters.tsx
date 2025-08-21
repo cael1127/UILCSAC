@@ -79,18 +79,18 @@ export default function ProblemFilters({ onFiltersChange }: ProblemFiltersProps)
       <div className="flex flex-col sm:flex-row gap-4">
         {/* Search */}
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-dim-gray" />
           <Input
             placeholder="Search problems..."
             value={filters.search}
             onChange={(e) => updateFilter("search", e.target.value)}
-            className="pl-10 bg-input border-border"
+            className="pl-10 bg-white border-slate-gray/20 focus:border-ut-orange"
           />
         </div>
 
         {/* Category Filter */}
         <Select value={filters.category} onValueChange={(value) => updateFilter("category", value)}>
-          <SelectTrigger className="w-full sm:w-48 bg-input border-border">
+          <SelectTrigger className="w-full sm:w-48 bg-white border-slate-gray/20 focus:border-ut-orange">
             <SelectValue placeholder="All Categories" />
           </SelectTrigger>
           <SelectContent>
@@ -105,7 +105,7 @@ export default function ProblemFilters({ onFiltersChange }: ProblemFiltersProps)
 
         {/* Difficulty Filter */}
         <Select value={filters.difficulty} onValueChange={(value) => updateFilter("difficulty", value)}>
-          <SelectTrigger className="w-full sm:w-48 bg-input border-border">
+          <SelectTrigger className="w-full sm:w-48 bg-white border-slate-gray/20 focus:border-ut-orange">
             <SelectValue placeholder="All Difficulties" />
           </SelectTrigger>
           <SelectContent>
@@ -120,53 +120,74 @@ export default function ProblemFilters({ onFiltersChange }: ProblemFiltersProps)
 
         {/* Status Filter */}
         <Select value={filters.status} onValueChange={(value) => updateFilter("status", value)}>
-          <SelectTrigger className="w-full sm:w-48 bg-input border-border">
-            <SelectValue placeholder="All Status" />
+          <SelectTrigger className="w-full sm:w-48 bg-white border-slate-gray/20 focus:border-ut-orange">
+            <SelectValue placeholder="All Statuses" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Status</SelectItem>
+            <SelectItem value="all">All Statuses</SelectItem>
             <SelectItem value="not_attempted">Not Attempted</SelectItem>
             <SelectItem value="attempted">Attempted</SelectItem>
             <SelectItem value="solved">Solved</SelectItem>
           </SelectContent>
         </Select>
-
-        {/* Clear Filters */}
-        {hasActiveFilters && (
-          <Button variant="outline" onClick={clearFilters} className="flex items-center gap-2 bg-transparent">
-            <X className="h-4 w-4" />
-            Clear
-          </Button>
-        )}
       </div>
 
-      {/* Active Filters */}
+      {/* Active Filters Display */}
       {hasActiveFilters && (
-        <div className="flex flex-wrap gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-sm text-dim-gray">Active filters:</span>
           {filters.search && (
-            <Badge variant="secondary" className="flex items-center gap-1">
-              Search: {filters.search}
-              <X className="h-3 w-3 cursor-pointer" onClick={() => updateFilter("search", "")} />
+            <Badge variant="outline" className="border-ut-orange/30 text-ut-orange">
+              Search: "{filters.search}"
+              <button
+                onClick={() => updateFilter("search", "")}
+                className="ml-2 hover:bg-ut-orange/10 rounded-full p-1"
+              >
+                <X className="h-3 w-3" />
+              </button>
             </Badge>
           )}
           {filters.category !== "all" && (
-            <Badge variant="secondary" className="flex items-center gap-1">
-              {categories.find((c) => c.id === filters.category)?.name}
-              <X className="h-3 w-3 cursor-pointer" onClick={() => updateFilter("category", "all")} />
+            <Badge variant="outline" className="border-slate-gray/30 text-slate-gray">
+              Category: {categories.find(c => c.id === filters.category)?.name}
+              <button
+                onClick={() => updateFilter("category", "all")}
+                className="ml-2 hover:bg-slate-gray/10 rounded-full p-1"
+              >
+                <X className="h-3 w-3" />
+              </button>
             </Badge>
           )}
           {filters.difficulty !== "all" && (
-            <Badge variant="secondary" className="flex items-center gap-1">
-              {difficulties.find((d) => d.id === filters.difficulty)?.name}
-              <X className="h-3 w-3 cursor-pointer" onClick={() => updateFilter("difficulty", "all")} />
+            <Badge variant="outline" className="border-slate-gray/30 text-slate-gray">
+              Difficulty: {difficulties.find(d => d.id === filters.difficulty)?.name}
+              <button
+                onClick={() => updateFilter("difficulty", "all")}
+                className="ml-2 hover:bg-slate-gray/10 rounded-full p-1"
+              >
+                <X className="h-3 w-3" />
+              </button>
             </Badge>
           )}
           {filters.status !== "all" && (
-            <Badge variant="secondary" className="flex items-center gap-1">
-              {filters.status.replace("_", " ").replace(/\b\w/g, (l) => l.toUpperCase())}
-              <X className="h-3 w-3 cursor-pointer" onClick={() => updateFilter("status", "all")} />
+            <Badge variant="outline" className="border-slate-gray/30 text-slate-gray">
+              Status: {filters.status.replace("_", " ").replace(/\b\w/g, l => l.toUpperCase())}
+              <button
+                onClick={() => updateFilter("status", "all")}
+                className="ml-2 hover:bg-slate-gray/10 rounded-full p-1"
+              >
+                <X className="h-3 w-3" />
+              </button>
             </Badge>
           )}
+          <Button
+            onClick={clearFilters}
+            variant="outline"
+            size="sm"
+            className="border-slate-gray text-slate-gray hover:bg-slate-gray hover:text-white"
+          >
+            Clear All
+          </Button>
         </div>
       )}
     </div>

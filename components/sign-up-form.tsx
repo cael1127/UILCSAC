@@ -18,7 +18,7 @@ export default function SignUpForm() {
   const [lastName, setLastName] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [message, setMessage] = useState<string | null>(null)
+
   const router = useRouter()
 
   useEffect(() => {
@@ -26,18 +26,18 @@ export default function SignUpForm() {
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession()
       if (session) {
-        router.push("/dashboard")
+        // Don't auto-redirect, let user choose to stay or go to dashboard
+        console.log("User already has an active session")
       }
     }
     
     checkSession()
-  }, [router])
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError(null)
-    setMessage(null)
 
     // Validate passwords match
     if (password !== confirmPassword) {
@@ -51,6 +51,7 @@ export default function SignUpForm() {
         email,
         password,
         options: {
+          emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/auth/sign-up-confirmation`,
           data: {
             first_name: firstName,
             last_name: lastName,
@@ -61,13 +62,8 @@ export default function SignUpForm() {
       if (signUpError) {
         setError(signUpError.message)
       } else {
-        setMessage("Account created successfully! Please check your email to verify your account.")
-        // Clear form
-        setEmail("")
-        setPassword("")
-        setConfirmPassword("")
-        setFirstName("")
-        setLastName("")
+        // Redirect to confirmation page
+        router.push("/auth/sign-up-confirmation")
       }
     } catch (error) {
       setError("An unexpected error occurred")
@@ -92,11 +88,7 @@ export default function SignUpForm() {
             </Alert>
           )}
           
-          {message && (
-            <Alert>
-              <AlertDescription>{message}</AlertDescription>
-            </Alert>
-          )}
+
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
@@ -164,11 +156,19 @@ export default function SignUpForm() {
             {loading ? "Creating account..." : "Create Account"}
           </Button>
 
-          <div className="text-center text-sm">
-            <span className="text-muted-foreground">Already have an account? </span>
-            <Link href="/auth/login" className="text-primary hover:underline">
-              Sign in
-            </Link>
+          <div className="text-center text-sm space-y-2">
+            <div>
+              <span className="text-muted-foreground">Already have an account? </span>
+              <Link href="/auth/login" className="text-primary hover:underline">
+                Sign in
+              </Link>
+            </div>
+            <div>
+              <span className="text-muted-foreground">Already logged in? </span>
+              <Link href="/dashboard" className="text-primary hover:underline">
+                Go to Dashboard
+              </Link>
+            </div>
           </div>
         </form>
       </CardContent>
