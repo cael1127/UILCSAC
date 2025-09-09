@@ -1,5 +1,5 @@
 [build]
-  command = "pnpm install && pnpm run build"
+  command = "pnpm install && NEXT_PUBLIC_SUPABASE_URL=https://placeholder.supabase.co NEXT_PUBLIC_SUPABASE_ANON_KEY=placeholder-key pnpm run build"
   publish = ".next"
 
 [build.environment]
