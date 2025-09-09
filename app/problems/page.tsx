@@ -94,7 +94,7 @@ export default async function ProblemsPage() {
                </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Categories</SelectItem>
-                {categories?.map((category) => (
+                {categories?.map((category: { id: string; name: string }) => (
                   <SelectItem key={category.id} value={category.id}>
                     {category.name}
                   </SelectItem>
@@ -106,7 +106,16 @@ export default async function ProblemsPage() {
 
         {/* Problems Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {problems?.map((problem) => (
+          {problems?.map((problem: {
+            id: string;
+            title: string;
+            description: string;
+            difficulty_level: number;
+            time_limit?: number;
+            programming_language?: string;
+            points?: number;
+            categories?: string;
+          }) => (
             <Card key={problem.id} className="card-ut hover-lift group">
               <CardHeader className="pb-4">
                 <div className="flex items-center justify-between mb-3">
@@ -148,7 +157,7 @@ export default async function ProblemsPage() {
                 {/* Categories */}
                 {problem.categories && (
                   <div className="flex flex-wrap gap-2 mb-4">
-                    {problem.categories.split(',').slice(0, 3).map((category, index) => (
+                    {problem.categories.split(',').slice(0, 3).map((category: string, index: number) => (
                       <Badge key={index} variant="outline" className="text-xs border-[var(--border)] text-[var(--muted-foreground)]">
                         {category.trim()}
                       </Badge>
