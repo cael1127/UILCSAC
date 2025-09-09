@@ -39,6 +39,11 @@ class QueryCache {
   delete(key: string): void {
     this.cache.delete(key)
   }
+
+  // Expose keys iterator for safe external iteration without leaking internal map
+  keys(): IterableIterator<string> {
+    return this.cache.keys()
+  }
 }
 
 // Global cache instance
@@ -117,7 +122,7 @@ export class DatabaseOptimizer {
   clearCache(pattern?: string): void {
     if (pattern) {
       // Clear entries matching pattern
-      for (const key of this.cache.cache.keys()) {
+      for (const key of this.cache.keys()) {
         if (key.includes(pattern)) {
           this.cache.delete(key)
         }
