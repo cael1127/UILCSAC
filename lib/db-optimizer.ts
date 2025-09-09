@@ -139,7 +139,7 @@ export const optimizedQueries = {
   async getLearningPaths() {
     const optimizer = DatabaseOptimizer.getInstance()
     return optimizer.queryWithCache(
-      () => supabase.from('learning_paths').select('*').order('order_index'),
+      async () => await supabase.from('learning_paths').select('*').order('order_index'),
       'learning_paths',
       10 * 60 * 1000 // 10 minutes cache
     )
@@ -152,12 +152,12 @@ export const optimizedQueries = {
     const queries = [
       {
         key: `module_${moduleId}`,
-        queryFn: () => supabase.from('path_modules').select('*').eq('id', moduleId).single(),
+        queryFn: async () => await supabase.from('path_modules').select('*').eq('id', moduleId).single(),
         ttl: 5 * 60 * 1000
       },
       {
         key: `questions_${moduleId}`,
-        queryFn: () => supabase
+        queryFn: async () => await supabase
           .from('questions')
           .select(`
             *
@@ -179,7 +179,7 @@ export const optimizedQueries = {
     // Batch all question options queries
     const queries = questionIds.map(questionId => ({
       key: `options_${questionId}`,
-      queryFn: () => supabase
+      queryFn: async () => await supabase
         .from('question_options')
         .select('*')
         .eq('question_id', questionId)
