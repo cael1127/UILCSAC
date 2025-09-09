@@ -7,29 +7,23 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
-import { ArrowLeft, ArrowRight, CheckCircle, XCircle, Play, RotateCcw, Zap, Clock } from 'lucide-react';
-import CodeEditor from '@/components/code-editor';
-import { WebExecutionEditor } from '@/components/web-execution-editor';
+import { ArrowLeft, ArrowRight, CheckCircle, XCircle, Play, RotateCcw, Zap, Clock, Code } from 'lucide-react';
+import { UnifiedJavaIDE } from '@/components/unified-java-ide';
 import { supabase } from '@/lib/supabase/client';
 import { LoadingSpinner, Skeleton, ContentLoader } from '@/components/ui/loading-spinner';
 
 interface Question {
   id: string;
-  title: string;
-  description: string;
   question_text: string;
-  question_types: { name: string };
-  points: number;
+  question_type: string;
+  correct_answer?: string;
+  explanation?: string;
   order_index: number;
-  concept_tags?: string[];
-  difficulty_level?: number;
-  time_limit_seconds?: number;
-  max_attempts?: number;
-  supports_web_execution?: boolean;
-  web_execution_template?: string;
-  expected_function_signature?: string;
+  points: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
   question_options?: QuestionOption[];
-  explanation?: string; // Added for full explanation
 }
 
 interface QuestionOption {
@@ -52,9 +46,10 @@ interface ModuleInterfaceProps {
   userId: string;
 }
 
-// Lazy load heavy components
-const LazyCodeEditor = React.lazy(() => import('@/components/code-editor'));
-const LazyWebExecutionEditor = React.lazy(() => import('@/components/web-execution-editor'));
+// Lazy load heavy components only when needed
+const LazyUnifiedJavaIDE = React.lazy(() => 
+  import('@/components/unified-java-ide').then(module => ({ default: module.UnifiedJavaIDE }))
+);
 
 // Memoized question display component
 const QuestionDisplay = memo(({ question, onAnswerSelect, selectedAnswer }: {
@@ -64,19 +59,15 @@ const QuestionDisplay = memo(({ question, onAnswerSelect, selectedAnswer }: {
 }) => (
   <div className="space-y-4">
     <div className="space-y-2">
-      <h3 className="text-lg font-semibold text-smoky-black">{question.title}</h3>
-      <p className="text-dim-gray">{question.question_text}</p>
-      {question.description && (
-        <p className="text-sm text-dim-gray">{question.description}</p>
-      )}
+      <h3 className="text-lg font-semibold text-[var(--foreground)]">{question.question_text}</h3>
     </div>
     
-    {question.question_types.name === 'multiple_choice' && question.question_options && (
+    {question.question_type === 'multiple_choice' && question.question_options && (
       <div className="space-y-2">
         {question.question_options.map((option) => (
           <label
             key={option.id}
-            className="flex items-center space-x-2 p-3 border border-slate-gray/20 rounded-lg cursor-pointer hover:bg-slate-gray/5 transition-colors bg-white"
+            className="flex items-center space-x-2 p-3 border border-[var(--border)] rounded-lg cursor-pointer hover:bg-[var(--muted)]/5 transition-colors bg-[var(--card)]"
           >
             <input
               type="radio"
@@ -88,14 +79,14 @@ const QuestionDisplay = memo(({ question, onAnswerSelect, selectedAnswer }: {
             />
             <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
               selectedAnswer === option.id 
-                ? 'border-ut-orange bg-ut-orange' 
-                : 'border-slate-gray/30'
+                ? 'border-[var(--primary)] bg-[var(--primary)]' 
+                : 'border-[var(--border)]'
             }`}>
               {selectedAnswer === option.id && (
-                <div className="w-2 h-2 rounded-full bg-smoky-black" />
+                <div className="w-2 h-2 rounded-full bg-[var(--primary-foreground)]" />
               )}
             </div>
-            <span className="flex-1 text-smoky-black">{option.option_text}</span>
+                              <span className="flex-1 text-[var(--foreground)]">{option.option_text}</span>
           </label>
         ))}
       </div>
@@ -116,6 +107,10 @@ export default function ModuleInterface({ moduleId, userId }: ModuleInterfacePro
   const [showResults, setShowResults] = useState(false);
   const [score, setScore] = useState(0);
   const [totalScore, setTotalScore] = useState(0);
+  const [showAnswerFeedback, setShowAnswerFeedback] = useState(false);
+  const [lastAnswerCorrect, setLastAnswerCorrect] = useState(false);
+  const [lastAnswerExplanation, setLastAnswerExplanation] = useState('');
+  const [nextModule, setNextModule] = useState<PathModule | null>(null);
 
   // Memoized calculations
   const progress = useMemo(() => {
@@ -126,6 +121,42 @@ export default function ModuleInterface({ moduleId, userId }: ModuleInterfacePro
   const totalScoreCalc = useMemo(() => {
     return questions.reduce((sum, q) => sum + q.points, 0);
   }, [questions]);
+
+  // IDE visibility logic
+  const shouldShowIDE = useMemo(() => {
+    if (!questions[currentQuestionIndex] ) return false;
+    const currentQuestion = questions[currentQuestionIndex];
+    
+    // Debug log to see what question types we have
+    console.log('🔍 Question Debug:', {
+      type: currentQuestion.question_type,
+      title: currentQuestion.question_text,
+      isMultipleChoice: currentQuestion.question_type === 'multiple_choice',
+      shouldShowIDE: currentQuestion.question_type !== 'multiple_choice'
+    });
+    
+    // Show IDE for any question that is NOT multiple choice
+    // This includes written problems, programming, coding, etc.
+    // Also show IDE if question type is undefined/null (fallback case)
+    const questionType = currentQuestion.question_type?.toLowerCase();
+    
+    // Explicitly include common written problem types
+    if (questionType === 'written' || questionType === 'essay' || questionType === 'text' || 
+        questionType === 'programming' || questionType === 'coding' || questionType === 'algorithm') {
+      return true;
+    }
+    
+    // Show IDE for any non-multiple choice question
+    const finalResult = questionType !== 'multiple_choice';
+    console.log('🎯 Final IDE decision:', finalResult);
+    return finalResult;
+  }, [questions, currentQuestionIndex]);
+
+  const isMultipleChoice = useMemo(() => {
+    if (!questions[currentQuestionIndex] ) return false;
+    const currentQuestion = questions[currentQuestionIndex];
+    return currentQuestion.question_type === 'multiple_choice';
+  }, [questions, currentQuestionIndex]);
 
   // Helper functions
   const randomizeOptions = useCallback((options: QuestionOption[]) => {
@@ -154,6 +185,78 @@ export default function ModuleInterface({ moduleId, userId }: ModuleInterfacePro
     return question.question_options?.find(opt => opt.is_correct)?.option_text || '';
   }, []);
 
+  const getDefaultJavaTemplate = useCallback((question: Question) => {
+    // Generate a basic Java template based on question content
+    const questionText = (question.question_text || '').toLowerCase();
+    const title = (question.question_text || '').toLowerCase();
+    
+    if (questionText.includes('array') || questionText.includes('list') || title.includes('array')) {
+      return `public class Solution {
+    public static int[] solve(int[] input) {
+        // Your code here
+        // Modify this method to solve the problem
+        return input;
+    }
+    
+    public static void main(String[] args) {
+        // Test your solution
+        int[] testInput = {1, 2, 3, 4, 5};
+        int[] result = solve(testInput);
+        System.out.println("Result: " + java.util.Arrays.toString(result));
+    }
+}`;
+    }
+    
+    if (questionText.includes('string') || questionText.includes('text') || title.includes('string')) {
+      return `public class Solution {
+    public static String solve(String input) {
+        // Your code here
+        // Modify this method to solve the problem
+        return input;
+    }
+    
+    public static void main(String[] args) {
+        // Test your solution
+        String testInput = "test";
+        String result = solve(testInput);
+        System.out.println("Result: " + result);
+    }
+}`;
+    }
+    
+    if (questionText.includes('math') || questionText.includes('calculate') || questionText.includes('sum')) {
+      return `public class Solution {
+    public static int solve(int input) {
+        // Your code here
+        // Modify this method to solve the problem
+        return input;
+    }
+    
+    public static void main(String[] args) {
+        // Test your solution
+        int testInput = 10;
+        int result = solve(testInput);
+        System.out.println("Result: " + result);
+    }
+}`;
+    }
+    
+    // Default template for any question
+    return `public class Solution {
+    public static Object solve(Object input) {
+        // Your code here
+        // Modify this method to solve the problem
+        return input;
+        }
+    
+    public static void main(String[] args) {
+        // Test your solution
+        System.out.println("Implement your solution in the solve method");
+        System.out.println("You can modify the input type and return type as needed");
+    }
+}`;
+  }, []);
+
   const generateFullExplanation = useCallback((question: Question, userAnswer: string) => {
     const correctAnswer = getCorrectAnswer(question);
     const isCorrect = userAnswer === correctAnswer;
@@ -178,6 +281,37 @@ export default function ModuleInterface({ moduleId, userId }: ModuleInterfacePro
     }
   }, [currentQuestionIndex, questions.length]);
 
+  // Load user's progress for this module
+  const loadUserProgress = useCallback(async (learningPathId: string, moduleId: string, questionsList: any[]) => {
+    if (!userId || !questionsList || questionsList.length === 0) return;
+
+    try {
+      // Check if user has already completed this specific module
+      const { data: moduleProgress, error: moduleProgressError } = await supabase
+        .from('user_question_responses')
+        .select('question_id, points_earned')
+        .eq('user_id', userId)
+        .in('question_id', questionsList.map(q => q.id));
+
+      if (moduleProgressError) {
+        console.error('Error loading module progress:', moduleProgressError);
+        return;
+      }
+
+      // If all questions in this module have been answered, show results
+      if (moduleProgress && moduleProgress.length === questionsList.length) {
+        const totalEarned = moduleProgress.reduce((sum, response) => sum + (response.points_earned || 0), 0);
+        setShowResults(true);
+        setScore(totalEarned);
+        console.log('Module already completed, showing results with score:', totalEarned);
+      } else {
+        console.log('Module not completed yet, showing questions. Answered:', moduleProgress?.length || 0, 'of', questionsList.length);
+      }
+    } catch (error) {
+      console.error('Error loading user progress:', error);
+    }
+  }, [userId]);
+
   // Fetch module and questions
   const fetchModuleAndQuestions = useCallback(async () => {
     try {
@@ -199,15 +333,17 @@ export default function ModuleInterface({ moduleId, userId }: ModuleInterfacePro
 
       setModule(moduleData);
 
+      // Fetch the next module
+      await fetchNextModule(moduleId, moduleData.learning_path_id);
+
       // Fetch questions for this module
       const { data: questionsData, error: questionsError } = await supabase
         .from('questions')
         .select(`
           *,
-          question_types (name),
           question_options (*)
         `)
-        .eq('path_module_id', moduleId)
+        .eq('module_id', moduleId)
         .eq('is_active', true)
         .order('order_index', { ascending: true });
 
@@ -225,13 +361,25 @@ export default function ModuleInterface({ moduleId, userId }: ModuleInterfacePro
 
       setQuestions(questionsWithRandomizedOptions);
       setTotalScore(questionsWithRandomizedOptions.reduce((sum, q) => sum + q.points, 0));
+
+      console.log('Loaded questions for module:', {
+        moduleId,
+        questionCount: questionsWithRandomizedOptions.length,
+        userId,
+        learningPathId: moduleData.learning_path_id
+      });
+
+      // Load user's progress for this module
+      if (userId && moduleData.learning_path_id) {
+        await loadUserProgress(moduleData.learning_path_id, moduleId, questionsWithRandomizedOptions);
+      }
     } catch (error) {
       console.error('Error in fetchModuleAndQuestions:', error);
       setError('An unexpected error occurred');
     } finally {
       setLoading(false);
     }
-  }, [moduleId, randomizeOptions]);
+  }, [moduleId, randomizeOptions, userId, loadUserProgress]);
 
   useEffect(() => {
     fetchModuleAndQuestions();
@@ -259,13 +407,13 @@ export default function ModuleInterface({ moduleId, userId }: ModuleInterfacePro
     try {
       const { error } = await supabase
         .from('user_question_responses')
-        .insert({
+        .upsert({
           user_id: userId,
           question_id: currentQuestion.id,
-          selected_option_id: selectedAnswer,
+          response_text: selectedAnswer,
           is_correct: isCorrect,
-          score: isCorrect ? currentQuestion.points : 0,
-          answered_at: new Date().toISOString()
+          points_earned: isCorrect ? currentQuestion.points : 0,
+          submitted_at: new Date().toISOString()
         });
 
       if (error) {
@@ -275,8 +423,10 @@ export default function ModuleInterface({ moduleId, userId }: ModuleInterfacePro
       console.error('Error saving response:', error);
     }
 
-    // Move to next question or show results
-    moveToNextQuestion();
+    // Show answer feedback
+    setLastAnswerCorrect(isCorrect);
+    setLastAnswerExplanation(generateFullExplanation(currentQuestion, selectedAnswer));
+    setShowAnswerFeedback(true);
   };
 
   const handleRetry = () => {
@@ -285,11 +435,135 @@ export default function ModuleInterface({ moduleId, userId }: ModuleInterfacePro
     setUserAnswers({});
     setScore(0);
     setShowResults(false);
+    setShowAnswerFeedback(false);
   };
+
+  const handleNextQuestion = async () => {
+    if (currentQuestionIndex < questions.length - 1) {
+      setCurrentQuestionIndex(prev => prev + 1);
+      setSelectedAnswer('');
+      setShowAnswerFeedback(false);
+    } else {
+      // Module completed! Save progress to database
+      await saveModuleCompletion();
+      setShowResults(true);
+    }
+  };
+
+  const saveModuleCompletion = async () => {
+    if (!userId || !module?.learning_path_id) return;
+
+    try {
+      // Get current progress
+      const { data: currentProgress, error: fetchError } = await supabase
+        .from('user_learning_progress')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('learning_path_id', module.learning_path_id)
+        .single();
+
+      if (fetchError && fetchError.code !== 'PGRST116') {
+        console.error('Error fetching current progress:', fetchError);
+        return;
+      }
+
+      // Calculate new progress
+      const newCompletedModules = (currentProgress?.completed_modules || 0) + 1;
+      const newTotalScore = (currentProgress?.total_score || 0) + score;
+
+      // Get next module in the learning path
+      const { data: nextModule, error: nextModuleError } = await supabase
+        .from('path_modules')
+        .select('id')
+        .eq('learning_path_id', module.learning_path_id)
+        .gt('order_index', module.order_index)
+        .order('order_index', { ascending: true })
+        .limit(1)
+        .single();
+
+      const nextModuleId = nextModule?.id || null;
+      const isPathCompleted = !nextModuleId;
+
+      if (currentProgress) {
+        // Update existing progress
+        const { error: updateError } = await supabase
+          .from('user_learning_progress')
+          .update({
+            current_module_id: nextModuleId,
+            completed_modules: newCompletedModules,
+            total_score: newTotalScore,
+            is_completed: isPathCompleted,
+            last_accessed: new Date().toISOString()
+          })
+          .eq('id', currentProgress.id);
+
+        if (updateError) {
+          console.error('Error updating progress:', updateError);
+        }
+      } else {
+        // Create new progress record
+        const { error: insertError } = await supabase
+          .from('user_learning_progress')
+          .insert({
+            user_id: userId,
+            learning_path_id: module.learning_path_id,
+            current_module_id: nextModuleId,
+            completed_modules: newCompletedModules,
+            total_score: newTotalScore,
+            is_completed: isPathCompleted,
+            started_at: new Date().toISOString(),
+            last_accessed: new Date().toISOString()
+          });
+
+        if (insertError) {
+          console.error('Error creating progress:', insertError);
+        }
+      }
+    } catch (error) {
+      console.error('Error saving module completion:', error);
+    }
+  };
+
+  // Function to fetch the next module
+  const fetchNextModule = useCallback(async (currentModuleId: string, learningPathId: string) => {
+    try {
+      const { data: currentModule, error: currentError } = await supabase
+        .from('path_modules')
+        .select('order_index')
+        .eq('id', currentModuleId)
+        .single();
+
+      if (currentError || !currentModule) {
+        console.error('Error fetching current module:', currentError);
+        return;
+      }
+
+      const { data: nextModuleData, error: nextError } = await supabase
+        .from('path_modules')
+        .select('*')
+        .eq('learning_path_id', learningPathId)
+        .gt('order_index', currentModule.order_index)
+        .eq('is_active', true)
+        .order('order_index', { ascending: true })
+        .limit(1)
+        .single();
+
+      if (nextError) {
+        console.log('No next module found:', nextError);
+        setNextModule(null);
+        return;
+      }
+
+      setNextModule(nextModuleData);
+    } catch (error) {
+      console.error('Error fetching next module:', error);
+      setNextModule(null);
+    }
+  }, []);
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-ivory p-6">
+      <div className="min-h-screen bg-[var(--background)] p-6">
         <div className="max-w-4xl mx-auto space-y-6">
           <Skeleton className="h-8 w-64" />
           <Skeleton className="h-4 w-full" />
@@ -306,13 +580,13 @@ export default function ModuleInterface({ moduleId, userId }: ModuleInterfacePro
 
   if (error) {
     return (
-      <div className="min-h-screen bg-ivory p-6">
+      <div className="min-h-screen bg-[var(--background)] p-6">
         <div className="max-w-4xl mx-auto">
           <Alert variant="destructive">
             <XCircle className="h-4 w-4" />
             <AlertDescription>{error}</AlertDescription>
           </Alert>
-          <Button onClick={fetchModuleAndQuestions} className="mt-4 bg-ut-orange hover:bg-ut-orange/90 text-smoky-black">
+                        <Button onClick={fetchModuleAndQuestions} className="mt-4 bg-ut-orange hover:bg-ut-orange/90 text-[var(--primary-foreground)]">
             Try Again
           </Button>
         </div>
@@ -320,12 +594,42 @@ export default function ModuleInterface({ moduleId, userId }: ModuleInterfacePro
     );
   }
 
-  if (!module || questions.length === 0) {
+  if (!module) {
     return (
-      <div className="min-h-screen bg-ivory p-6">
+      <div className="min-h-screen bg-[var(--background)] p-6">
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-2xl font-bold text-smoky-black mb-4">Module Not Found</h1>
-          <p className="text-dim-gray">This module doesn't exist or has no questions.</p>
+          <h1 className="text-2xl font-bold text-[var(--foreground)] mb-4">Module Not Found</h1>
+          <p className="text-[var(--muted-foreground)]">This module doesn't exist.</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (questions.length === 0) {
+    return (
+      <div className="min-h-screen bg-[var(--background)] p-6">
+        <div className="max-w-4xl mx-auto">
+          <Card className="card-modern">
+            <CardHeader>
+              <CardTitle className="text-2xl text-[var(--foreground)]">{module.name}</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="p-4 rounded-lg bg-[var(--muted)]/30 text-[var(--muted-foreground)]">
+                This module currently has no questions.
+              </div>
+              <div className="flex gap-3">
+                {nextModule ? (
+                  <Button asChild className="btn-primary text-[var(--primary-foreground)]">
+                    <a href={`/learning/${module.learning_path_id}/module/${nextModule.id}`}>Go to Next Module</a>
+                  </Button>
+                ) : (
+                  <Button asChild className="btn-primary text-[var(--primary-foreground)]">
+                    <a href={`/learning/${module.learning_path_id}`}>Back to Learning Path</a>
+                  </Button>
+                )}
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     );
@@ -335,32 +639,53 @@ export default function ModuleInterface({ moduleId, userId }: ModuleInterfacePro
     const percentage = Math.round((score / totalScoreCalc) * 100);
     
     return (
-      <div className="min-h-screen bg-ivory p-6">
+      <div className="min-h-screen bg-[var(--background)] p-6">
         <div className="max-w-4xl mx-auto">
           <Card className="card-ut">
             <CardHeader className="text-center">
-              <CardTitle className="text-3xl text-smoky-black mb-4">Module Complete!</CardTitle>
+              <CardTitle className="text-3xl text-[var(--foreground)] mb-4">Module Complete!</CardTitle>
               <div className="space-y-4">
-                <div className="text-6xl font-bold text-ut-orange">{percentage}%</div>
-                <div className="text-xl text-dim-gray">
+                <div className="text-6xl font-bold text-[var(--primary)]">{percentage}%</div>
+                <div className="text-xl text-[var(--muted-foreground)]">
                   Score: {score} / {totalScoreCalc} points
                 </div>
                 <Progress value={percentage} className="h-3" />
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Button 
                   onClick={handleRetry}
                   variant="outline"
-                  className="border-slate-gray text-slate-gray hover:bg-slate-gray hover:text-white"
+                  className="border-[var(--border)] text-[var(--muted-foreground)] hover:bg-[var(--muted)] hover:text-[var(--foreground)]"
                 >
                   <RotateCcw className="h-4 w-4 mr-2" />
                   Retry Module
                 </Button>
+                {nextModule ? (
+                  <Button 
+                    asChild
+                    className="bg-[var(--success)] hover:bg-[var(--success)]/90 text-[var(--success-foreground)]"
+                  >
+                    <a href={`/learning/${module?.learning_path_id}/module/${nextModule.id}`}>
+                      <ArrowRight className="h-4 w-4 mr-2" />
+                      Next Module: {nextModule.name}
+                    </a>
+                  </Button>
+                ) : (
+                  <Button 
+                    asChild
+                    className="bg-[var(--primary)] hover:bg-[var(--primary)]/90 text-[var(--primary-foreground)]"
+                  >
+                    <a href={`/learning/${module?.learning_path_id}`}>
+                      <ArrowRight className="h-4 w-4 mr-2" />
+                      View Learning Path
+                    </a>
+                  </Button>
+                )}
                 <Button 
                   asChild
-                  className="bg-ut-orange hover:bg-ut-orange/90 text-smoky-black"
+                  className="bg-ut-orange hover:bg-ut-orange/90 text-[var(--primary-foreground)]"
                 >
                   <a href="/dashboard">Back to Dashboard</a>
                 </Button>
@@ -376,20 +701,20 @@ export default function ModuleInterface({ moduleId, userId }: ModuleInterfacePro
   const isLastQuestion = currentQuestionIndex === questions.length - 1;
 
   return (
-    <div className="min-h-screen bg-ivory">
-      {/* Header */}
-      <header className="border-b border-slate-gray/20 bg-white shadow-sm">
-        <div className="max-w-4xl mx-auto px-6 py-4">
+    <div className="min-h-screen bg-[var(--background)] transition-colors duration-300">
+      {/* Enhanced Header */}
+      <header className="border-b border-[var(--border)] bg-[var(--card)] shadow-sm backdrop-blur-sm">
+        <div className="max-w-4xl mx-auto px-6 py-6">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-xl font-bold text-smoky-black">{module.name}</h1>
-              <p className="text-dim-gray">{module.description}</p>
+            <div className="flex-1">
+              <h1 className="text-2xl font-bold text-[var(--foreground)] mb-2">{module.name}</h1>
+              <p className="text-[var(--muted-foreground)] text-lg">{module.description}</p>
             </div>
-            <div className="text-right">
-              <div className="text-sm text-dim-gray">
+            <div className="text-right ml-6">
+              <div className="text-sm text-[var(--muted-foreground)] mb-2">
                 Question {currentQuestionIndex + 1} of {questions.length}
               </div>
-              <Progress value={progress} className="h-2 w-32 mt-1" />
+              <Progress value={progress} className="h-3 w-40" />
             </div>
           </div>
         </div>
@@ -397,27 +722,14 @@ export default function ModuleInterface({ moduleId, userId }: ModuleInterfacePro
 
       <div className="max-w-4xl mx-auto p-6">
         <div className="space-y-6">
-          {/* Question */}
-          <Card className="card-ut">
+          {/* Enhanced Question */}
+          <Card className="card-modern hover-lift">
             <CardHeader>
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <Badge variant="outline" className="border-ut-orange/30 text-ut-orange">
+                <div className="flex items-center space-x-3">
+                  <Badge variant="outline" className="border-[var(--primary)]/30 text-[var(--primary)] bg-[var(--primary)]/10">
                     {currentQuestion.points} pts
                   </Badge>
-                  {currentQuestion.difficulty_level && (
-                    <Badge variant="outline" className="border-slate-gray/30 text-slate-gray">
-                      Level {currentQuestion.difficulty_level}
-                    </Badge>
-                  )}
-                </div>
-                <div className="text-sm text-dim-gray">
-                  {currentQuestion.time_limit_seconds && (
-                    <span className="flex items-center space-x-1">
-                      <Clock className="h-4 w-4" />
-                      {currentQuestion.time_limit_seconds}s
-                    </span>
-                  )}
                 </div>
               </div>
             </CardHeader>
@@ -430,24 +742,79 @@ export default function ModuleInterface({ moduleId, userId }: ModuleInterfacePro
             </CardContent>
           </Card>
 
-          {/* Web Execution Editor (if supported) */}
-          {currentQuestion.supports_web_execution && (
-            <Card className="card-ut">
+          {/* Enhanced Answer Feedback */}
+          {showAnswerFeedback && (
+            <Card className={`card-modern border-2 ${
+              lastAnswerCorrect ? 'border-[var(--success)]' : 'border-[var(--destructive)]'
+            }`}>
               <CardHeader>
-                <CardTitle className="text-lg text-smoky-black">Code Editor</CardTitle>
-                <p className="text-sm text-dim-gray">
-                  Write and test your code here. Make sure your function matches the expected signature.
+                <CardTitle className={`text-xl flex items-center gap-3 ${
+                  lastAnswerCorrect ? 'text-[var(--success)]' : 'text-[var(--destructive)]'
+                }`}>
+                  <div className={`p-2 rounded-full ${
+                    lastAnswerCorrect ? 'bg-[var(--success)]/10' : 'bg-[var(--destructive)]/10'
+                  }`}>
+                    {lastAnswerCorrect ? (
+                      <CheckCircle className="h-6 w-6" />
+                    ) : (
+                      <XCircle className="h-6 w-6" />
+                    )}
+                  </div>
+                  {lastAnswerCorrect ? 'Correct!' : 'Incorrect'}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="p-6 bg-[var(--muted)]/30 rounded-xl">
+                  <h4 className="font-semibold text-[var(--foreground)] mb-3 text-lg">Explanation:</h4>
+                  <p className="text-[var(--foreground)] leading-relaxed">{lastAnswerExplanation}</p>
+                </div>
+                
+                <div className="flex justify-end">
+                  <Button
+                    onClick={handleNextQuestion}
+                    className="btn-primary hover-glow text-[var(--primary-foreground)]"
+                  >
+                    {isLastQuestion ? 'Finish Module' : 'Next Question'}
+                    <ArrowRight className="h-4 w-4 ml-2" />
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Enhanced Code Editor - Only for Programming Questions */}
+          {shouldShowIDE && (
+            <Card className="card-modern hover-lift">
+              <CardHeader>
+                <CardTitle className="text-xl text-[var(--foreground)] flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-[var(--primary)]/10">
+                    <Code className="h-5 w-5 text-[var(--primary)]" />
+                  </div>
+                  {currentQuestion?.question_type === 'written' ? 'Java IDE for Written Problem' : 'Java IDE'}
+                </CardTitle>
+                <p className="text-[var(--muted-foreground)] leading-relaxed">
+                  {currentQuestion?.question_type === 'written' 
+                    ? 'Write and test your Java solution for this written problem. Use the code editor to implement your answer.'
+                    : 'Write and test your Java code here. Use this to practice and experiment with solutions.'
+                  }
                 </p>
               </CardHeader>
               <CardContent>
-                <Suspense fallback={<ContentLoader lines={10} />}>
-                  <LazyWebExecutionEditor
+                <Suspense fallback={
+                  <div className="h-64 bg-[var(--muted)]/30 rounded-xl flex items-center justify-center">
+                    <div className="text-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--primary)] mx-auto mb-3"></div>
+                      <p className="text-sm text-[var(--muted-foreground)]">Loading Java IDE...</p>
+                    </div>
+                  </div>
+                }>
+                  <LazyUnifiedJavaIDE
+                    key={`${currentQuestion.id}-${currentQuestion.question_type}`}
                     questionId={currentQuestion.id}
                     userId={userId}
-                    questionTitle={currentQuestion.title}
-                    questionDescription={currentQuestion.description}
-                    templateCode={currentQuestion.web_execution_template || ''}
-                    expectedSignature={currentQuestion.expected_function_signature || ''}
+                    questionTitle={currentQuestion.question_text}
+                    questionDescription={currentQuestion.explanation || ''}
+                    templateCode={getDefaultJavaTemplate(currentQuestion)}
                     testCases={[]}
                     onExecutionComplete={() => {}}
                   />
@@ -456,36 +823,62 @@ export default function ModuleInterface({ moduleId, userId }: ModuleInterfacePro
             </Card>
           )}
 
-          {/* Navigation */}
-          <div className="flex justify-between">
-            <Button
-              variant="outline"
-              onClick={() => setCurrentQuestionIndex(prev => Math.max(0, prev - 1))}
-              disabled={currentQuestionIndex === 0}
-              className="border-slate-gray text-slate-gray hover:bg-slate-gray hover:text-white"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Previous
-            </Button>
+          {/* Message for Multiple Choice Questions */}
+          {isMultipleChoice && (
+            <Card className="card-ut border-dashed border-[var(--border)]">
+              <CardContent className="py-6 text-center">
+                <div className="text-[var(--muted-foreground)]">
+                  <p className="text-sm">This is a multiple choice question. No code editor is needed.</p>
+                  <p className="text-xs mt-1">Select an answer above to continue.</p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
-            <Button
-              onClick={handleAnswerSubmit}
-              disabled={!selectedAnswer}
-              className="bg-ut-orange hover:bg-ut-orange/90 text-smoky-black"
-            >
-              {isLastQuestion ? (
-                <>
-                  <CheckCircle className="h-4 w-4 mr-2" />
-                  Finish Module
-                </>
-              ) : (
-                <>
-                  Next Question
-                  <ArrowRight className="h-4 w-4 ml-2" />
-                </>
-              )}
-            </Button>
-          </div>
+          {/* Message for Written Problems */}
+          {!isMultipleChoice && currentQuestion?.question_type === 'written' && (
+            <Card className="card-ut border-dashed border-[var(--border)] bg-blue-50 dark:bg-blue-950/20">
+              <CardContent className="py-4 text-center">
+                <div className="text-blue-800 dark:text-blue-200">
+                  <p className="text-sm font-medium">Written Problem with Java IDE</p>
+                  <p className="text-xs mt-1">Use the Java IDE below to write and test your solution.</p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Enhanced Navigation - Only show when not displaying answer feedback */}
+          {!showAnswerFeedback && (
+            <div className="flex justify-between gap-4">
+              <Button
+                variant="outline"
+                onClick={() => setCurrentQuestionIndex(prev => Math.max(0, prev - 1))}
+                disabled={currentQuestionIndex === 0}
+                className="btn-outline hover-lift text-[var(--foreground)]"
+              >
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Previous
+              </Button>
+
+              <Button
+                onClick={handleAnswerSubmit}
+                disabled={!selectedAnswer}
+                className="btn-primary hover-glow text-[var(--primary-foreground)]"
+              >
+                {isLastQuestion ? (
+                  <>
+                    <CheckCircle className="h-4 w-4 mr-2" />
+                    Finish Module
+                  </>
+                ) : (
+                  <>
+                    Next Question
+                    <ArrowRight className="h-4 w-4 ml-2" />
+                  </>
+                )}
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </div>

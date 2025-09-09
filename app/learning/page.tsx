@@ -39,17 +39,17 @@ export default async function LearningPage() {
   return (
     <div className="min-h-screen bg-ivory">
       {/* Header */}
-      <header className="border-b border-slate-gray/20 bg-white shadow-sm">
+              <header className="border-b border-[var(--border)] bg-[var(--card)] shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
-              <Button variant="ghost" size="sm" asChild className="text-smoky-black hover:bg-slate-gray/10">
+                             <Button variant="ghost" size="sm" asChild className="text-[var(--foreground)] hover:bg-[var(--muted)]/10">
                 <Link href="/dashboard">
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Back to Dashboard
                 </Link>
               </Button>
-              <h1 className="text-xl font-bold text-smoky-black">Learning Paths</h1>
+                             <h1 className="text-xl font-bold text-[var(--foreground)]">Learning Paths</h1>
             </div>
           </div>
         </div>
@@ -58,10 +58,10 @@ export default async function LearningPage() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Page Header */}
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-smoky-black mb-4">
+                     <h2 className="text-4xl font-bold text-[var(--foreground)] mb-4">
             Choose Your Learning Journey
           </h2>
-          <p className="text-xl text-dim-gray max-w-2xl mx-auto">
+          <p className="text-xl text-[var(--muted-foreground)] max-w-2xl mx-auto">
             Select a learning path to master competitive programming concepts and prepare for UIL competitions
           </p>
         </div>
@@ -85,21 +85,21 @@ export default async function LearningPage() {
                       {path.difficulty?.charAt(0).toUpperCase() + path.difficulty?.slice(1) || 'Beginner'}
                     </Badge>
                     {userPathProgress && (
-                      <div className="text-sm text-dim-gray">
+                      <div className="text-sm text-[var(--muted-foreground)]">
                         {Math.round(progressPercentage)}% Complete
                       </div>
                     )}
                   </div>
-                  <CardTitle className="text-lg text-smoky-black group-hover:text-ut-orange transition-colors">
+                  <CardTitle className="text-lg text-[var(--foreground)] group-hover:text-[var(--primary)] transition-colors">
                     {path.name}
                   </CardTitle>
-                  <CardDescription className="text-dim-gray">
+                  <CardDescription className="text-[var(--muted-foreground)]">
                     {path.description}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="pt-0">
                   {/* Path Stats */}
-                  <div className="flex items-center space-x-4 mb-4 text-sm text-dim-gray">
+                  <div className="flex items-center space-x-4 mb-4 text-sm text-[var(--muted-foreground)]">
                     <div className="flex items-center space-x-1">
                       <BookOpen className="h-4 w-4" />
                       <span>{totalModules} modules</span>
@@ -129,7 +129,7 @@ export default async function LearningPage() {
                   {/* Action Button */}
                   <Button 
                     asChild 
-                    className="w-full bg-ut-orange hover:bg-ut-orange/90 text-smoky-black font-semibold"
+                    className="w-full bg-ut-orange hover:bg-ut-orange/90 text-[var(--primary-foreground)] font-semibold"
                   >
                     <Link href={`/learning/${path.id}`}>
                       {userPathProgress ? 'Continue Learning' : 'Start Learning'}
@@ -145,34 +145,34 @@ export default async function LearningPage() {
         {/* Empty State */}
         {(!learningPaths || learningPaths.length === 0) && (
           <div className="text-center py-12">
-            <div className="w-16 h-16 bg-slate-gray/20 rounded-full flex items-center justify-center mx-auto mb-4">
-              <BookOpen className="h-8 w-8 text-slate-gray" />
+            <div className="w-16 h-16 bg-[var(--muted)] rounded-full flex items-center justify-center mx-auto mb-4">
+              <BookOpen className="h-8 w-8 text-[var(--muted-foreground)]" />
             </div>
-            <h3 className="text-lg font-medium text-smoky-black mb-2">No Learning Paths Available</h3>
-            <p className="text-dim-gray mb-6">
+                         <h3 className="text-lg font-medium text-[var(--foreground)] mb-2">No Learning Paths Available</h3>
+            <p className="text-[var(--muted-foreground)] mb-6">
               Learning paths are being prepared. Check back soon!
             </p>
-            <Button asChild variant="outline" className="border-slate-gray text-slate-gray hover:bg-slate-gray hover:text-white">
+            <Button asChild variant="outline" className="border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--muted)] hover:text-[var(--muted-foreground)]">
               <Link href="/dashboard">Back to Dashboard</Link>
             </Button>
           </div>
         )}
 
         {/* Quick Start Section */}
-        <div className="mt-16 bg-white border border-slate-gray/20 rounded-lg p-8">
+        <div className="mt-16 bg-[var(--card)] border border-[var(--border)] rounded-lg p-8">
           <div className="text-center">
-            <h3 className="text-2xl font-bold text-smoky-black mb-4">
+                         <h3 className="text-2xl font-bold text-[var(--foreground)] mb-4">
               New to Competitive Programming?
             </h3>
-            <p className="text-dim-gray mb-6 max-w-2xl mx-auto">
+            <p className="text-[var(--muted-foreground)] mb-6 max-w-2xl mx-auto">
               Start with our beginner-friendly learning paths designed to build your skills step by step. 
               Each path includes interactive exercises, real competition problems, and detailed explanations.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button asChild size="lg" className="bg-ut-orange hover:bg-ut-orange/90 text-smoky-black font-semibold">
+                             <Button asChild size="lg" className="bg-ut-orange hover:bg-ut-orange/90 text-[var(--primary-foreground)] font-semibold">
                 <Link href="/problems">Practice Problems</Link>
               </Button>
-              <Button asChild variant="outline" size="lg" className="border-slate-gray text-slate-gray hover:bg-slate-gray hover:text-white">
+              <Button asChild variant="outline" size="lg" className="border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--muted)] hover:text-[var(--muted-foreground)]">
                 <Link href="/dashboard">View Dashboard</Link>
               </Button>
             </div>

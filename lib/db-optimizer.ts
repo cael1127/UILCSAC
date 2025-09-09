@@ -155,10 +155,9 @@ export const optimizedQueries = {
         queryFn: () => supabase
           .from('questions')
           .select(`
-            *,
-            question_types (name)
+            *
           `)
-          .eq('path_module_id', moduleId)
+          .eq('module_id', moduleId)
           .eq('is_active', true)
           .order('order_index'),
         ttl: 5 * 60 * 1000

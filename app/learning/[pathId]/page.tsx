@@ -112,7 +112,7 @@ export default async function LearningPathPage({ params }: LearningPathPageProps
             const isLocked = index > completedModules
             
             return (
-              <Card key={module.id} className={`border-border ${isCompleted ? 'bg-green-50/50' : ''}`}>
+              <Card key={module.id} className={`border-border ${isCompleted ? 'bg-success/5' : ''}`}>
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div className="space-y-2 flex-1">

@@ -1,355 +1,259 @@
-"use client"
-
-import { useEffect, useRef, useState, useCallback, useMemo } from "react"
-import dynamic from "next/dynamic"
+import React, { useState, useEffect, useRef } from 'react';
+import { cn } from '@/lib/utils';
 
 interface CodeEditorProps {
-  value: string
-  onChange: (value: string) => void
-  language: string
-  height?: string
-  theme?: string
-  readOnly?: boolean
+  value: string;
+  onChange: (value: string) => void;
+  language?: string;
+  height?: string;
+  placeholder?: string;
+  readOnly?: boolean;
+  className?: string;
 }
 
-// Pre-configure Monaco Editor themes when it loads
-const configureMonacoThemes = async () => {
-  const monaco = await import('monaco-editor')
-  
-  monaco.editor.defineTheme("uil-dark", {
-    base: "vs-dark",
-    inherit: true,
-    rules: [
-      { token: "comment", foreground: "6b7280", fontStyle: "italic" },
-      { token: "keyword", foreground: "d97706", fontStyle: "bold" },
-      { token: "string", foreground: "10b981" },
-      { token: "number", foreground: "f59e0b" },
-      { token: "type", foreground: "ec4899" },
-      { token: "function", foreground: "3b82f6" },
-    ],
-    colors: {
-      "editor.background": "#1f2937",
-      "editor.foreground": "#f9fafb",
-      "editor.lineHighlightBackground": "#374151",
-      "editor.selectionBackground": "#4b5563",
-      "editorCursor.foreground": "#d97706",
-      "editorLineNumber.foreground": "#6b7280",
-      "editorLineNumber.activeForeground": "#d97706",
-    },
-  })
-
-  monaco.editor.defineTheme("uil-light", {
-    base: "vs",
-    inherit: true,
-    rules: [
-      { token: "comment", foreground: "6b7280", fontStyle: "italic" },
-      { token: "keyword", foreground: "d97706", fontStyle: "bold" },
-      { token: "string", foreground: "059669" },
-      { token: "number", foreground: "d97706" },
-      { token: "type", foreground: "ec4899" },
-      { token: "function", foreground: "2563eb" },
-    ],
-    colors: {
-      "editor.background": "#fefce8",
-      "editor.foreground": "#374151",
-      "editor.lineHighlightBackground": "#f9fafb",
-      "editor.selectionBackground": "#e5e7eb",
-      "editorCursor.foreground": "#d97706",
-      "editorLineNumber.foreground": "#9ca3af",
-      "editorLineNumber.activeForeground": "#d97706",
-    },
-  })
-  
-  return monaco
+interface LineNumberProps {
+  lineNumber: number;
+  hasError?: boolean;
+  hasWarning?: boolean;
 }
 
-function CodeEditorComponent({
+const LineNumber: React.FC<LineNumberProps> = ({ lineNumber, hasError, hasWarning }) => (
+  <div
+    className={cn(
+      "select-none text-right pr-3 text-xs font-mono text-[var(--muted-foreground)] border-r border-[var(--border)]",
+      hasError && "bg-destructive/10 text-destructive",
+      hasWarning && "bg-warning/10 text-warning"
+    )}
+  >
+    {lineNumber}
+  </div>
+);
+
+export default function CodeEditor({
   value,
   onChange,
-  language,
-  height = "400px",
-  theme = "vs-dark",
+  language = 'java',
+  height = '400px',
+  placeholder = 'Write your code here...',
   readOnly = false,
+  className
 }: CodeEditorProps) {
-  const editorRef = useRef<HTMLDivElement>(null)
-  const monacoRef = useRef<any>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [lineNumbers, setLineNumbers] = useState<number[]>([]);
+  const [currentLine, setCurrentLine] = useState(1);
+  const [currentColumn, setCurrentColumn] = useState(1);
+  const [showLineNumbers, setShowLineNumbers] = useState(true);
+  const [fontSize, setFontSize] = useState(14);
+  const [wordWrap, setWordWrap] = useState(false);
 
-  // Memoize language mapping for better performance
-  const monacoLanguage = useMemo(() => {
-    const languageMap: Record<string, string> = {
-      java: "java",
-      python: "python",
-      cpp: "cpp",
-      javascript: "javascript",
-      typescript: "typescript",
-      c: "c",
-      csharp: "csharp",
-      go: "go",
-      rust: "rust",
-      kotlin: "kotlin",
-      swift: "swift",
-    }
-    return languageMap[language] || "plaintext"
-  }, [language])
-
-  // Memoize editor options for better performance
-  const editorOptions = useMemo(() => ({
-    value,
-    language: monacoLanguage,
-    theme: theme === "vs-dark" ? "uil-dark" : "uil-light",
-    readOnly,
-    fontSize: 14,
-    lineNumbers: "on" as const,
-    roundedSelection: false,
-    scrollBeyondLastLine: false,
-    automaticLayout: true,
-    minimap: { enabled: false },
-    wordWrap: "on" as const,
-    tabSize: 2,
-    insertSpaces: true,
-    folding: true,
-    lineDecorationsWidth: 10,
-    lineNumbersMinChars: 3,
-    glyphMargin: false,
-    contextmenu: true,
-    mouseWheelZoom: true,
-    smoothScrolling: true,
-    cursorBlinking: "blink" as const,
-    cursorSmoothCaretAnimation: "on" as const,
-    renderLineHighlight: "line" as const,
-    selectOnLineNumbers: true,
-    bracketPairColorization: { enabled: true },
-    guides: {
-      bracketPairs: true,
-      indentation: true,
-      highlightActiveIndentation: true,
-    },
-    suggest: {
-      showKeywords: true,
-      showSnippets: true,
-      showClasses: true,
-      showFunctions: true,
-      showVariables: true,
-      showConstants: true,
-      showEnums: true,
-      showEnumMembers: true,
-      showColors: true,
-      showFiles: true,
-      showReferences: true,
-      showFolders: true,
-      showTypeParameters: true,
-    },
-  }), [value, monacoLanguage, theme, readOnly])
-
-  // Initialize editor with better error handling
-  const initializeEditor = useCallback(async () => {
-    if (!editorRef.current) return
-
-    try {
-      setIsLoading(true)
-      setError(null)
-
-      const monaco = await configureMonacoThemes()
-      
-      if (editorRef.current) {
-        monacoRef.current = monaco.editor.create(editorRef.current, editorOptions)
-        
-        // Handle content changes
-        monacoRef.current.onDidChangeModelContent(() => {
-          if (monacoRef.current) {
-            onChange(monacoRef.current.getValue())
-          }
-        })
-
-        // Add code snippets
-        addCodeSnippets(language, monaco)
-        
-        setIsLoading(false)
-      }
-    } catch (err) {
-      console.error('Failed to initialize Monaco Editor:', err)
-      setError('Failed to load code editor')
-      setIsLoading(false)
-    }
-  }, [editorOptions, language, onChange])
-
-  // Initialize editor when component mounts
+  // Update line numbers when value changes
   useEffect(() => {
-    initializeEditor()
+    const lines = value.split('\n');
+    setLineNumbers(Array.from({ length: Math.max(lines.length, 1) }, (_, i) => i + 1));
+  }, [value]);
+
+  // Handle textarea changes
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newValue = e.target.value;
+    onChange(newValue);
     
-    return () => {
-      if (monacoRef.current) {
-        monacoRef.current.dispose()
-      }
-    }
-  }, [initializeEditor])
+    // Update cursor position
+    const textarea = e.target;
+    const cursorPosition = textarea.selectionStart;
+    const lines = newValue.substring(0, cursorPosition).split('\n');
+    setCurrentLine(lines.length);
+    setCurrentColumn(lines[lines.length - 1].length + 1);
+  };
 
-  // Update editor value when prop changes
+  // Handle key navigation
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      const textarea = e.currentTarget;
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      
+      // Insert 4 spaces for tab
+      const newValue = value.substring(0, start) + '    ' + value.substring(end);
+      onChange(newValue);
+      
+      // Set cursor position after the inserted spaces
+      setTimeout(() => {
+        textarea.selectionStart = textarea.selectionEnd = start + 4;
+      }, 0);
+    }
+  };
+
+  // Auto-resize textarea
   useEffect(() => {
-    if (monacoRef.current && monacoRef.current.getValue() !== value) {
-      monacoRef.current.setValue(value)
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = textareaRef.current.scrollHeight + 'px';
     }
-  }, [value])
+  }, [value]);
 
-  // Update editor language when prop changes
-  useEffect(() => {
-    if (monacoRef.current) {
-      const model = monacoRef.current.getModel()
-      if (model) {
-        import('monaco-editor').then(monaco => {
-          monaco.editor.setModelLanguage(model, monacoLanguage)
-        }).catch(console.error)
-      }
+  // Handle textarea scroll to sync with line numbers
+  const handleScroll = () => {
+    if (textareaRef.current) {
+      const scrollTop = textareaRef.current.scrollTop;
+      // You could implement line number scrolling sync here
     }
-  }, [monacoLanguage])
+  };
 
-  // Update editor theme when prop changes
-  useEffect(() => {
-    if (monacoRef.current) {
-      import('monaco-editor').then(monaco => {
-        monaco.editor.setTheme(theme === "vs-dark" ? "uil-dark" : "uil-light")
-      }).catch(console.error)
-    }
-  }, [theme])
+  // Increase font size
+  const increaseFontSize = () => {
+    setFontSize(prev => Math.min(prev + 1, 24));
+  };
 
-  const addCodeSnippets = useCallback((lang: string, monaco: any) => {
-    const snippets: Record<string, any[]> = {
-      java: [
-        {
-          label: "main",
-          kind: monaco.languages.CompletionItemKind.Snippet,
-          insertText: ["public static void main(String[] args) {", "\t${1:// Your code here}", "}"].join("\n"),
-          insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-          documentation: "Main method template",
-        },
-        {
-          label: "scanner",
-          kind: monaco.languages.CompletionItemKind.Snippet,
-          insertText: "Scanner ${1:sc} = new Scanner(System.in);",
-          insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-          documentation: "Scanner for input",
-        },
-        {
-          label: "sysout",
-          kind: monaco.languages.CompletionItemKind.Snippet,
-          insertText: "System.out.println(${1:});",
-          insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-          documentation: "System.out.println",
-        },
-      ],
-      python: [
-        {
-          label: "input",
-          kind: monaco.languages.CompletionItemKind.Snippet,
-          insertText: "${1:var} = input(${2:})",
-          insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-          documentation: "Input statement",
-        },
-        {
-          label: "print",
-          kind: monaco.languages.CompletionItemKind.Snippet,
-          insertText: "print(${1:})",
-          insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-          documentation: "Print statement",
-        },
-        {
-          label: "for",
-          kind: monaco.languages.CompletionItemKind.Snippet,
-          insertText: ["for ${1:i} in range(${2:n}):", "\t${3:pass}"].join("\n"),
-          insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-          documentation: "For loop",
-        },
-      ],
-      cpp: [
-        {
-          label: "main",
-          kind: monaco.languages.CompletionItemKind.Snippet,
-          insertText: [
-            "#include <iostream>",
-            "using namespace std;",
-            "",
-            "int main() {",
-            "\t${1:// Your code here}",
-            "\treturn 0;",
-            "}",
-          ].join("\n"),
-          insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-          documentation: "Main function template",
-        },
-        {
-          label: "cout",
-          kind: monaco.languages.CompletionItemKind.Snippet,
-          insertText: "cout << ${1:} << endl;",
-          insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-          documentation: "Console output",
-        },
-        {
-          label: "cin",
-          kind: monaco.languages.CompletionItemKind.Snippet,
-          insertText: "cin >> ${1:};",
-          insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-          documentation: "Console input",
-        },
-      ],
-    }
+  // Decrease font size
+  const decreaseFontSize = () => {
+    setFontSize(prev => Math.max(prev - 1, 10));
+  };
 
-    if (snippets[lang]) {
-      monaco.languages.registerCompletionItemProvider(monacoLanguage, {
-        provideCompletionItems: () => ({
-          suggestions: snippets[lang],
-        }),
-      })
-    }
-  }, [monacoLanguage])
+  // Toggle word wrap
+  const toggleWordWrap = () => {
+    setWordWrap(!wordWrap);
+  };
 
-  // Show loading state
-  if (isLoading) {
-    return (
-      <div 
-        style={{ height, width: "100%" }} 
-        className="border border-border rounded-md bg-gray-50 flex items-center justify-center"
-      >
-        <div className="flex flex-col items-center gap-2">
-          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
-          <div className="text-gray-500 text-sm">Loading editor...</div>
+  return (
+    <div className={cn("relative bg-[var(--card)] border border-[var(--border)] rounded-lg overflow-hidden shadow-lg", className)}>
+      {/* Eclipse-style Editor Header */}
+      <div className="bg-gradient-to-r from-[var(--muted)] to-[var(--muted)] px-4 py-2 border-b border-[var(--border)] flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          {/* Eclipse-style window controls */}
+          <div className="flex gap-1">
+            <div className="w-3 h-3 rounded-full bg-red-500 hover:bg-red-600 cursor-pointer transition-colors"></div>
+            <div className="w-3 h-3 rounded-full bg-yellow-500 hover:bg-yellow-600 cursor-pointer transition-colors"></div>
+            <div className="w-3 h-3 rounded-full bg-green-500 hover:bg-green-600 cursor-pointer transition-colors"></div>
+          </div>
+          
+          {/* File info */}
+          <div className="ml-3 text-sm text-[var(--foreground)] font-medium">
+            {language === 'java' ? 'Solution.java' : `file.${language}`}
+          </div>
         </div>
-      </div>
-    )
-  }
-
-  // Show error state
-  if (error) {
-    return (
-      <div 
-        style={{ height, width: "100%" }} 
-        className="border border-border rounded-md bg-red-50 flex items-center justify-center"
-      >
-        <div className="text-red-500 text-center">
-          <div className="text-sm font-medium mb-1">Editor Error</div>
-          <div className="text-xs">{error}</div>
-          <button 
-            onClick={initializeEditor}
-            className="mt-2 px-3 py-1 bg-red-100 hover:bg-red-200 text-red-700 rounded text-xs"
+        
+        {/* Editor controls */}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowLineNumbers(!showLineNumbers)}
+            className="px-2 py-1 text-xs bg-[var(--card)] border border-[var(--border)] rounded hover:bg-[var(--muted)] transition-colors"
+            title="Toggle line numbers"
           >
-            Retry
+            {showLineNumbers ? 'Hide' : 'Show'} Lines
           </button>
+          
+          <button
+            onClick={decreaseFontSize}
+            className="px-2 py-1 text-xs bg-[var(--card)] border border-[var(--border)] rounded hover:bg-[var(--muted)] transition-colors"
+            title="Decrease font size"
+          >
+            A-
+          </button>
+          
+          <button
+            onClick={increaseFontSize}
+            className="px-2 py-1 text-xs bg-[var(--card)] border border-[var(--border)] rounded hover:bg-[var(--muted)] transition-colors"
+            title="Increase font size"
+          >
+            A+
+          </button>
+          
+          <button
+            onClick={toggleWordWrap}
+            className={cn(
+              "px-2 py-1 text-xs border rounded transition-colors",
+              wordWrap 
+                ? "bg-blue-100 border-blue-300 text-blue-700" 
+                : "bg-[var(--card)] border-[var(--border)] hover:bg-[var(--muted)]"
+            )}
+            title="Toggle word wrap"
+          >
+            Wrap
+          </button>
+          
+          {/* Cursor position display */}
+          <div className="text-xs text-[var(--muted-foreground)] bg-[var(--card)] px-2 py-1 rounded border border-[var(--border)]">
+            Ln {currentLine}, Col {currentColumn}
+          </div>
         </div>
       </div>
-    )
-  }
 
-  // Show editor
-  return <div ref={editorRef} style={{ height, width: "100%" }} className="border border-border rounded-md" />
+      {/* Editor Content */}
+      <div className="flex" style={{ height }}>
+        {/* Line Numbers */}
+        {showLineNumbers && (
+          <div className="bg-[var(--muted)] border-r border-[var(--border)] overflow-hidden min-w-[60px]">
+            {lineNumbers.map((lineNum) => (
+              <LineNumber key={lineNum} lineNumber={lineNum} />
+            ))}
+          </div>
+        )}
+
+        {/* Code Textarea */}
+        <div className="flex-1 relative">
+          <textarea
+            ref={textareaRef}
+            value={value}
+            onChange={handleChange}
+            onKeyDown={handleKeyDown}
+            onScroll={handleScroll}
+            readOnly={readOnly}
+            placeholder={placeholder}
+            className={cn(
+              "w-full h-full p-4 font-mono resize-none outline-none",
+              "bg-[var(--card)] text-[var(--foreground)]",
+              "focus:ring-2 focus:ring-blue-500 focus:border-transparent",
+              "leading-6",
+              readOnly && "bg-[var(--muted)] cursor-not-allowed"
+            )}
+            style={{
+              fontFamily: 'JetBrains Mono, Consolas, Monaco, monospace',
+              fontSize: `${fontSize}px`,
+              lineHeight: '1.5',
+              tabSize: 4,
+              whiteSpace: wordWrap ? 'pre-wrap' : 'pre'
+            }}
+          />
+        </div>
+      </div>
+
+      {/* Eclipse-style Status Bar */}
+      <div className="bg-gradient-to-r from-[var(--muted)] to-[var(--muted)] px-4 py-2 border-t border-[var(--border)] flex items-center justify-between text-xs text-[var(--muted-foreground)]">
+        <div className="flex items-center gap-4">
+          <span className="font-medium">{language.toUpperCase()}</span>
+          <span>UTF-8</span>
+          <span>{lineNumbers.length} lines</span>
+          <span>Spaces: 4</span>
+        </div>
+        
+        <div className="flex items-center gap-4">
+          <span>Font: {fontSize}px</span>
+          <span>Word Wrap: {wordWrap ? 'On' : 'Off'}</span>
+          <span>Ln {currentLine}, Col {currentColumn}</span>
+        </div>
+      </div>
+
+      {/* Eclipse-style Right Panel (can be expanded) */}
+      <div className="absolute right-0 top-0 bottom-0 w-64 bg-[var(--muted)] border-l border-[var(--border)] transform translate-x-full transition-transform duration-300 hover:translate-x-0 group">
+        <div className="p-3 border-b border-[var(--border)] bg-[var(--muted)]">
+          <h3 className="text-sm font-medium text-[var(--foreground)]">Outline</h3>
+        </div>
+        <div className="p-3">
+          <div className="text-xs text-[var(--muted-foreground)]">
+            <div className="mb-2">• Solution (class)</div>
+            <div className="ml-4 mb-1">• main(String[] args)</div>
+            <div className="ml-4 text-[var(--muted-foreground)]">• String name</div>
+            <div className="ml-4 text-[var(--muted-foreground)]">• int number</div>
+          </div>
+        </div>
+        
+        {/* Hover indicator */}
+        <div className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-1 bg-blue-500 text-smoky-black text-xs px-2 py-1 rounded-l opacity-0 group-hover:opacity-100 transition-opacity">
+          Outline
+        </div>
+      </div>
+    </div>
+  );
 }
 
-// Export with dynamic import and better loading
-export default dynamic(() => Promise.resolve(CodeEditorComponent), {
-  ssr: false,
-  loading: () => (
-    <div className="border border-border rounded-md bg-gray-50 flex items-center justify-center animate-pulse" style={{ height: "400px" }}>
-      <div className="text-gray-500">Preparing editor...</div>
-    </div>
-  )
-})

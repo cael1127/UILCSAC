@@ -40,25 +40,40 @@ export default async function LearningModulePage({ params }: LearningModulePageP
     redirect("/dashboard")
   }
 
-  // Verify the user has access to this learning path
-  const { data: userProgress, error: userProgressError } = await supabase
+  // Ensure the user has a progress row for this learning path (create if missing)
+  const { data: userProgress } = await supabase
     .from("user_learning_progress")
     .select("*")
     .eq("user_id", user.id)
     .eq("learning_path_id", pathId)
-    .single()
+    .maybeSingle()
 
-  // If there's an error or user hasn't started this path, redirect to dashboard
-  if (userProgressError || !userProgress) {
-    console.error("User progress error:", userProgressError)
-    redirect("/dashboard")
+  if (!userProgress) {
+    // Create an initial progress record pointing at the current module
+    const { error: createProgressError } = await supabase
+      .from("user_learning_progress")
+      .insert({
+        user_id: user.id,
+        learning_path_id: pathId,
+        current_module_id: moduleId,
+        completed_modules: 0,
+        total_score: 0,
+        is_completed: false,
+        started_at: new Date().toISOString(),
+        last_accessed: new Date().toISOString(),
+      })
+
+    if (createProgressError) {
+      console.error("Failed to create initial learning progress:", createProgressError)
+      // Allow the page to continue rendering even if creation fails
+    }
   }
 
   // Debug: Check if questions exist for this module
   const { data: questionCount, error: questionCountError } = await supabase
     .from("questions")
     .select("id", { count: "exact" })
-    .eq("path_module_id", moduleId)
+    .eq("module_id", moduleId)
     .eq("is_active", true)
 
   console.log("Question count for module:", { 

@@ -43,7 +43,14 @@ export default function LoginForm() {
       })
 
       if (error) {
-        setError(error.message)
+        // Handle specific error types
+        if (error.message.includes('429') || error.message.includes('rate limit')) {
+          setError("Too many login attempts. Please wait a few minutes and try again.")
+        } else if (error.message.includes('Invalid login credentials')) {
+          setError("Invalid email or password. Please check your credentials.")
+        } else {
+          setError(error.message)
+        }
       } else {
         // Redirect to success page
         router.push("/auth/sign-in-success")
@@ -58,8 +65,8 @@ export default function LoginForm() {
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>Sign In</CardTitle>
-        <CardDescription>
+        <CardTitle style={{ color: 'var(--foreground)' }}>Sign In</CardTitle>
+        <CardDescription style={{ color: 'var(--muted-foreground)' }}>
           Enter your credentials to access your account
         </CardDescription>
       </CardHeader>
@@ -74,7 +81,7 @@ export default function LoginForm() {
 
 
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email" style={{ color: 'var(--foreground)' }}>Email</Label>
             <Input
               id="email"
               type="email"
@@ -82,11 +89,12 @@ export default function LoginForm() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              style={{ color: 'var(--foreground)' }}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password" style={{ color: 'var(--foreground)' }}>Password</Label>
             <Input
               id="password"
               type="password"
@@ -94,23 +102,24 @@ export default function LoginForm() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              style={{ color: 'var(--foreground)' }}
             />
           </div>
 
-          <Button type="submit" className="w-full" disabled={loading}>
+          <Button type="submit" className="w-full" disabled={loading} style={{ backgroundColor: 'var(--primary)', color: 'var(--primary-foreground)' }}>
             {loading ? "Signing in..." : "Sign In"}
           </Button>
 
           <div className="text-center text-sm space-y-2">
             <div>
-              <span className="text-muted-foreground">Don't have an account? </span>
-              <Link href="/auth/sign-up" className="text-primary hover:underline">
+              <span style={{ color: 'var(--muted-foreground)' }}>Don't have an account? </span>
+              <Link href="/auth/sign-up" className="text-[var(--primary)] hover:underline">
                 Sign up
               </Link>
             </div>
             <div>
-              <span className="text-muted-foreground">Already logged in? </span>
-              <Link href="/dashboard" className="text-primary hover:underline">
+              <span style={{ color: 'var(--muted-foreground)' }}>Already logged in? </span>
+              <Link href="/dashboard" className="text-[var(--primary)] hover:underline">
                 Go to Dashboard
               </Link>
             </div>

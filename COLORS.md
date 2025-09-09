@@ -151,7 +151,7 @@ background: linear-gradient(90deg, var(--ivory), var(--smoky-black));
 </div>
 
 // Gradient hero section
-<div className="gradient-ut text-white py-20">
+<div className="gradient-ut text-[var(--primary-foreground)] py-20">
   <h1>Welcome to UIL CS Academy</h1>
 </div>
 ```

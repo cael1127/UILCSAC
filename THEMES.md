@@ -171,7 +171,7 @@ Edit the CSS variables in the respective theme class in `app/globals.css`:
 
 // ❌ Bad - Hardcoded colors
 <div className="bg-ivory text-smoky-black">
-  <Button className="bg-ut-orange text-white">
+  <Button className="bg-[var(--primary)] text-[var(--primary-foreground)]">
     Click me
   </Button>
 </div>

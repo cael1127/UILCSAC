@@ -56,6 +56,21 @@ const nextConfig = {
   
   // Enable SWC minification
   swcMinify: true,
+  
+  // Serve .wasm files with correct MIME type for future WebAssembly support
+  async headers() {
+    return [
+      {
+        source: '/:path*.wasm',
+        headers: [
+          {
+            key: 'Content-Type',
+            value: 'application/wasm',
+          },
+        ],
+      },
+    ];
+  },
 }
 
 export default nextConfig

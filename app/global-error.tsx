@@ -41,7 +41,7 @@ export default function GlobalError({
                 <summary className="cursor-pointer text-sm text-dim-gray hover:text-smoky-black mb-2">
                   Error Details
                 </summary>
-                <div className="bg-white border border-slate-gray/20 rounded p-3 text-xs font-mono text-smoky-black overflow-auto">
+                <div className="bg-[var(--card)] border border-[var(--border)] rounded p-3 text-xs font-mono text-[var(--foreground)] overflow-auto">
                   <div className="text-dim-gray mb-1">Message:</div>
                   <div className="mb-2">{error.message}</div>
                   {error.digest && (
@@ -66,7 +66,7 @@ export default function GlobalError({
                 Try Again
               </Button>
               
-              <Button asChild variant="outline" className="w-full border-slate-gray text-slate-gray hover:bg-slate-gray hover:text-white">
+              <Button asChild variant="outline" className="w-full border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--muted)] hover:text-[var(--muted-foreground)]">
                 <Link href="/">
                   <Home className="h-4 w-4 mr-2" />
                   Go Home
@@ -77,7 +77,7 @@ export default function GlobalError({
             {/* Support Info */}
             <div className="mt-8 text-sm text-dim-gray">
               <p>If this error continues, please contact support with:</p>
-              <p className="font-mono text-xs mt-2 bg-white border border-slate-gray/20 rounded px-2 py-1">
+              <p className="font-mono text-xs mt-2 bg-[var(--card)] border border-[var(--border)] rounded px-2 py-1">
                 Error ID: {error.digest || 'N/A'}
               </p>
             </div>

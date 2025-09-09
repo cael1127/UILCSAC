@@ -3,6 +3,8 @@ import { Inter } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/sonner"
+import ThemeSwitcher from "@/components/theme-switcher"
+import ModernNavigation from "@/components/modern-navigation"
 
 const inter = Inter({ 
   subsets: ["latin"],
@@ -116,6 +118,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           {children}
+          <ThemeSwitcher />
           <Toaster />
         </ThemeProvider>
       </body>

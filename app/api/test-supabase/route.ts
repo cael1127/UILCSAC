@@ -1,50 +1,56 @@
-import { NextResponse } from 'next/server'
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
+import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    // Test basic Supabase connection
-    const supabase = createRouteHandlerClient({ cookies })
-    
-    // Test environment variables
-    const envStatus = {
-      url: process.env.NEXT_PUBLIC_SUPABASE_URL ? 'Set' : 'Missing',
-      anonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? 'Set' : 'Missing',
-      serviceKey: process.env.SUPABASE_SERVICE_ROLE_KEY ? 'Set' : 'Missing'
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    // Check environment variables
+    if (!supabaseUrl || !supabaseServiceKey) {
+      return NextResponse.json({
+        success: false,
+        error: 'Missing environment variables',
+        details: {
+          NEXT_PUBLIC_SUPABASE_URL: supabaseUrl ? 'SET' : 'MISSING',
+          SUPABASE_SERVICE_ROLE_KEY: supabaseServiceKey ? 'SET' : 'MISSING'
+        }
+      }, { status: 500 });
     }
+
+    // Test Supabase connection
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
     
-    // Test database connection
-    const { data: testData, error: testError } = await supabase
-      .from('learning_paths')
+    // Try to query the code_executions table
+    const { data, error } = await supabase
+      .from('code_executions')
       .select('count')
-      .limit(1)
-    
-    // Test auth status
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession()
-    
+      .limit(1);
+
+    if (error) {
+      return NextResponse.json({
+        success: false,
+        error: 'Supabase connection failed',
+        details: error.message,
+        hint: error.hint
+      }, { status: 500 });
+    }
+
     return NextResponse.json({
       success: true,
-      timestamp: new Date().toISOString(),
-      environment: envStatus,
-      database: {
-        connected: !testError,
-        error: testError?.message || null,
-        data: testData
+      message: 'Supabase connection successful',
+      environment: {
+        url: supabaseUrl.substring(0, 20) + '...',
+        key: supabaseServiceKey.substring(0, 20) + '...'
       },
-      auth: {
-        hasSession: !!session,
-        sessionError: sessionError?.message || null,
-        userId: session?.user?.id || null
-      }
-    })
-    
+      tableAccess: 'code_executions table accessible'
+    });
+
   } catch (error) {
-    console.error('Supabase test error:', error)
     return NextResponse.json({
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
-      timestamp: new Date().toISOString()
-    }, { status: 500 })
+      error: 'Test failed',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, { status: 500 });
   }
 }

@@ -1,5 +1,7 @@
-// Web-based Java interpreter for client-side code execution
-// This interpreter actually compiles and executes Java code
+// WebAssembly-based Java execution system
+// This system runs Java code in the browser without requiring Java installation
+
+import { wasmJavaLoader, isWebAssemblySupported } from './wasm-java-loader';
 
 export interface JavaExecutionResult {
   success: boolean;
@@ -22,9 +24,12 @@ export class JavaInterpreter {
   private output: string[] = [];
   private error: string | null = null;
   private executionStartTime: number = 0;
+  private wasmInstance: any = null;
+  private isWasmLoaded = false;
 
   constructor() {
     this.reset();
+    this.initializeWasm();
   }
 
   reset(): void {
@@ -34,81 +39,109 @@ export class JavaInterpreter {
     this.executionStartTime = 0;
   }
 
-  execute(code: string): JavaExecutionResult {
+  private async initializeWasm() {
+    try {
+      // Check if WebAssembly is supported
+      if (!isWebAssemblySupported()) {
+        console.warn('WebAssembly not supported in this browser');
+        this.isWasmLoaded = false;
+        return;
+      }
+      
+      console.log('Initializing WebAssembly Java runtime...');
+      
+      // Load the actual WebAssembly Java runtime
+      const runtime = await wasmJavaLoader.load();
+      this.wasmInstance = runtime;
+      this.isWasmLoaded = true;
+      
+      console.log('WebAssembly Java runtime ready');
+    } catch (error) {
+      console.warn('WebAssembly Java runtime not available, falling back to interpreter:', error);
+      this.isWasmLoaded = false;
+    }
+  }
+
+  async execute(code: string): Promise<JavaExecutionResult> {
     this.executionStartTime = performance.now();
     
     try {
       this.reset();
       
-      // Parse and validate Java code
-      if (!this.validateJavaCode(code)) {
+      // Basic Java syntax validation
+      const validationResult = this.validateJavaCode(code);
+      if (!validationResult.isValid) {
         return {
           success: false,
           output: '',
-          error: this.error || 'Invalid Java code structure. Please ensure you have a proper main method.',
+          error: validationResult.error,
           executionTime: 0
         };
       }
 
-      // Execute the code
-      this.executeJavaCode(code);
+      // Execute the code using WebAssembly Java runtime or fallback interpreter
+      let result;
+      if (this.isWasmLoaded) {
+        result = await this.executeWithWasm(code);
+      } else {
+        result = await this.executeWithInterpreter(code);
+      }
       
       const executionTime = performance.now() - this.executionStartTime;
       
       return {
-        success: this.error === null,
-        output: this.output.length > 0 ? this.output.join('\n') : 'Program executed successfully (no output)',
-        error: this.error || undefined,
+        success: result.success,
+        output: result.output,
+        error: result.error,
         executionTime: executionTime,
-        variables: this.getVariablesMap()
+        variables: result.variables || {}
       };
     } catch (err) {
       const executionTime = performance.now() - this.executionStartTime;
       return {
         success: false,
-        output: this.output.join('\n'),
+        output: '',
         error: err instanceof Error ? err.message : 'Unknown error occurred',
         executionTime: executionTime
       };
     }
   }
 
-  private validateJavaCode(code: string): boolean {
-    // Basic Java validation
-    const trimmedCode = code.trim();
-    
-    // Must contain a main method
-    if (!trimmedCode.includes('public static void main(String[] args)')) {
-      this.error = 'Java code must contain a main method: public static void main(String[] args)';
-      return false;
+  private async executeWithWasm(code: string): Promise<{ success: boolean; output: string; error?: string; variables?: Record<string, any> }> {
+    try {
+      if (!this.wasmInstance) {
+        throw new Error('WebAssembly runtime not initialized');
+      }
+      
+      // Use the actual WebAssembly Java runtime
+      const result = await this.wasmInstance.executeJava(code);
+      
+      return {
+        success: result.success,
+        output: result.output,
+        error: result.error,
+        variables: result.variables || {}
+      };
+      
+    } catch (error) {
+      console.warn('WebAssembly execution failed, falling back to interpreter:', error);
+      
+      // Fall back to interpreter if WASM fails
+      return await this.executeWithInterpreter(code);
     }
-    
-    // Must have proper braces
-    const openBraces = (trimmedCode.match(/\{/g) || []).length;
-    const closeBraces = (trimmedCode.match(/\}/g) || []).length;
-    
-    if (openBraces !== closeBraces) {
-      this.error = `Mismatched braces: found ${openBraces} opening and ${closeBraces} closing braces`;
-      return false;
-    }
-    
-    // Check for basic Java class structure
-    if (!trimmedCode.includes('class') && !trimmedCode.includes('public class')) {
-      this.error = 'Java code must be wrapped in a class declaration';
-      return false;
-    }
-    
-    return true;
   }
 
-  private executeJavaCode(code: string): void {
+  private async executeWithInterpreter(code: string): Promise<{ success: boolean; output: string; error?: string; variables?: Record<string, any> }> {
     try {
       // Extract the main method content
       const mainMethodMatch = code.match(/public static void main\(String\[\] args\)\s*\{([\s\S]*)\}/);
       
       if (!mainMethodMatch) {
-        this.error = 'Could not find main method';
-        return;
+        return {
+          success: false,
+          output: '',
+          error: 'Could not find main method'
+        };
       }
 
       const mainMethodBody = mainMethodMatch[1];
@@ -118,12 +151,191 @@ export class JavaInterpreter {
       
       for (const statement of statements) {
         if (this.error) break;
-        this.executeStatement(statement);
+        await this.executeStatement(statement);
       }
       
+      return {
+        success: this.error === null,
+        output: this.output.length > 0 ? this.output.join('\n') : 'Program executed successfully (no output)',
+        error: this.error || undefined,
+        variables: this.getVariablesMap()
+      };
+      
     } catch (err) {
-      this.error = `Execution error: ${err instanceof Error ? err.message : 'Unknown error'}`;
+      return {
+        success: false,
+        output: '',
+        error: `Interpreter execution error: ${err instanceof Error ? err.message : 'Unknown error'}`,
+        variables: {}
+      };
     }
+  }
+
+  private validateJavaCode(code: string): { isValid: boolean; error?: string } {
+    const trimmedCode = code.trim();
+    
+    // Check for basic Java structure
+    if (!trimmedCode.includes('public class')) {
+      return { isValid: false, error: 'Java code must start with "public class"' };
+    }
+    
+    // Check for main method
+    if (!trimmedCode.includes('public static void main(String[] args)')) {
+      return { isValid: false, error: 'Java code must contain a main method: public static void main(String[] args)' };
+    }
+    
+    // Check for proper class structure
+    const classMatch = trimmedCode.match(/public class (\w+)/);
+    if (!classMatch) {
+      return { isValid: false, error: 'Invalid class declaration syntax' };
+    }
+    
+    const className = classMatch[1];
+    
+    // Check for matching braces
+    const braceValidation = this.validateBraces(trimmedCode);
+    if (!braceValidation.isValid) {
+      return { isValid: false, error: braceValidation.error };
+    }
+    
+    // Check for semicolons after statements
+    const semicolonValidation = this.validateSemicolons(trimmedCode);
+    if (!semicolonValidation.isValid) {
+      return { isValid: false, error: semicolonValidation.error };
+    }
+    
+    // Check for proper import statements
+    const importValidation = this.validateImports(trimmedCode);
+    if (!importValidation.isValid) {
+      return { isValid: false, error: importValidation.error };
+    }
+    
+    // Check for basic syntax errors
+    const syntaxValidation = this.validateBasicSyntax(trimmedCode);
+    if (!syntaxValidation.isValid) {
+      return { isValid: false, error: syntaxValidation.error };
+    }
+    
+    return { isValid: true };
+  }
+
+  private validateBraces(code: string): { isValid: boolean; error?: string } {
+    let braceLevel = 0;
+    let inString = false;
+    let stringChar = '';
+    
+    for (let i = 0; i < code.length; i++) {
+      const char = code[i];
+      
+      // Handle string literals
+      if (char === '"' || char === "'") {
+        if (!inString) {
+          inString = true;
+          stringChar = char;
+        } else if (stringChar === char) {
+          inString = false;
+        }
+      }
+      
+      if (!inString) {
+        if (char === '{') braceLevel++;
+        if (char === '}') braceLevel--;
+        
+        if (braceLevel < 0) {
+          return { isValid: false, error: `Unexpected closing brace '}' at position ${i + 1}` };
+        }
+      }
+    }
+    
+    if (braceLevel > 0) {
+      return { isValid: false, error: `Missing ${braceLevel} closing brace(s)` };
+    }
+    
+    if (braceLevel < 0) {
+      return { isValid: false, error: `Unexpected closing brace` };
+    }
+    
+    return { isValid: true };
+  }
+
+  private validateSemicolons(code: string): { isValid: boolean; error?: string } {
+    const lines = code.split('\n');
+    
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      
+      // Skip empty lines, comments, and lines that should end with semicolons
+      if (line === '' || line.startsWith('//') || line.startsWith('/*') || line.startsWith('*')) {
+        continue;
+      }
+      
+      // Check if line should end with semicolon
+      if (this.shouldEndWithSemicolon(line) && !line.endsWith(';') && !line.endsWith('{') && !line.endsWith('}')) {
+        return { 
+          isValid: false, 
+          error: `Missing semicolon at line ${i + 1}: "${line}"` 
+        };
+      }
+    }
+    
+    return { isValid: true };
+  }
+
+  private shouldEndWithSemicolon(line: string): boolean {
+    const trimmed = line.trim();
+    
+    // These should end with semicolons
+    if (trimmed.includes('System.out.println') || 
+        trimmed.includes('=') ||
+        trimmed.match(/^(int|String|double|boolean)\s+\w+/)) {
+      return true;
+    }
+    
+    return false;
+  }
+
+  private validateImports(code: string): { isValid: boolean; error?: string } {
+    const lines = code.split('\n');
+    
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (trimmed.startsWith('import ')) {
+        // Check if import statement is valid
+        if (!trimmed.endsWith(';')) {
+          return { isValid: false, error: `Import statement missing semicolon: "${trimmed}"` };
+        }
+        
+        // Check for valid import patterns
+        if (!trimmed.match(/^import\s+(java\.(util|io|math)\..*|java\..*);$/)) {
+          return { isValid: false, error: `Invalid import statement: "${trimmed}"` };
+        }
+      }
+    }
+    
+    return { isValid: true };
+  }
+
+  private validateBasicSyntax(code: string): { isValid: boolean; error?: string } {
+    // Check for common syntax errors
+    
+    // Check for unmatched quotes
+    const singleQuotes = (code.match(/'/g) || []).length;
+    const doubleQuotes = (code.match(/"/g) || []).length;
+    
+    if (singleQuotes % 2 !== 0) {
+      return { isValid: false, error: 'Unmatched single quotes in code' };
+    }
+    
+    if (doubleQuotes % 2 !== 0) {
+      return { isValid: false, error: 'Unmatched double quotes in code' };
+    }
+    
+    // Check for basic Java keywords
+    if (!code.includes('class') || !code.includes('public') || !code.includes('static') || !code.includes('void')) {
+      return { isValid: false, error: 'Missing required Java keywords (class, public, static, void)' };
+    }
+    
+    return { isValid: true };
   }
 
   private parseStatements(mainMethodBody: string): string[] {
@@ -171,7 +383,7 @@ export class JavaInterpreter {
     return statements.filter(stmt => stmt.trim() && !stmt.trim().startsWith('//'));
   }
 
-  private executeStatement(statement: string): void {
+  private async executeStatement(statement: string): Promise<void> {
     const trimmedStmt = statement.trim();
     
     try {
@@ -183,6 +395,9 @@ export class JavaInterpreter {
         this.handleDeclaration(trimmedStmt);
       } else if (trimmedStmt.includes('if') || trimmedStmt.includes('for') || trimmedStmt.includes('while')) {
         this.handleControlFlow(trimmedStmt);
+      } else if (trimmedStmt.trim() && !trimmedStmt.trim().startsWith('//')) {
+        // Try to evaluate any other statement
+        this.evaluateExpression(trimmedStmt);
       }
     } catch (err) {
       this.error = `Error executing statement "${trimmedStmt}": ${err instanceof Error ? err.message : 'Unknown error'}`;
@@ -317,6 +532,11 @@ export class JavaInterpreter {
 
   getOutput(): string[] {
     return [...this.output];
+  }
+
+  // Check if WebAssembly runtime is available
+  isWasmAvailable(): boolean {
+    return this.isWasmLoaded;
   }
 }
 

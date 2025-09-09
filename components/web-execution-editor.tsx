@@ -148,7 +148,7 @@ export function WebExecutionEditor({
   };
 
   const getExecutionStatusColor = (success: boolean) => {
-    return success ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+    return success ? 'bg-success/20 text-success' : 'bg-destructive/20 text-destructive';
   };
 
   const getExecutionStatusIcon = (success: boolean) => {
@@ -168,17 +168,17 @@ export function WebExecutionEditor({
         <CardContent className="space-y-3">
           <div>
             <h3 className="font-semibold text-lg">{questionTitle}</h3>
-            <p className="text-gray-600 text-sm">{questionDescription}</p>
+            <p className="text-[var(--muted-foreground)] text-sm">{questionDescription}</p>
           </div>
           
           {expectedSignature && (
-            <div className="bg-blue-50 p-3 rounded-lg">
+            <div className="bg-info/10 p-3 rounded-lg">
               <p className="text-sm font-medium text-blue-800">Expected Function Signature:</p>
               <code className="text-blue-700 font-mono text-sm">{expectedSignature}</code>
             </div>
           )}
 
-          <div className="flex items-center gap-2 text-sm text-gray-600">
+          <div className="flex items-center gap-2 text-sm text-[var(--muted-foreground)]">
             <Clock className="w-4 h-4" />
             <span>Timeout: 10 seconds</span>
             <Separator orientation="vertical" className="h-4" />
@@ -257,19 +257,19 @@ export function WebExecutionEditor({
 
                   {/* Execution Details */}
                   <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div className="bg-gray-50 p-3 rounded-lg">
-                      <p className="font-medium text-gray-700">Execution Time</p>
-                      <p className="text-gray-600">{executionResult.executionTime}ms</p>
-                    </div>
-                    <div className="bg-gray-50 p-3 rounded-lg">
-                      <p className="font-medium text-gray-700">Memory Usage</p>
-                      <p className="text-gray-600">{(executionResult.memoryUsage / 1024 / 1024).toFixed(2)} MB</p>
-                    </div>
+                                       <div className="bg-[var(--muted)] p-3 rounded-lg">
+                     <p className="font-medium text-[var(--foreground)]">Execution Time</p>
+                     <p className="text-[var(--muted-foreground)]">{executionResult.executionTime}ms</p>
+                   </div>
+                   <div className="bg-[var(--muted)] p-3 rounded-lg">
+                     <p className="font-medium text-[var(--foreground)]">Memory Usage</p>
+                     <p className="text-[var(--muted-foreground)]">{(executionResult.memoryUsage / 1024 / 1024).toFixed(2)} MB</p>
+                   </div>
                   </div>
 
                   {/* Output */}
                   {executionResult.output && (
-                    <div className="bg-black text-green-400 p-4 rounded-lg font-mono text-sm overflow-auto max-h-64">
+                    <div className="bg-[var(--muted)] text-[var(--foreground)] p-4 rounded-lg font-mono text-sm overflow-auto max-h-64 border border-[var(--border)]">
                       <div className="flex items-center gap-2 mb-2">
                         <span className="text-green-500">$</span>
                         <span>Program Output:</span>
@@ -278,21 +278,21 @@ export function WebExecutionEditor({
                     </div>
                   )}
 
-                  {/* Variables State (for debugging) */}
-                  {executionResult.success && (
-                    <div className="bg-gray-50 p-3 rounded-lg">
-                      <p className="font-medium text-gray-700 mb-2">Variables State:</p>
-                      <div className="text-xs text-gray-600 font-mono">
+                                     {/* Variables State (for debugging) */}
+                   {executionResult.success && (
+                     <div className="bg-[var(--muted)] p-3 rounded-lg">
+                       <p className="font-medium text-[var(--foreground)] mb-2">Variables State:</p>
+                       <div className="text-xs text-[var(--muted-foreground)] font-mono">
                         {executionResult.variables ? (
                           Object.entries(executionResult.variables).map(([name, value]) => (
                             <div key={name} className="flex gap-2">
-                              <span className="text-blue-600">{name}</span>
-                              <span>=</span>
-                              <span className="text-green-600">{String(value)}</span>
+                                                         <span className="text-[var(--primary)]">{name}</span>
+                           <span>=</span>
+                           <span className="text-[var(--success)]">{String(value)}</span>
                             </div>
                           ))
                         ) : (
-                          <span className="text-gray-500">No variables declared</span>
+                          <span className="text-[var(--muted-foreground)]">No variables declared</span>
                         )}
                       </div>
                     </div>
@@ -300,7 +300,7 @@ export function WebExecutionEditor({
 
                   {/* Error */}
                   {executionResult.error && (
-                    <div className="bg-red-50 border border-red-200 p-4 rounded-lg">
+                    <div className="bg-destructive/10 border border-destructive/20 p-4 rounded-lg">
                       <div className="flex items-center gap-2 mb-2">
                         <AlertTriangle className="w-4 h-4 text-red-600" />
                         <span className="font-medium text-red-800">Error:</span>
@@ -309,19 +309,19 @@ export function WebExecutionEditor({
                     </div>
                   )}
 
-                  {/* Environment Info */}
-                  <div className="bg-blue-50 p-3 rounded-lg text-sm">
-                    <p className="text-blue-800">
-                      <strong>Environment:</strong> {executionResult.environment.name} v{executionResult.environment.version}
-                    </p>
-                    <p className="text-blue-700">
-                      <strong>Limits:</strong> {executionResult.environment.timeout}ms timeout, {executionResult.environment.memoryLimit}MB memory
-                    </p>
-                  </div>
+                                     {/* Environment Info */}
+                   <div className="bg-[var(--info)]/10 p-3 rounded-lg text-sm">
+                     <p className="text-[var(--info-foreground)]">
+                       <strong>Environment:</strong> {executionResult.environment.name} v{executionResult.environment.version}
+                     </p>
+                     <p className="text-[var(--info-foreground)]">
+                       <strong>Limits:</strong> {executionResult.environment.timeout}ms timeout, {executionResult.environment.memoryLimit}MB memory
+                     </p>
+                   </div>
                 </div>
               ) : (
-                <div className="text-center text-gray-500 py-8">
-                  <Play className="w-12 h-12 mx-auto mb-2 text-gray-300" />
+                <div className="text-center text-[var(--muted-foreground)] py-8">
+                  <Play className="w-12 h-12 mx-auto mb-2 text-[var(--muted-foreground)]" />
                   <p>Click "Run Code" to execute your Java code</p>
                   <p className="text-sm">No Java installation required - runs in your browser!</p>
                 </div>
@@ -336,7 +336,7 @@ export function WebExecutionEditor({
                     <div
                       key={index}
                       className={`p-4 rounded-lg border ${
-                        test.passed ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
+                        test.passed ? 'bg-success/10 border-success/20' : 'bg-destructive/10 border-destructive/20'
                       }`}
                     >
                       <div className="flex items-center justify-between mb-2">
@@ -348,34 +348,34 @@ export function WebExecutionEditor({
                       
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
                         <div>
-                          <p className="font-medium text-gray-700">Input:</p>
-                          <code className="text-gray-600 bg-gray-100 px-2 py-1 rounded">
+                          <p className="font-medium text-[var(--foreground)]">Input:</p>
+                          <code className="text-[var(--muted-foreground)] bg-[var(--muted)] px-2 py-1 rounded">
                             {JSON.stringify(test.input)}
                           </code>
                         </div>
                         <div>
-                          <p className="font-medium text-gray-700">Expected:</p>
-                          <code className="text-gray-600 bg-gray-100 px-2 py-1 rounded">
+                          <p className="font-medium text-[var(--foreground)]">Expected:</p>
+                          <code className="text-[var(--muted-foreground)] bg-[var(--muted)] px-2 py-1 rounded">
                             {JSON.stringify(test.expected)}
                           </code>
                         </div>
                         <div>
-                          <p className="font-medium text-gray-700">Actual:</p>
-                          <code className="text-gray-600 bg-gray-100 px-2 py-1 rounded">
+                          <p className="font-medium text-[var(--foreground)]">Actual:</p>
+                          <code className="text-[var(--muted-foreground)] bg-[var(--muted)] px-2 py-1 rounded">
                             {JSON.stringify(test.actual)}
                           </code>
                         </div>
                       </div>
                       
-                      <div className="mt-2 text-xs text-gray-500">
+                      <div className="mt-2 text-xs text-[var(--muted-foreground)]">
                         Execution time: {test.executionTime}ms
                       </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="text-center text-gray-500 py-8">
-                  <CheckCircle className="w-12 h-12 mx-auto mb-2 text-gray-300" />
+                <div className="text-center text-[var(--muted-foreground)] py-8">
+                  <CheckCircle className="w-12 h-12 mx-auto mb-2 text-[var(--muted-foreground)]" />
                   <p>No test results available</p>
                   <p className="text-sm">Run your code to see test results</p>
                 </div>
@@ -397,7 +397,7 @@ export function WebExecutionEditor({
                 <div
                   key={index}
                   className={`flex items-center justify-between p-3 rounded-lg border ${
-                    result.success ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
+                    result.success ? 'bg-success/10 border-success/20' : 'bg-destructive/10 border-destructive/20'
                   }`}
                 >
                   <div className="flex items-center gap-3">
@@ -406,7 +406,7 @@ export function WebExecutionEditor({
                       <p className="font-medium text-sm">
                         Execution #{executionHistory.length - index}
                       </p>
-                      <p className="text-xs text-gray-600">
+                      <p className="text-xs text-[var(--muted-foreground)]">
                         {result.executionTime}ms • {(result.memoryUsage / 1024 / 1024).toFixed(2)}MB
                       </p>
                     </div>

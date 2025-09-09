@@ -75,8 +75,8 @@ export default function SignUpForm() {
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>Create Account</CardTitle>
-        <CardDescription>
+        <CardTitle style={{ color: 'var(--foreground)' }}>Create Account</CardTitle>
+        <CardDescription style={{ color: 'var(--muted-foreground)' }}>
           Sign up to get started with UIL CS Academy
         </CardDescription>
       </CardHeader>
@@ -92,7 +92,7 @@ export default function SignUpForm() {
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="firstName">First Name</Label>
+              <Label htmlFor="firstName" style={{ color: 'var(--foreground)' }}>First Name</Label>
               <Input
                 id="firstName"
                 type="text"
@@ -100,11 +100,12 @@ export default function SignUpForm() {
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
                 required
+                style={{ color: 'var(--foreground)' }}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="lastName">Last Name</Label>
+              <Label htmlFor="lastName" style={{ color: 'var(--foreground)' }}>Last Name</Label>
               <Input
                 id="lastName"
                 type="text"
@@ -112,12 +113,13 @@ export default function SignUpForm() {
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
                 required
+                style={{ color: 'var(--foreground)' }}
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email" style={{ color: 'var(--foreground)' }}>Email</Label>
             <Input
               id="email"
               type="email"
@@ -125,11 +127,12 @@ export default function SignUpForm() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              style={{ color: 'var(--foreground)' }}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password" style={{ color: 'var(--foreground)' }}>Password</Label>
             <Input
               id="password"
               type="password"
@@ -137,11 +140,12 @@ export default function SignUpForm() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              style={{ color: 'var(--foreground)' }}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="confirmPassword">Confirm Password</Label>
+            <Label htmlFor="confirmPassword" style={{ color: 'var(--foreground)' }}>Confirm Password</Label>
             <Input
               id="confirmPassword"
               type="password"
@@ -149,23 +153,24 @@ export default function SignUpForm() {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
+              style={{ color: 'var(--foreground)' }}
             />
           </div>
 
-          <Button type="submit" className="w-full" disabled={loading}>
+          <Button type="submit" className="w-full" disabled={loading} style={{ backgroundColor: 'var(--primary)', color: 'var(--primary-foreground)' }}>
             {loading ? "Creating account..." : "Create Account"}
           </Button>
 
           <div className="text-center text-sm space-y-2">
             <div>
-              <span className="text-muted-foreground">Already have an account? </span>
-              <Link href="/auth/login" className="text-primary hover:underline">
+              <span style={{ color: 'var(--muted-foreground)' }}>Already have an account? </span>
+              <Link href="/auth/login" className="text-[var(--primary)] hover:underline">
                 Sign in
               </Link>
             </div>
             <div>
-              <span className="text-muted-foreground">Already logged in? </span>
-              <Link href="/dashboard" className="text-primary hover:underline">
+              <span style={{ color: 'var(--muted-foreground)' }}>Already logged in? </span>
+              <Link href="/dashboard" className="text-[var(--primary)] hover:underline">
                 Go to Dashboard
               </Link>
             </div>

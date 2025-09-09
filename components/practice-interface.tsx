@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ArrowLeft, Play, Send, Clock, Trophy, Target, CheckCircle, XCircle, AlertCircle } from "lucide-react"
 import Link from "next/link"
-import CodeEditor from "./code-editor"
+import { UnifiedJavaIDE } from "./unified-java-ide"
 import { TestingService } from "@/lib/testing-service"
 
 interface TestCase {
@@ -33,9 +33,9 @@ interface Problem {
   points: number
   time_limit: number
   memory_limit: number
-  categories?: { name: string; color: string }
-  difficulty_levels?: { name: string; level: number; color: string }
-  user_progress?: Array<{ status: string; best_score: number; attempts: number }>
+  category?: string
+  difficulty_level?: number
+  user_progress?: { status: string; best_score: number; attempts: number }
   test_cases: TestCase[]
 }
 
@@ -68,7 +68,7 @@ export default function PracticeInterface({ problem, userId }: PracticeInterface
   const [editorTheme, setEditorTheme] = useState("vs-dark")
   const [fontSize, setFontSize] = useState(14)
 
-  const userProgress = problem.user_progress?.[0]
+  const userProgress = problem.user_progress
   const status = userProgress?.status || "not_attempted"
 
   // Load saved code from localStorage
@@ -143,7 +143,19 @@ export default function PracticeInterface({ problem, userId }: PracticeInterface
         return `import java.util.*;
 
 public class Solution {
-    public int[] twoSum(int[] nums, int target) {
+    public static String arrayToString(int[] arr) {
+        if (arr == null) return "null";
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        for (int i = 0; i < arr.length; i++) {
+            if (i > 0) sb.append(", ");
+            sb.append(arr[i]);
+        }
+        sb.append("]");
+        return sb.toString();
+    }
+
+    public static int[] twoSum(int[] nums, int target) {
         // TODO: Implement the two sum algorithm
         // Given an array of integers nums and an integer target,
         // return indices of the two numbers such that they add up to target.
@@ -161,18 +173,16 @@ public class Solution {
     
     // Main method for testing
     public static void main(String[] args) {
-        Solution solution = new Solution();
-        
         // Test cases
         int[] nums1 = {2, 7, 11, 15};
         int target1 = 9;
-        int[] result1 = solution.twoSum(nums1, target1);
-        System.out.println("Test 1: " + Arrays.toString(result1));
+        int[] result1 = twoSum(nums1, target1);
+        System.out.println("Test 1: " + arrayToString(result1));
         
         int[] nums2 = {3, 2, 4};
         int target2 = 6;
-        int[] result2 = solution.twoSum(nums2, target2);
-        System.out.println("Test 2: " + Arrays.toString(result2));
+        int[] result2 = twoSum(nums2, target2);
+        System.out.println("Test 2: " + arrayToString(result2));
     }
 }`
       }
@@ -182,7 +192,7 @@ public class Solution {
         return `import java.util.*;
 
 public class Solution {
-    public boolean isPalindrome(String s) {
+    public static boolean isPalindrome(String s) {
         // TODO: Implement palindrome check
         // A phrase is a palindrome if, after converting all uppercase letters into lowercase letters
         // and removing all non-alphanumeric characters, it reads the same forward and backward.
@@ -199,14 +209,12 @@ public class Solution {
     
     // Main method for testing
     public static void main(String[] args) {
-        Solution solution = new Solution();
-        
         // Test cases
         String test1 = "A man, a plan, a canal: Panama";
-        System.out.println("Test 1: " + solution.isPalindrome(test1));
+        System.out.println("Test 1: " + isPalindrome(test1));
         
         String test2 = "race a car";
-        System.out.println("Test 2: " + solution.isPalindrome(test2));
+        System.out.println("Test 2: " + isPalindrome(test2));
     }
 }`
       }
@@ -216,7 +224,7 @@ public class Solution {
         return `import java.util.*;
 
 public class Solution {
-    public int fibonacci(int n) {
+    public static int fibonacci(int n) {
         // TODO: Implement fibonacci calculation
         // The Fibonacci numbers, commonly denoted F(n) form a sequence, called the Fibonacci sequence,
         // such that each number is the sum of the two preceding ones, starting from 0 and 1.
@@ -233,13 +241,11 @@ public class Solution {
     
     // Main method for testing
     public static void main(String[] args) {
-        Solution solution = new Solution();
-        
         // Test cases
-        System.out.println("Test 1: F(0) = " + solution.fibonacci(0));
-        System.out.println("Test 2: F(1) = " + solution.fibonacci(1));
-        System.out.println("Test 3: F(5) = " + solution.fibonacci(5));
-        System.out.println("Test 4: F(10) = " + solution.fibonacci(10));
+        System.out.println("Test 1: F(0) = " + fibonacci(0));
+        System.out.println("Test 2: F(1) = " + fibonacci(1));
+        System.out.println("Test 3: F(5) = " + fibonacci(5));
+        System.out.println("Test 4: F(10) = " + fibonacci(10));
     }
 }`
       }
@@ -249,7 +255,19 @@ public class Solution {
         return `import java.util.*;
 
 public class Solution {
-    public int[] sortArray(int[] nums) {
+    public static String arrayToString(int[] arr) {
+        if (arr == null) return "null";
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        for (int i = 0; i < arr.length; i++) {
+            if (i > 0) sb.append(", ");
+            sb.append(arr[i]);
+        }
+        sb.append("]");
+        return sb.toString();
+    }
+
+    public static int[] sortArray(int[] nums) {
         // TODO: Implement array sorting algorithm
         // Given an array of integers nums, sort the array in ascending order and return it.
         // You must solve the problem without using any built-in sort functions.
@@ -263,16 +281,14 @@ public class Solution {
     
     // Main method for testing
     public static void main(String[] args) {
-        Solution solution = new Solution();
-        
         // Test cases
         int[] nums1 = {5, 2, 3, 1};
-        int[] result1 = solution.sortArray(nums1);
-        System.out.println("Test 1: " + Arrays.toString(result1));
+        int[] result1 = sortArray(nums1);
+        System.out.println("Test 1: " + arrayToString(result1));
         
         int[] nums2 = {5, 1, 1, 2, 0, 0};
-        int[] result2 = solution.sortArray(nums2);
-        System.out.println("Test 2: " + Arrays.toString(result2));
+        int[] result2 = sortArray(nums2);
+        System.out.println("Test 2: " + arrayToString(result2));
     }
 }`
       }
@@ -282,7 +298,7 @@ public class Solution {
         return `import java.util.*;
 
 public class Solution {
-    public String reverseString(String s) {
+    public static String reverseString(String s) {
         // TODO: Implement string reversal
         // Write a function that reverses a string. The input string is given as an array of characters s.
         // You must do this by modifying the input array in-place with O(1) extra memory.
@@ -296,14 +312,12 @@ public class Solution {
     
     // Main method for testing
     public static void main(String[] args) {
-        Solution solution = new Solution();
-        
         // Test cases
         String test1 = "hello";
-        System.out.println("Test 1: " + solution.reverseString(test1));
+        System.out.println("Test 1: " + reverseString(test1));
         
         String test2 = "Hannah";
-        System.out.println("Test 2: " + solution.reverseString(test2));
+        System.out.println("Test 2: " + reverseString(test2));
     }
 }`
       }
@@ -313,7 +327,7 @@ public class Solution {
         return `import java.util.*;
 
 public class Solution {
-    public boolean isPrime(int n) {
+    public static boolean isPrime(int n) {
         // TODO: Implement prime number check
         // Given an integer n, return true if n is a prime number, and false otherwise.
         // A prime number is a natural number greater than 1 that is not a product of two smaller natural numbers.
@@ -328,12 +342,10 @@ public class Solution {
     
     // Main method for testing
     public static void main(String[] args) {
-        Solution solution = new Solution();
-        
         // Test cases
-        System.out.println("Test 1: isPrime(2) = " + solution.isPrime(2));
-        System.out.println("Test 2: isPrime(4) = " + solution.isPrime(4));
-        System.out.println("Test 3: isPrime(17) = " + solution.isPrime(17));
+        System.out.println("Test 1: isPrime(2) = " + isPrime(2));
+        System.out.println("Test 2: isPrime(4) = " + isPrime(4));
+        System.out.println("Test 3: isPrime(17) = " + isPrime(17));
     }
 }`
       }
@@ -357,7 +369,7 @@ public class Solution {
         }
     }
     
-    public int maxDepth(TreeNode root) {
+    public static int maxDepth(TreeNode root) {
         // TODO: Implement maximum depth calculation
         // Given the root of a binary tree, return its maximum depth.
         // A binary tree's maximum depth is the number of nodes along the longest path
@@ -372,11 +384,9 @@ public class Solution {
     
     // Main method for testing
     public static void main(String[] args) {
-        Solution solution = new Solution();
-        
         // Test cases
         // Note: You'll need to create tree structures for testing
-        System.out.println("Test 1: maxDepth(null) = " + solution.maxDepth(null));
+        System.out.println("Test 1: maxDepth(null) = " + maxDepth(null));
     }
 }`
       }
@@ -386,7 +396,7 @@ public class Solution {
         return `import java.util.*;
 
 public class Solution {
-    public int climbStairs(int n) {
+    public static int climbStairs(int n) {
         // TODO: Implement climbing stairs solution
         // You are climbing a staircase. It takes n steps to reach the top.
         // Each time you can either climb 1 or 2 steps. In how many distinct ways can you climb to the top?
@@ -403,12 +413,10 @@ public class Solution {
     
     // Main method for testing
     public static void main(String[] args) {
-        Solution solution = new Solution();
-        
         // Test cases
-        System.out.println("Test 1: climbStairs(2) = " + solution.climbStairs(2));
-        System.out.println("Test 2: climbStairs(3) = " + solution.climbStairs(3));
-        System.out.println("Test 3: climbStairs(4) = " + solution.climbStairs(4));
+        System.out.println("Test 1: climbStairs(2) = " + climbStairs(2));
+        System.out.println("Test 2: climbStairs(3) = " + climbStairs(3));
+        System.out.println("Test 3: climbStairs(4) = " + climbStairs(4));
     }
 }`
       }
@@ -417,7 +425,7 @@ public class Solution {
       return `import java.util.*;
 
 public class Solution {
-    public String solve(String input) {
+    public static String solve(String input) {
         // TODO: Implement your solution here
         // Problem: ${problem.title}
         // 
@@ -431,11 +439,9 @@ public class Solution {
     
     // Main method for testing
     public static void main(String[] args) {
-        Solution solution = new Solution();
-        
         // Test cases
         String test1 = "test input";
-        System.out.println("Test 1: " + solution.solve(test1));
+        System.out.println("Test 1: " + solve(test1));
     }
 }`
     }
@@ -663,19 +669,24 @@ solution.test();`
   }
 
   const getDifficultyBadge = () => {
-    if (!problem.difficulty_levels) return null
+    const difficultyLevel = problem.difficulty_level
+    if (!difficultyLevel) return null
 
-    const colors: Record<string, string> = {
-      Beginner: "bg-green-500/10 text-green-700 border-green-500/20",
-      Easy: "bg-blue-500/10 text-blue-700 border-blue-500/20",
-      Medium: "bg-yellow-500/10 text-yellow-700 border-yellow-500/20",
-      Hard: "bg-red-500/10 text-red-700 border-red-500/20",
-      Expert: "bg-purple-500/10 text-purple-700 border-purple-500/20",
+    const colors: Record<number, string> = {
+      1: "bg-green-500/10 text-green-700 border-green-500/20",
+      2: "bg-yellow-500/10 text-yellow-700 border-yellow-500/20", 
+      3: "bg-red-500/10 text-red-700 border-red-500/20",
+    }
+
+    const difficultyNames: Record<number, string> = {
+      1: "Beginner",
+      2: "Intermediate", 
+      3: "Advanced"
     }
 
     return (
-      <Badge className={colors[problem.difficulty_levels.name] || "bg-gray-500/10 text-gray-700 border-gray-500/20"}>
-        {problem.difficulty_levels.name}
+      <Badge className={colors[difficultyLevel] || "bg-[var(--muted)]/10 text-[var(--foreground)] border-[var(--border)]/20"}>
+        {difficultyNames[difficultyLevel] || "Unknown"}
       </Badge>
     )
   }
@@ -763,24 +774,24 @@ solution.test();`
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-card">
+    <div className="min-h-screen bg-[var(--background)] transition-colors duration-300">
+      {/* Enhanced Header */}
+      <header className="border-b border-[var(--border)] bg-[var(--card)] shadow-sm backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
-              <Button variant="ghost" size="sm" asChild>
-                <Link href={`/problems/${problem.id}`}>
+              <Button variant="ghost" size="sm" asChild className="hover-lift">
+                <Link href="/dashboard">
                   <ArrowLeft className="h-4 w-4 mr-2" />
-                  Back to Problem
+                  Back to Dashboard
                 </Link>
               </Button>
-              <div className="text-sm text-muted-foreground">
+              <div className="text-sm text-[var(--muted-foreground)] bg-[var(--muted)]/50 px-3 py-1 rounded-lg">
                 <Clock className="h-4 w-4 inline mr-1" />
                 {formatTime(timeElapsed)}
               </div>
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-3">
               <Select value={editorTheme} onValueChange={setEditorTheme}>
                 <SelectTrigger className="w-32">
                   <SelectValue />
@@ -799,25 +810,25 @@ solution.test();`
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[calc(100vh-200px)]">
-          {/* Problem Panel */}
-          <div className="space-y-4 overflow-y-auto">
-            <Card className="border-border">
+          {/* Enhanced Problem Panel */}
+          <div className="space-y-6 overflow-y-auto">
+            <Card className="card-modern hover-lift">
               <CardHeader>
                 <div className="flex items-start justify-between">
-                  <div>
-                    <CardTitle className="text-xl mb-2">{problem.title}</CardTitle>
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                      <div className="flex items-center gap-1">
-                        <Trophy className="h-4 w-4" />
-                        <span>{problem.points} pts</span>
+                  <div className="flex-1">
+                    <CardTitle className="text-2xl mb-3 text-[var(--foreground)]">{problem.title}</CardTitle>
+                    <div className="flex items-center gap-4 text-sm">
+                      <div className="flex items-center gap-1 bg-[var(--primary)]/10 px-3 py-1 rounded-lg">
+                        <Trophy className="h-4 w-4 text-[var(--primary)]" />
+                        <span className="text-[var(--primary)] font-medium">{problem.points} pts</span>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <Clock className="h-4 w-4" />
-                        <span>{problem.time_limit / 1000}s</span>
+                      <div className="flex items-center gap-1 bg-[var(--muted)]/50 px-3 py-1 rounded-lg">
+                        <Clock className="h-4 w-4 text-[var(--muted-foreground)]" />
+                        <span className="text-[var(--muted-foreground)]">{problem.time_limit / 1000}s</span>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <Target className="h-4 w-4" />
-                        <span>{problem.memory_limit} MB</span>
+                      <div className="flex items-center gap-1 bg-[var(--muted)]/50 px-3 py-1 rounded-lg">
+                        <Target className="h-4 w-4 text-[var(--muted-foreground)]" />
+                        <span className="text-[var(--muted-foreground)]">{problem.memory_limit} MB</span>
                       </div>
                     </div>
                   </div>
@@ -825,45 +836,45 @@ solution.test();`
               </CardHeader>
               <CardContent>
                 <div className="prose prose-sm max-w-none">
-                  <p className="text-foreground whitespace-pre-wrap mb-4">{problem.description}</p>
+                  <p className="text-[var(--foreground)] whitespace-pre-wrap mb-6 leading-relaxed">{problem.description}</p>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <div>
-                      <h4 className="font-semibold text-foreground mb-2">Input Format</h4>
-                      <p className="text-sm text-muted-foreground whitespace-pre-wrap">{problem.input_format}</p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div className="p-4 bg-[var(--muted)]/30 rounded-xl">
+                      <h4 className="font-semibold text-[var(--foreground)] mb-3">Input Format</h4>
+                      <p className="text-sm text-[var(--muted-foreground)] whitespace-pre-wrap">{problem.input_format}</p>
                     </div>
-                    <div>
-                      <h4 className="font-semibold text-foreground mb-2">Output Format</h4>
-                      <p className="text-sm text-muted-foreground whitespace-pre-wrap">{problem.output_format}</p>
+                    <div className="p-4 bg-[var(--muted)]/30 rounded-xl">
+                      <h4 className="font-semibold text-[var(--foreground)] mb-3">Output Format</h4>
+                      <p className="text-sm text-[var(--muted-foreground)] whitespace-pre-wrap">{problem.output_format}</p>
                     </div>
                   </div>
 
                   {problem.constraints && (
-                    <div className="mb-4">
-                      <h4 className="font-semibold text-foreground mb-2">Constraints</h4>
-                      <p className="text-sm text-muted-foreground whitespace-pre-wrap">{problem.constraints}</p>
+                    <div className="mb-6 p-4 bg-[var(--warning)]/10 rounded-xl">
+                      <h4 className="font-semibold text-[var(--foreground)] mb-3">Constraints</h4>
+                      <p className="text-sm text-[var(--muted-foreground)] whitespace-pre-wrap">{problem.constraints}</p>
                     </div>
                   )}
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <h4 className="font-semibold text-foreground mb-2">Sample Input</h4>
-                      <pre className="bg-muted p-3 rounded text-sm overflow-x-auto">
-                        <code>{problem.sample_input}</code>
+                      <h4 className="font-semibold text-[var(--foreground)] mb-3">Sample Input</h4>
+                      <pre className="bg-[var(--muted)]/50 p-4 rounded-xl text-sm overflow-x-auto border border-[var(--border)]">
+                        <code className="text-[var(--foreground)]">{problem.sample_input}</code>
                       </pre>
                     </div>
                     <div>
-                      <h4 className="font-semibold text-foreground mb-2">Sample Output</h4>
-                      <pre className="bg-muted p-3 rounded text-sm overflow-x-auto">
-                        <code>{problem.sample_output}</code>
+                      <h4 className="font-semibold text-[var(--foreground)] mb-3">Sample Output</h4>
+                      <pre className="bg-[var(--muted)]/50 p-4 rounded-xl text-sm overflow-x-auto border border-[var(--border)]">
+                        <code className="text-[var(--foreground)]">{problem.sample_output}</code>
                       </pre>
                     </div>
                   </div>
 
                   {problem.explanation && (
-                    <div className="mt-4">
-                      <h4 className="font-semibold text-foreground mb-2">Explanation</h4>
-                      <p className="text-sm text-muted-foreground whitespace-pre-wrap">{problem.explanation}</p>
+                    <div className="mt-6 p-4 bg-[var(--accent)]/10 rounded-xl">
+                      <h4 className="font-semibold text-[var(--foreground)] mb-3">Explanation</h4>
+                      <p className="text-sm text-[var(--muted-foreground)] whitespace-pre-wrap leading-relaxed">{problem.explanation}</p>
                     </div>
                   )}
                 </div>
@@ -871,207 +882,87 @@ solution.test();`
             </Card>
           </div>
 
-          {/* Code Panel */}
+          {/* Enhanced Java IDE */}
           <div className="space-y-4">
-            <Card className="border-border flex-1">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg">Solution</CardTitle>
-                  <div className="flex items-center space-x-2">
-                    <Select value={language} onValueChange={setLanguage}>
-                      <SelectTrigger className="w-32">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="java">Java</SelectItem>
-                        <SelectItem value="python">Python</SelectItem>
-                        <SelectItem value="cpp">C++</SelectItem>
-                        <SelectItem value="javascript">JavaScript</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="flex-1 p-0">
-                <div className="p-4 border-b border-border">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="text-sm text-muted-foreground">
-                      <strong>Template:</strong> {getTemplateType()} • 
-                      <strong>Function:</strong> {getFunctionSignature()}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        onClick={() => {
-                          const template = getProblemSpecificTemplates(language)
-                          if (template) setCode(template)
-                        }}
-                        variant="outline"
-                        size="sm"
-                        className="flex items-center gap-2"
-                      >
-                        <ArrowLeft className="h-4 w-4" />
-                        Load Template
-                      </Button>
-                      <Button
-                        onClick={() => setCode("")}
-                        variant="ghost"
-                        size="sm"
-                        className="flex items-center gap-2"
-                      >
-                        <XCircle className="h-4 w-4" />
-                        Clear
-                      </Button>
-                    </div>
-                  </div>
-                  <div className="bg-blue-50 dark:bg-blue-950/20 p-3 rounded-md border border-blue-200 dark:border-blue-800">
-                    <p className="text-xs text-blue-800 dark:text-blue-200">
-                      <strong>Instructions:</strong> Implement the required function that returns the correct answer. 
-                      Your code will be tested against multiple test cases. Make sure to handle edge cases properly.
-                    </p>
-                  </div>
-                </div>
-                <CodeEditor value={code} onChange={setCode} language={language} height="400px" theme={editorTheme} />
-              </CardContent>
-            </Card>
+            <UnifiedJavaIDE
+              problemId={problem.id}
+              userId={userId}
+              problemTitle={problem.title}
+              problemDescription={problem.description}
+              testCases={problem.test_cases}
+              templateCode={getProblemSpecificTemplates(language)}
+              onExecutionComplete={(result) => {
+                console.log('Execution completed:', result);
+                // You can add additional logic here if needed
+              }}
+            />
 
-            {/* Test Panel */}
-            <Card className="border-border">
-              <CardContent className="p-4">
-                <Tabs defaultValue="custom" className="w-full">
-                  <TabsList className="grid w-full grid-cols-3">
-                    <TabsTrigger value="custom">Custom Test</TabsTrigger>
-                    <TabsTrigger value="sample">Sample Tests</TabsTrigger>
-                    <TabsTrigger value="submit">Submit</TabsTrigger>
-                  </TabsList>
+            {/* Enhanced Submit Panel */}
+            <Card className="card-modern">
+              <CardContent className="p-6">
+                <Button
+                  onClick={submitSolution}
+                  disabled={isSubmitting || !code.trim()}
+                  className="w-full btn-primary hover-glow text-[var(--primary-foreground)]"
+                >
+                  <Send className="h-4 w-4 mr-2" />
+                  {isSubmitting ? "Submitting..." : "Submit Solution"}
+                </Button>
 
-                  <TabsContent value="custom" className="space-y-4">
-                    <div>
-                      <label className="text-sm font-medium text-foreground mb-2 block">Custom Input</label>
-                      <Textarea
-                        value={customInput}
-                        onChange={(e) => setCustomInput(e.target.value)}
-                        placeholder="Enter your test input..."
-                        className="min-h-[80px] font-mono text-sm bg-input border-border"
-                      />
-                    </div>
-                    <Button onClick={runCustomTest} disabled={isRunning || !code.trim() || !customInput.trim()}>
-                      <Play className="h-4 w-4 mr-2" />
-                      {isRunning ? "Running..." : "Run Test"}
-                    </Button>
-                    {customOutput && (
-                      <div>
-                        <label className="text-sm font-medium text-foreground mb-2 block">Output</label>
-                        <pre className="bg-muted p-3 rounded text-sm overflow-x-auto max-h-40">
-                          <code>{customOutput}</code>
-                        </pre>
+                {submissionResult && (
+                  <Card className="card-modern mt-6 border-2 border-[var(--border)]">
+                    <CardContent className="p-6">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className={`p-2 rounded-full ${
+                          submissionResult.status === "accepted" ? 'bg-[var(--success)]/10' : 
+                          submissionResult.status === "error" ? 'bg-[var(--destructive)]/10' : 
+                          'bg-[var(--destructive)]/10'
+                        }`}>
+                          {submissionResult.status === "accepted" ? (
+                            <CheckCircle className="h-6 w-6 text-[var(--success)]" />
+                          ) : submissionResult.status === "error" ? (
+                            <AlertCircle className="h-6 w-6 text-[var(--destructive)]" />
+                          ) : (
+                            <XCircle className="h-6 w-6 text-[var(--destructive)]" />
+                          )}
+                        </div>
+                        <span className={`font-semibold text-lg ${TestingService.getStatusColor(submissionResult.status)}`}>
+                          {TestingService.getStatusMessage(submissionResult.status)}
+                        </span>
                       </div>
-                    )}
-                  </TabsContent>
 
-                  <TabsContent value="sample" className="space-y-4">
-                    <Button onClick={runSampleTests} disabled={isRunning || !code.trim()}>
-                      <Play className="h-4 w-4 mr-2" />
-                      {isRunning ? "Running..." : "Run Sample Tests"}
-                    </Button>
-                    {testResults.length > 0 && (
-                      <div className="space-y-2 max-h-60 overflow-y-auto">
-                        {testResults.map((result, index) => (
-                          <div key={index} className="border border-border rounded p-3">
-                            <div className="flex items-center gap-2 mb-2">
-                              {result.passed ? (
-                                <CheckCircle className="h-4 w-4 text-green-500" />
-                              ) : (
-                                <XCircle className="h-4 w-4 text-red-500" />
-                              )}
-                              <span className="text-sm font-medium">
-                                Test Case {index + 1}: {result.passed ? "Passed" : "Failed"}
-                              </span>
-                              <div className="ml-auto text-xs text-muted-foreground">
-                                {result.executionTime}ms, {Math.round(result.memoryUsed / 1024)}KB
-                              </div>
-                            </div>
-                            {!result.passed && (
-                              <div className="text-xs space-y-1">
-                                {result.error ? (
-                                  <div className="text-red-600">Error: {result.error}</div>
+                      {submissionResult.status !== "error" && (
+                        <div className="grid grid-cols-2 gap-4 text-sm p-4 bg-[var(--muted)]/30 rounded-xl">
+                          <div className="font-medium text-[var(--foreground)]">Score: {submissionResult.score}/100</div>
+                          <div className="font-medium text-[var(--foreground)]">Time: {submissionResult.executionTime}ms</div>
+                          <div className="font-medium text-[var(--foreground)]">Memory: {Math.round(submissionResult.memoryUsed / 1024)}KB</div>
+                          <div className="font-medium text-[var(--foreground)]">
+                            Tests: {submissionResult.testCasesPassed}/{submissionResult.totalTestCases}
+                          </div>
+                        </div>
+                      )}
+
+                      {submissionResult.testResults && submissionResult.testResults.length > 0 && (
+                        <div className="mt-4 p-4 bg-[var(--muted)]/30 rounded-xl">
+                          <h4 className="text-sm font-semibold mb-3 text-[var(--foreground)]">Test Results:</h4>
+                          <div className="space-y-2 max-h-32 overflow-y-auto">
+                            {submissionResult.testResults.map((result: any, index: number) => (
+                              <div key={index} className="flex items-center gap-2 text-xs">
+                                {result.passed ? (
+                                  <CheckCircle className="h-3 w-3 text-[var(--success)]" />
                                 ) : (
-                                  <>
-                                    <div>
-                                      <strong>Expected:</strong> {result.expected}
-                                    </div>
-                                    <div>
-                                      <strong>Got:</strong> {result.actual}
-                                    </div>
-                                  </>
+                                  <XCircle className="h-3 w-3 text-[var(--destructive)]" />
                                 )}
+                                <span className="text-[var(--foreground)]">Test {index + 1}</span>
+                                <span className="text-[var(--muted-foreground)]">{result.executionTime}ms</span>
                               </div>
-                            )}
+                            ))}
                           </div>
-                        ))}
-                      </div>
-                    )}
-                  </TabsContent>
-
-                  <TabsContent value="submit" className="space-y-4">
-                    <Button
-                      onClick={submitSolution}
-                      disabled={isSubmitting || !code.trim()}
-                      className="w-full bg-primary hover:bg-primary/90"
-                    >
-                      <Send className="h-4 w-4 mr-2" />
-                      {isSubmitting ? "Submitting..." : "Submit Solution"}
-                    </Button>
-
-                    {submissionResult && (
-                      <Card className="border-border">
-                        <CardContent className="p-4">
-                          <div className="flex items-center gap-2 mb-3">
-                            {submissionResult.status === "accepted" ? (
-                              <CheckCircle className="h-5 w-5 text-green-500" />
-                            ) : submissionResult.status === "error" ? (
-                              <AlertCircle className="h-5 w-5 text-red-500" />
-                            ) : (
-                              <XCircle className="h-5 w-5 text-red-500" />
-                            )}
-                            <span className={`font-medium ${TestingService.getStatusColor(submissionResult.status)}`}>
-                              {TestingService.getStatusMessage(submissionResult.status)}
-                            </span>
-                          </div>
-
-                          {submissionResult.status !== "error" && (
-                            <div className="grid grid-cols-2 gap-4 text-sm">
-                              <div>Score: {submissionResult.score}/100</div>
-                              <div>Time: {submissionResult.executionTime}ms</div>
-                              <div>Memory: {Math.round(submissionResult.memoryUsed / 1024)}KB</div>
-                              <div>
-                                Tests: {submissionResult.testCasesPassed}/{submissionResult.totalTestCases}
-                              </div>
-                            </div>
-                          )}
-
-                          {submissionResult.testResults && submissionResult.testResults.length > 0 && (
-                            <div className="mt-4">
-                              <h4 className="text-sm font-medium mb-2">Test Results:</h4>
-                              <div className="space-y-1 max-h-32 overflow-y-auto">
-                                {submissionResult.testResults.map((result: any, index: number) => (
-                                  <div key={index} className="flex items-center gap-2 text-xs">
-                                    {result.passed ? (
-                                      <CheckCircle className="h-3 w-3 text-green-500" />
-                                    ) : (
-                                      <XCircle className="h-3 w-3 text-red-500" />
-                                    )}
-                                    <span>Test {index + 1}</span>
-                                    <span className="text-muted-foreground">{result.executionTime}ms</span>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-                        </CardContent>
-                      </Card>
-                    )}
-                  </TabsContent>
-                </Tabs>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                )}
               </CardContent>
             </Card>
           </div>

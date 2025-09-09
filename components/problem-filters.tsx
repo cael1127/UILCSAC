@@ -8,18 +8,25 @@ import { Badge } from "@/components/ui/badge"
 import { Search, X } from "lucide-react"
 import { supabase } from "@/lib/supabase/client"
 
-interface Category {
-  id: string
-  name: string
-  color: string
-}
+// Since we don't have separate tables, we'll use static data
+const DIFFICULTY_LEVELS = [
+  { id: "1", name: "Beginner", level: 1 },
+  { id: "2", name: "Intermediate", level: 2 },
+  { id: "3", name: "Advanced", level: 3 },
+]
 
-interface DifficultyLevel {
-  id: string
-  name: string
-  level: number
-  color: string
-}
+const CATEGORIES = [
+  { id: "Arrays", name: "Arrays" },
+  { id: "Strings", name: "Strings" },
+  { id: "Recursion", name: "Recursion" },
+  { id: "Search", name: "Search" },
+  { id: "Sorting", name: "Sorting" },
+  { id: "Math", name: "Math" },
+  { id: "Hash Table", name: "Hash Table" },
+  { id: "Two Pointers", name: "Two Pointers" },
+  { id: "Binary Search", name: "Binary Search" },
+  { id: "Divide and Conquer", name: "Divide and Conquer" },
+]
 
 interface ProblemFiltersProps {
   onFiltersChange?: (filters: {
@@ -31,29 +38,12 @@ interface ProblemFiltersProps {
 }
 
 export default function ProblemFilters({ onFiltersChange }: ProblemFiltersProps) {
-  const [categories, setCategories] = useState<Category[]>([])
-  const [difficulties, setDifficulties] = useState<DifficultyLevel[]>([])
   const [filters, setFilters] = useState({
     search: "",
     category: "all",
     difficulty: "all",
     status: "all",
   })
-
-  useEffect(() => {
-    // Fetch categories and difficulties
-    const fetchFilters = async () => {
-      const [categoriesResult, difficultiesResult] = await Promise.all([
-        supabase.from("categories").select("*").order("name"),
-        supabase.from("difficulty_levels").select("*").order("level"),
-      ])
-
-      if (categoriesResult.data) setCategories(categoriesResult.data)
-      if (difficultiesResult.data) setDifficulties(difficultiesResult.data)
-    }
-
-    fetchFilters()
-  }, [])
 
   useEffect(() => {
     onFiltersChange?.(filters)
@@ -79,23 +69,24 @@ export default function ProblemFilters({ onFiltersChange }: ProblemFiltersProps)
       <div className="flex flex-col sm:flex-row gap-4">
         {/* Search */}
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-dim-gray" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[var(--muted-foreground)]" />
           <Input
             placeholder="Search problems..."
             value={filters.search}
             onChange={(e) => updateFilter("search", e.target.value)}
-            className="pl-10 bg-white border-slate-gray/20 focus:border-ut-orange"
+            className="pl-10 bg-[var(--input)] border-[var(--border)] focus:border-[var(--ring)]"
+            style={{ color: 'var(--foreground)' }}
           />
         </div>
 
         {/* Category Filter */}
         <Select value={filters.category} onValueChange={(value) => updateFilter("category", value)}>
-          <SelectTrigger className="w-full sm:w-48 bg-white border-slate-gray/20 focus:border-ut-orange">
+          <SelectTrigger className="w-full sm:w-48 bg-[var(--input)] border-[var(--border)] focus:border-[var(--ring)]" style={{ color: 'var(--foreground)' }}>
             <SelectValue placeholder="All Categories" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Categories</SelectItem>
-            {categories.map((category) => (
+            {CATEGORIES.map((category) => (
               <SelectItem key={category.id} value={category.id}>
                 {category.name}
               </SelectItem>
@@ -105,12 +96,12 @@ export default function ProblemFilters({ onFiltersChange }: ProblemFiltersProps)
 
         {/* Difficulty Filter */}
         <Select value={filters.difficulty} onValueChange={(value) => updateFilter("difficulty", value)}>
-          <SelectTrigger className="w-full sm:w-48 bg-white border-slate-gray/20 focus:border-ut-orange">
+          <SelectTrigger className="w-full sm:w-48 bg-[var(--input)] border-[var(--border)] focus:border-[var(--ring)]" style={{ color: 'var(--foreground)' }}>
             <SelectValue placeholder="All Difficulties" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Difficulties</SelectItem>
-            {difficulties.map((difficulty) => (
+            {DIFFICULTY_LEVELS.map((difficulty) => (
               <SelectItem key={difficulty.id} value={difficulty.id}>
                 {difficulty.name}
               </SelectItem>
@@ -120,7 +111,7 @@ export default function ProblemFilters({ onFiltersChange }: ProblemFiltersProps)
 
         {/* Status Filter */}
         <Select value={filters.status} onValueChange={(value) => updateFilter("status", value)}>
-          <SelectTrigger className="w-full sm:w-48 bg-white border-slate-gray/20 focus:border-ut-orange">
+          <SelectTrigger className="w-full sm:w-48 bg-[var(--input)] border-[var(--border)] focus:border-[var(--ring)]" style={{ color: 'var(--foreground)' }}>
             <SelectValue placeholder="All Statuses" />
           </SelectTrigger>
           <SelectContent>
@@ -135,9 +126,9 @@ export default function ProblemFilters({ onFiltersChange }: ProblemFiltersProps)
       {/* Active Filters Display */}
       {hasActiveFilters && (
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-sm text-dim-gray">Active filters:</span>
+          <span className="text-sm text-[var(--muted-foreground)]">Active filters:</span>
           {filters.search && (
-            <Badge variant="outline" className="border-ut-orange/30 text-ut-orange">
+            <Badge variant="outline" className="border-[var(--primary)]/30 text-[var(--primary)]">
               Search: "{filters.search}"
               <button
                 onClick={() => updateFilter("search", "")}
@@ -148,8 +139,8 @@ export default function ProblemFilters({ onFiltersChange }: ProblemFiltersProps)
             </Badge>
           )}
           {filters.category !== "all" && (
-            <Badge variant="outline" className="border-slate-gray/30 text-slate-gray">
-              Category: {categories.find(c => c.id === filters.category)?.name}
+            <Badge variant="outline" className="border-[var(--border)] text-[var(--muted-foreground)]">
+              Category: {CATEGORIES.find(c => c.id === filters.category)?.name}
               <button
                 onClick={() => updateFilter("category", "all")}
                 className="ml-2 hover:bg-slate-gray/10 rounded-full p-1"
@@ -159,8 +150,8 @@ export default function ProblemFilters({ onFiltersChange }: ProblemFiltersProps)
             </Badge>
           )}
           {filters.difficulty !== "all" && (
-            <Badge variant="outline" className="border-slate-gray/30 text-slate-gray">
-              Difficulty: {difficulties.find(d => d.id === filters.difficulty)?.name}
+            <Badge variant="outline" className="border-[var(--border)] text-[var(--muted-foreground)]">
+              Difficulty: {DIFFICULTY_LEVELS.find(d => d.id === filters.difficulty)?.name}
               <button
                 onClick={() => updateFilter("difficulty", "all")}
                 className="ml-2 hover:bg-slate-gray/10 rounded-full p-1"
@@ -170,7 +161,7 @@ export default function ProblemFilters({ onFiltersChange }: ProblemFiltersProps)
             </Badge>
           )}
           {filters.status !== "all" && (
-            <Badge variant="outline" className="border-slate-gray/30 text-slate-gray">
+            <Badge variant="outline" className="border-[var(--border)] text-[var(--muted-foreground)]">
               Status: {filters.status.replace("_", " ").replace(/\b\w/g, l => l.toUpperCase())}
               <button
                 onClick={() => updateFilter("status", "all")}
@@ -184,7 +175,7 @@ export default function ProblemFilters({ onFiltersChange }: ProblemFiltersProps)
             onClick={clearFilters}
             variant="outline"
             size="sm"
-            className="border-slate-gray text-slate-gray hover:bg-slate-gray hover:text-white"
+            className="border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--muted)] hover:text-[var(--muted-foreground)]"
           >
             Clear All
           </Button>

@@ -33,18 +33,28 @@ export default async function PracticePage({ params }: PracticePageProps) {
     .from("problems")
     .select(`
       *,
-      categories (name, color),
-      difficulty_levels (name, level, color),
-      user_progress!left (status, best_score, attempts),
       test_cases (id, input, expected_output, is_sample, points)
     `)
     .eq("id", id)
-    .eq("user_progress.user_id", user.id)
     .single()
 
   if (error || !problem) {
     notFound()
   }
 
-  return <PracticeInterface problem={problem} userId={user.id} />
+  // Fetch user progress separately
+  const { data: userProgress } = await supabase
+    .from("user_progress")
+    .select("status, best_score, attempts")
+    .eq("user_id", user.id)
+    .eq("problem_id", id)
+    .single()
+
+  // Add user progress to problem object
+  const problemWithProgress = {
+    ...problem,
+    user_progress: userProgress
+  }
+
+  return <PracticeInterface problem={problemWithProgress} userId={user.id} />
 }
