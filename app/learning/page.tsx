@@ -6,6 +6,11 @@ import { Badge } from "@/components/ui/badge"
 import { ArrowLeft, BookOpen, Clock, Users, Trophy } from "lucide-react"
 import Link from "next/link"
 
+type UserProgressRow = {
+  learning_path_id: string
+  completed_modules?: number
+}
+
 export default async function LearningPage() {
   // Get the user from the server
   const supabase = await createClient()
@@ -32,8 +37,8 @@ export default async function LearningPage() {
     .eq("user_id", user.id)
 
   // Create a map of user progress by path ID
-  const progressMap = new Map(
-    userProgress?.map(progress => [progress.learning_path_id, progress]) || []
+  const progressMap = new Map<string, UserProgressRow>(
+    userProgress?.map((progress: UserProgressRow) => [progress.learning_path_id, progress]) || []
   )
 
   return (
@@ -68,21 +73,24 @@ export default async function LearningPage() {
 
         {/* Learning Paths Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {learningPaths?.map((path) => {
+          {learningPaths?.map((path: { id: string; name: string; description: string; difficulty?: string; total_modules?: number; estimated_hours?: number; target_audience?: string }) => {
             const userPathProgress = progressMap.get(path.id)
             const totalModules = path.total_modules || 0
             const completedModules = userPathProgress?.completed_modules || 0
             const progressPercentage = totalModules > 0 ? (completedModules / totalModules) * 100 : 0
+            const difficulty = (path.difficulty ?? 'beginner') as string
+            const difficultyVariant = difficulty === 'beginner' ? 'default' : difficulty === 'intermediate' ? 'secondary' : 'destructive'
+            const difficultyLabel = difficulty ? (difficulty.charAt(0).toUpperCase() + difficulty.slice(1)) : 'Beginner'
 
             return (
               <Card key={path.id} className="card-ut hover-lift group">
                 <CardHeader className="pb-4">
                   <div className="flex items-center justify-between mb-3">
                     <Badge 
-                      variant={path.difficulty === 'beginner' ? 'default' : path.difficulty === 'intermediate' ? 'secondary' : 'destructive'}
+                      variant={difficultyVariant}
                       className="text-xs"
                     >
-                      {path.difficulty?.charAt(0).toUpperCase() + path.difficulty?.slice(1) || 'Beginner'}
+                      {difficultyLabel}
                     </Badge>
                     {userPathProgress && (
                       <div className="text-sm text-[var(--muted-foreground)]">
