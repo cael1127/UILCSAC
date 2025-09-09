@@ -74,7 +74,9 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         
         {/* DNS prefetch for external domains */}
-        <link rel="dns-prefetch" href="//mjdkyyvmpwttlpaebnuw.supabase.co" />
+        {process.env.NEXT_PUBLIC_SUPABASE_URL && (
+          <link rel="dns-prefetch" href={`//${new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname}`} />
+        )}
         
         {/* Performance monitoring for A/B testing */}
         {process.env.NODE_ENV === 'production' && (

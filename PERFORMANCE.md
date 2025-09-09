@@ -60,7 +60,7 @@ const inter = Inter({
 
 // Resource preloading
 <link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="dns-prefetch" href="//mjdkyyvmpwttlpaebnuw.supabase.co" />
+<link rel="dns-prefetch" href="//your-supabase-project.supabase.co" />
 <link rel="preload" href="/globals.css" as="style" />
 ```
 
