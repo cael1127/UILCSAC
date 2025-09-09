@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useRef } from 'react'
+import React, { useEffect, useCallback, useRef, useState, type DependencyList } from 'react'
 
 interface PerformanceMetrics {
   pageLoadTime: number
@@ -114,16 +114,16 @@ export function usePerformance() {
 // Hook for optimizing re-renders
 export function useOptimizedCallback<T extends (...args: any[]) => any>(
   callback: T,
-  deps: React.DependencyList
+  deps: DependencyList
 ): T {
   return useCallback(callback, deps)
 }
 
 // Hook for debouncing expensive operations
 export function useDebounce<T>(value: T, delay: number): T {
-  const [debouncedValue, setDebouncedValue] = React.useState<T>(value)
+  const [debouncedValue, setDebouncedValue] = useState<T>(value)
 
-  React.useEffect(() => {
+  useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedValue(value)
     }, delay)
