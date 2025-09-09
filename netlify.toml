@@ -6,6 +6,8 @@
   # Ensure pnpm is used and caching works
   NPM_FLAGS = "--version"
   PNPM_FLAGS = "--version"
+  NODE_VERSION = "22.19.0"
+  PNPM_VERSION = "9.9.0"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
