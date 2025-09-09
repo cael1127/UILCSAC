@@ -2,6 +2,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import { simpleJavaRuntimeFixed } from '@/lib/simple-java-runtime-fixed';
 import { enhancedJavaRuntime } from '@/lib/enhanced-java-runtime';
 
+// Unified execution result type
+interface ExecutionResult {
+  success: boolean;
+  output: string;
+  error: string;
+  executionTime: number;
+  memoryUsage: number;
+  testResults?: any;
+  variables?: Record<string, any>;
+}
+
 // Helper function to run test cases
 function runTestCases(code: string, testCases: any[]): any[] {
   const results = [];
@@ -30,13 +41,7 @@ function runTestCases(code: string, testCases: any[]): any[] {
 }
 
 // Execute Java using Piston (public code runner)
-async function executeJavaViaPiston(code: string): Promise<{
-  success: boolean;
-  output: string;
-  error: string;
-  executionTime: number;
-  memoryUsage: number;
-}> {
+async function executeJavaViaPiston(code: string): Promise<ExecutionResult> {
   const startTime = Date.now();
   try {
     const resp = await fetch('https://emkc.org/api/v2/piston/execute', {
@@ -57,6 +62,8 @@ async function executeJavaViaPiston(code: string): Promise<{
         error: data?.message || 'Piston execution failed',
         executionTime: Date.now() - startTime,
         memoryUsage: 0,
+        testResults: undefined,
+        variables: {},
       };
     }
 
@@ -71,6 +78,8 @@ async function executeJavaViaPiston(code: string): Promise<{
       error: errCombined.trim(),
       executionTime: Date.now() - startTime,
       memoryUsage: 0,
+      testResults: undefined,
+      variables: {},
     };
   } catch (error: any) {
     return {
@@ -79,20 +88,14 @@ async function executeJavaViaPiston(code: string): Promise<{
       error: error?.message || 'Piston error',
       executionTime: Date.now() - startTime,
       memoryUsage: 0,
+      testResults: undefined,
+      variables: {},
     };
   }
 }
 
 // Try executing via Supabase Edge Function (real javac/java)
-async function executeJavaViaSupabase(code: string, userId?: string, questionId?: string, override?: { supabaseUrl?: string; anonKey?: string }): Promise<{
-  success: boolean;
-  output: string;
-  error: string;
-  executionTime: number;
-  memoryUsage: number;
-  testResults?: any;
-  variables?: Record<string, any>;
-}> {
+async function executeJavaViaSupabase(code: string, userId?: string, questionId?: string, override?: { supabaseUrl?: string; anonKey?: string }): Promise<ExecutionResult> {
   const startTime = Date.now();
   try {
     const supabaseUrl = override?.supabaseUrl || process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -143,15 +146,7 @@ async function executeJavaViaSupabase(code: string, userId?: string, questionId?
 }
 
 // Enhanced Java execution function with better console output (browser fallback)
-async function executeJavaInBrowser(code: string, customInput?: string): Promise<{
-  success: boolean;
-  output: string;
-  error: string;
-  executionTime: number;
-  memoryUsage: number;
-  testResults?: any;
-  variables?: Record<string, any>;
-}> {
+async function executeJavaInBrowser(code: string, customInput?: string): Promise<ExecutionResult> {
   const startTime = Date.now();
   
   try {
@@ -222,7 +217,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Execute the code
-    let executionResult;
+    let executionResult: ExecutionResult;
     if (language === 'java') {
       try {
         // Try Piston first (real Java), then Supabase Edge if configured, else browser fallback
@@ -235,7 +230,7 @@ export async function POST(request: NextRequest) {
           result = await executeJavaInBrowser(code, customInput);
         }
         executionResult = result;
-        (executionResult as any).testResults = testCases ? runTestCases(code, testCases) : null;
+        executionResult.testResults = testCases ? runTestCases(code, testCases) : undefined;
       } catch (javaError: any) {
         // Handle Java runtime errors
         executionResult = {
