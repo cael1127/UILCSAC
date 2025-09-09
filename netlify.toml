@@ -1,0 +1,22 @@
+[build]
+  command = "pnpm run build"
+  publish = ".next"
+
+[build.environment]
+  # Ensure pnpm is used and caching works
+  NPM_FLAGS = "--version"
+  PNPM_FLAGS = "--version"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+# Cache node_modules and pnpm store between builds
+[functions]
+  node_bundler = "esbuild"
+
+# Redirect all unmatched routes to Next.js
+[[redirects]]
+  from = "/*"
+  to = "/.netlify/functions/next"
+  status = 200
+
