@@ -885,12 +885,12 @@ solution.test();`
           {/* Enhanced Java IDE */}
           <div className="space-y-4">
             <UnifiedJavaIDE
-              problemId={problem.id}
+              questionId={problem.id}
               userId={userId}
-              problemTitle={problem.title}
-              problemDescription={problem.description}
+              questionTitle={problem.title}
+              questionDescription={problem.description}
               testCases={problem.test_cases}
-              templateCode={getProblemSpecificTemplates(language)}
+              templateCode={getProblemSpecificTemplates(language) ?? undefined}
               onExecutionComplete={(result) => {
                 console.log('Execution completed:', result);
                 // You can add additional logic here if needed
