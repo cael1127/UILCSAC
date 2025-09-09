@@ -1,23 +1,18 @@
 [build]
-  command = "pnpm install --no-frozen-lockfile && pnpm run build"
+  command = "npm run build"
   publish = ".next"
 
 [build.environment]
-  # Ensure pnpm is used and caching works
-  NPM_FLAGS = "--version"
-  PNPM_FLAGS = "--version"
-  NODE_VERSION = "22"
-  PNPM_VERSION = "9.9.0"
-  PNPM_PREFER_FROZEN_LOCKFILE = "false"
+  NODE_VERSION = "20.18.0"
+  NPM_FLAGS = "--legacy-peer-deps"
+  NEXT_TELEMETRY_DISABLED = "1"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
-# Cache node_modules and pnpm store between builds
 [functions]
   node_bundler = "esbuild"
 
-# Redirect all unmatched routes to Next.js
 [[redirects]]
   from = "/*"
   to = "/.netlify/functions/next"
