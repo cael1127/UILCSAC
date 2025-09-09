@@ -6,7 +6,7 @@
   # Ensure pnpm is used and caching works
   NPM_FLAGS = "--version"
   PNPM_FLAGS = "--version"
-  NODE_VERSION = "20.11.0"
+  NODE_VERSION = "22.0.0"
   PNPM_VERSION = "9.9.0"
   PNPM_PREFER_FROZEN_LOCKFILE = "false"
 
