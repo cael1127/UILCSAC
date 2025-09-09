@@ -97,7 +97,6 @@ export default async function LearningModulePage({ params }: LearningModulePageP
       {/* Main Content */}
       <div className="py-8">
         <ModuleInterface 
-          pathId={pathId}
           moduleId={moduleId}
           userId={user.id}
         />
