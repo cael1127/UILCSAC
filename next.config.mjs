@@ -54,8 +54,7 @@ const nextConfig = {
   // React strict mode for better development
   reactStrictMode: true,
   
-  // Enable SWC minification
-  swcMinify: true,
+  // Next 15 uses SWC by default; remove deprecated swcMinify flag
   
   // Serve .wasm files with correct MIME type for future WebAssembly support
   async headers() {

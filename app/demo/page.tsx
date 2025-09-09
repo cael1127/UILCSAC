@@ -38,8 +38,8 @@ export default function DemoPage() {
         <div className="mb-8">
           <h2 className="text-2xl font-bold mb-6 text-center">Try the Java IDE</h2>
           <SimpleJavaIDE
-            questionId={null}
-            userId={null}
+            questionId={"demo-question"}
+            userId={"demo-user"}
             questionTitle="Java Programming Demo"
                           questionDescription="Write and execute Java code to test the IDE. Try this simple example: public class Solution { public static void main(String[] args) { System.out.println('Hello World'); } }"
           />
