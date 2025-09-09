@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Exclude Supabase Edge Functions from Next.js build
+  pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
+  
   // Performance optimizations
   experimental: {
     optimizePackageImports: ['@radix-ui/react-icons', 'lucide-react'],
