@@ -57,8 +57,9 @@ export function usePerformance() {
       const observer = new PerformanceObserver((list) => {
         let clsValue = 0
         for (const entry of list.getEntries()) {
-          if (!entry.hadRecentInput) {
-            clsValue += (entry as any).value
+          const ls = entry as any
+          if (!ls.hadRecentInput) {
+            clsValue += (ls.value as number) || 0
           }
         }
         metricsRef.current.cumulativeLayoutShift = clsValue
