@@ -2,10 +2,6 @@
 // This provides only the essential Java classes and methods needed for basic programming
 // without requiring system Java installation
 
-export class EssentialSystem {
-  static out = new EssentialPrintStream();
-}
-
 export class EssentialPrintStream {
   private buffer: string[] = [];
   
@@ -27,6 +23,10 @@ export class EssentialPrintStream {
   clear(): void {
     this.buffer = [];
   }
+}
+
+export class EssentialSystem {
+  static out = new EssentialPrintStream();
 }
 
 export class EssentialMath {
