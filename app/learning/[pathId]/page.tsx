@@ -106,7 +106,7 @@ export default async function LearningPathPage({ params }: LearningPathPageProps
         <div className="space-y-4">
           <h3 className="text-xl font-semibold text-foreground">Modules</h3>
           
-          {modules?.map((module, index) => {
+          {modules?.map((module: { id: string; name: string; description: string; estimated_hours?: number }, index: number) => {
             const isCompleted = index < completedModules
             const isCurrent = index === completedModules
             const isLocked = index > completedModules
