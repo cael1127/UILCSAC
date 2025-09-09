@@ -1,6 +1,9 @@
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server"
 import { redirect, notFound } from "next/navigation"
 
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic'
+
 interface ProblemPageProps {
   params: Promise<{
     id: string

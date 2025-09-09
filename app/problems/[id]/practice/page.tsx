@@ -2,6 +2,9 @@ import { createClient, isSupabaseConfigured } from "@/lib/supabase/server"
 import { redirect, notFound } from "next/navigation"
 import PracticeInterface from "@/components/practice-interface"
 
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic'
+
 interface PracticePageProps {
   params: Promise<{
     id: string

@@ -6,6 +6,9 @@ import { Badge } from "@/components/ui/badge"
 import { ArrowLeft, BookOpen, Clock, Users, Trophy } from "lucide-react"
 import Link from "next/link"
 
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic'
+
 type UserProgressRow = {
   learning_path_id: string
   completed_modules?: number

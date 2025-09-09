@@ -2,6 +2,9 @@ import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import ModuleInterface from "@/components/module-interface"
 
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic'
+
 interface LearningModulePageProps {
   params: Promise<{
     pathId: string

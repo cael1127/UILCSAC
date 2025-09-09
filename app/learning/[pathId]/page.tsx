@@ -7,6 +7,9 @@ import { Progress } from "@/components/ui/progress"
 import { ArrowLeft, Play, CheckCircle, Lock } from "lucide-react"
 import Link from "next/link"
 
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic'
+
 interface LearningPathPageProps {
   params: Promise<{
     pathId: string

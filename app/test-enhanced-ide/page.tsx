@@ -2,6 +2,9 @@ import { createClient, isSupabaseConfigured } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import { EnhancedJavaIDE } from "@/components/enhanced-java-ide"
 
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic'
+
 export default async function TestEnhancedIDEPage() {
   if (!isSupabaseConfigured) {
     return (

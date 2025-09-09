@@ -8,6 +8,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ArrowLeft, Search, Code, Clock, Target, Filter } from "lucide-react"
 import Link from "next/link"
 
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic'
+
 export default async function ProblemsPage() {
   // Get the user from the server
   const supabase = await createClient()

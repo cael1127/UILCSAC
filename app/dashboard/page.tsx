@@ -9,6 +9,9 @@ import ProblemGrid from "@/components/problem-grid"
 import LearningPaths from "@/components/learning-paths"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic'
+
 export default async function DashboardPage() {
   // If Supabase is not configured, show setup message
   if (!isSupabaseConfigured) {
