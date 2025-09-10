@@ -61,6 +61,20 @@ export default function SignUpForm() {
     }
 
     try {
+      // Check if email already exists in auth via public 'users' table mirror
+      // If you don't mirror auth users to public.users, we can call admin endpoints via Edge Function instead.
+      const { data: existingUser } = await supabase
+        .from('users')
+        .select('id')
+        .eq('email', email.toLowerCase())
+        .maybeSingle();
+
+      if (existingUser) {
+        setError("This email is already in use. Try signing in or use a different email.")
+        setLoading(false)
+        return
+      }
+
       const { error: signUpError } = await supabase.auth.signUp({
         email,
         password,
