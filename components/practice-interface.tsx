@@ -49,9 +49,8 @@ interface TestResult {
   input: string
   expected: string
   actual: string
-  error?: string
   executionTime: number
-  memoryUsed: number
+  memoryUsage: number
 }
 
 export default function PracticeInterface({ problem, userId }: PracticeInterfaceProps) {
@@ -62,16 +61,13 @@ export default function PracticeInterface({ problem, userId }: PracticeInterface
   const [testResults, setTestResults] = useState<TestResult[]>([])
   const [isRunning, setIsRunning] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [submissionResult, setSubmissionResult] = useState<any>(null)
+  const [status, setStatus] = useState<string>("not_attempted")
   const [timeElapsed, setTimeElapsed] = useState(0)
   const [isTimerRunning, setIsTimerRunning] = useState(false)
   const [editorTheme, setEditorTheme] = useState("vs-dark")
   const [fontSize, setFontSize] = useState(14)
 
-  const userProgress = problem.user_progress
-  const status = userProgress?.status || "not_attempted"
-
-  // Load saved code from localStorage
+  // Load saved data from localStorage
   useEffect(() => {
     const savedCode = localStorage.getItem(`problem-${problem.id}-code`)
     const savedLanguage = localStorage.getItem(`problem-${problem.id}-language`)
@@ -138,496 +134,81 @@ export default function PracticeInterface({ problem, userId }: PracticeInterface
     const description = problem.description.toLowerCase()
     
     if (lang === "java") {
-      // Two Sum variations
-      if (title.includes('two sum') || title.includes('2sum') || description.includes('two sum')) {
-        return `import java.util.*;
-
-public class Solution {
-    public static String arrayToString(int[] arr) {
-        if (arr == null) return "null";
-        StringBuilder sb = new StringBuilder();
-        sb.append("[");
-        for (int i = 0; i < arr.length; i++) {
-            if (i > 0) sb.append(", ");
-            sb.append(arr[i]);
-        }
-        sb.append("]");
-        return sb.toString();
-    }
-
-    public static int[] twoSum(int[] nums, int target) {
-        // TODO: Implement the two sum algorithm
-        // Given an array of integers nums and an integer target,
-        // return indices of the two numbers such that they add up to target.
-        // You may assume that each input would have exactly one solution,
-        // and you may not use the same element twice.
-        // You can return the answer in any order.
-        
-        // Example 1:
-        // Input: nums = [2, 7, 11, 15], target = 9
-        // Output: [0, 1]
-        // Explanation: Because nums[0] + nums[1] == 9, we return [0, 1].
-        
-        return new int[]{};
-    }
-    
-    // Main method for testing
+      // Simple, clean templates
+      if (title.includes('array') || title.includes('list') || description.includes('array')) {
+        return `public class Solution {
     public static void main(String[] args) {
-        // Test cases
-        int[] nums1 = {2, 7, 11, 15};
-        int target1 = 9;
-        int[] result1 = twoSum(nums1, target1);
-        System.out.println("Test 1: " + arrayToString(result1));
+        int[] nums = {2, 7, 11, 15};
+        int target = 9;
         
-        int[] nums2 = {3, 2, 4};
-        int target2 = 6;
-        int[] result2 = twoSum(nums2, target2);
-        System.out.println("Test 2: " + arrayToString(result2));
-    }
-}`
-      }
-      
-      // Palindrome variations
-      if (title.includes('palindrome') || description.includes('palindrome')) {
-        return `import java.util.*;
-
-public class Solution {
-    public static boolean isPalindrome(String s) {
-        // TODO: Implement palindrome check
-        // A phrase is a palindrome if, after converting all uppercase letters into lowercase letters
-        // and removing all non-alphanumeric characters, it reads the same forward and backward.
-        // Alphanumeric characters include letters and numbers.
-        // Given a string s, return true if it is a palindrome, or false otherwise.
-        
-        // Example 1:
-        // Input: s = "A man, a plan, a canal: Panama"
-        // Output: true
-        // Explanation: "amanaplanacanalpanama" is a palindrome.
-        
-        return false;
-    }
-    
-    // Main method for testing
-    public static void main(String[] args) {
-        // Test cases
-        String test1 = "A man, a plan, a canal: Panama";
-        System.out.println("Test 1: " + isPalindrome(test1));
-        
-        String test2 = "race a car";
-        System.out.println("Test 2: " + isPalindrome(test2));
-    }
-}`
-      }
-      
-      // Fibonacci variations
-      if (title.includes('fibonacci') || title.includes('fib') || description.includes('fibonacci')) {
-        return `import java.util.*;
-
-public class Solution {
-    public static int fibonacci(int n) {
-        // TODO: Implement fibonacci calculation
-        // The Fibonacci numbers, commonly denoted F(n) form a sequence, called the Fibonacci sequence,
-        // such that each number is the sum of the two preceding ones, starting from 0 and 1.
-        // That is, F(0) = 0, F(1) = 1, F(n) = F(n - 1) + F(n - 2) for n > 1.
-        // Given n, calculate F(n).
-        
-        // Example 1:
-        // Input: n = 2
-        // Output: 1
-        // Explanation: F(2) = F(1) + F(0) = 1 + 0 = 1.
-        
-        return 0;
-    }
-    
-    // Main method for testing
-    public static void main(String[] args) {
-        // Test cases
-        System.out.println("Test 1: F(0) = " + fibonacci(0));
-        System.out.println("Test 2: F(1) = " + fibonacci(1));
-        System.out.println("Test 3: F(5) = " + fibonacci(5));
-        System.out.println("Test 4: F(10) = " + fibonacci(10));
-    }
-}`
-      }
-      
-      // Array sorting problems
-      if (title.includes('array') || title.includes('sort') || description.includes('array') || description.includes('sort')) {
-        return `import java.util.*;
-
-public class Solution {
-    public static String arrayToString(int[] arr) {
-        if (arr == null) return "null";
-        StringBuilder sb = new StringBuilder();
-        sb.append("[");
-        for (int i = 0; i < arr.length; i++) {
-            if (i > 0) sb.append(", ");
-            sb.append(arr[i]);
-        }
-        sb.append("]");
-        return sb.toString();
-    }
-
-    public static int[] sortArray(int[] nums) {
-        // TODO: Implement array sorting algorithm
-        // Given an array of integers nums, sort the array in ascending order and return it.
-        // You must solve the problem without using any built-in sort functions.
-        
-        // Example 1:
-        // Input: nums = [5, 2, 3, 1]
-        // Output: [1, 2, 3, 5]
-        
-        return new int[]{};
-    }
-    
-    // Main method for testing
-    public static void main(String[] args) {
-        // Test cases
-        int[] nums1 = {5, 2, 3, 1};
-        int[] result1 = sortArray(nums1);
-        System.out.println("Test 1: " + arrayToString(result1));
-        
-        int[] nums2 = {5, 1, 1, 2, 0, 0};
-        int[] result2 = sortArray(nums2);
-        System.out.println("Test 2: " + arrayToString(result2));
-    }
-}`
-      }
-      
-      // String problems
-      if (title.includes('string') || title.includes('reverse') || description.includes('string') || description.includes('reverse')) {
-        return `import java.util.*;
-
-public class Solution {
-    public static String reverseString(String s) {
-        // TODO: Implement string reversal
-        // Write a function that reverses a string. The input string is given as an array of characters s.
-        // You must do this by modifying the input array in-place with O(1) extra memory.
-        
-        // Example 1:
-        // Input: s = "hello"
-        // Output: "olleh"
-        
-        return "";
-    }
-    
-    // Main method for testing
-    public static void main(String[] args) {
-        // Test cases
-        String test1 = "hello";
-        System.out.println("Test 1: " + reverseString(test1));
-        
-        String test2 = "Hannah";
-        System.out.println("Test 2: " + reverseString(test2));
-    }
-}`
-      }
-      
-      // Math problems
-      if (title.includes('math') || title.includes('prime') || title.includes('factor') || description.includes('math') || description.includes('prime')) {
-        return `import java.util.*;
-
-public class Solution {
-    public static boolean isPrime(int n) {
-        // TODO: Implement prime number check
-        // Given an integer n, return true if n is a prime number, and false otherwise.
-        // A prime number is a natural number greater than 1 that is not a product of two smaller natural numbers.
-        
-        // Example 1:
-        // Input: n = 2
-        // Output: true
-        // Explanation: 2 is a prime number.
-        
-        return false;
-    }
-    
-    // Main method for testing
-    public static void main(String[] args) {
-        // Test cases
-        System.out.println("Test 1: isPrime(2) = " + isPrime(2));
-        System.out.println("Test 2: isPrime(4) = " + isPrime(4));
-        System.out.println("Test 3: isPrime(17) = " + isPrime(17));
-    }
-}`
-      }
-      
-      // Tree/Graph problems
-      if (title.includes('tree') || title.includes('graph') || title.includes('node') || description.includes('tree') || description.includes('graph')) {
-        return `import java.util.*;
-
-public class Solution {
-    // Definition for a binary tree node.
-    public class TreeNode {
-        int val;
-        TreeNode left;
-        TreeNode right;
-        TreeNode() {}
-        TreeNode(int val) { this.val = val; }
-        TreeNode(int val, TreeNode left, TreeNode right) {
-            this.val = val;
-            this.left = left;
-            this.right = right;
-        }
-    }
-    
-    public static int maxDepth(TreeNode root) {
-        // TODO: Implement maximum depth calculation
-        // Given the root of a binary tree, return its maximum depth.
-        // A binary tree's maximum depth is the number of nodes along the longest path
-        // from the root node down to the farthest leaf node.
-        
-        // Example 1:
-        // Input: root = [3,9,20,null,null,15,7]
-        // Output: 3
-        
-        return 0;
-    }
-    
-    // Main method for testing
-    public static void main(String[] args) {
-        // Test cases
-        // Note: You'll need to create tree structures for testing
-        System.out.println("Test 1: maxDepth(null) = " + maxDepth(null));
-    }
-}`
-      }
-      
-      // Dynamic Programming problems
-      if (title.includes('dp') || title.includes('dynamic') || title.includes('memo') || description.includes('dynamic programming')) {
-        return `import java.util.*;
-
-public class Solution {
-    public static int climbStairs(int n) {
-        // TODO: Implement climbing stairs solution
-        // You are climbing a staircase. It takes n steps to reach the top.
-        // Each time you can either climb 1 or 2 steps. In how many distinct ways can you climb to the top?
-        
-        // Example 1:
-        // Input: n = 2
-        // Output: 2
-        // Explanation: There are two ways to climb to the top.
-        // 1. 1 step + 1 step
-        // 2. 2 steps
-        
-        return 0;
-    }
-    
-    // Main method for testing
-    public static void main(String[] args) {
-        // Test cases
-        System.out.println("Test 1: climbStairs(2) = " + climbStairs(2));
-        System.out.println("Test 2: climbStairs(3) = " + climbStairs(3));
-        System.out.println("Test 3: climbStairs(4) = " + climbStairs(4));
-    }
-}`
-      }
-      
-      // Default Java template
-      return `import java.util.*;
-
-public class Solution {
-    public static String solve(String input) {
-        // TODO: Implement your solution here
-        // Problem: ${problem.title}
-        // 
-        // ${problem.description}
-        // 
-        // Return the expected output based on the problem description.
-        // Make sure to handle edge cases and validate your input.
-        
-        return "";
-    }
-    
-    // Main method for testing
-    public static void main(String[] args) {
-        // Test cases
-        String test1 = "test input";
-        System.out.println("Test 1: " + solve(test1));
-    }
-}`
-    }
-    
-    // Python templates
-    if (lang === "python") {
-      if (title.includes('two sum') || title.includes('2sum') || description.includes('two sum')) {
-        return `class Solution:
-    def twoSum(self, nums: List[int], target: int) -> List[int]:
-        # TODO: Implement the two sum algorithm
-        # Given an array of integers nums and an integer target,
-        # return indices of the two numbers such that they add up to target.
-        
-        return []
-    
-    # Test cases
-    def test(self):
-        solution = Solution()
-        nums1 = [2, 7, 11, 15]
-        target1 = 9
-        result1 = solution.twoSum(nums1, target1)
-        print(f"Test 1: {result1}")
-        
-        nums2 = [3, 2, 4]
-        target2 = 6
-        result2 = solution.twoSum(nums2, target2)
-        print(f"Test 2: {result2}")
-
-if __name__ == "__main__":
-    solution = Solution()
-    solution.test()`
-      }
-      
-      return `# TODO: Implement your solution here
-# Problem: ${problem.title}
-# 
-# ${problem.description}
-
-class Solution:
-    def solve(self, input_str: str) -> str:
-        # Your solution here
-        return ""
-
-# Test cases
-if __name__ == "__main__":
-    solution = Solution()
-    test_input = "test input"
-    result = solution.solve(test_input)
-    print(f"Result: {result}")`
-    }
-    
-    // C++ templates
-    if (lang === "cpp") {
-      if (title.includes('two sum') || title.includes('2sum') || description.includes('two sum')) {
-        return `#include <iostream>
-#include <vector>
-#include <algorithm>
-using namespace std;
-
-class Solution {
-public:
-    vector<int> twoSum(vector<int>& nums, int target) {
-        // TODO: Implement the two sum algorithm
-        // Given an array of integers nums and an integer target,
-        // return indices of the two numbers such that they add up to target.
-        
-        return {};
-    }
-    
-    // Test cases
-    void test() {
-        vector<int> nums1 = {2, 7, 11, 15};
-        int target1 = 9;
-        vector<int> result1 = twoSum(nums1, target1);
-        cout << "Test 1: [";
-        for (int i = 0; i < result1.size(); i++) {
-            cout << result1[i];
-            if (i < result1.size() - 1) cout << ", ";
-        }
-        cout << "]" << endl;
-    }
-};
-
-int main() {
-    Solution solution;
-    solution.test();
-    return 0;
-}`
-      }
-      
-      return `#include <iostream>
-#include <vector>
-#include <algorithm>
-using namespace std;
-
-class Solution {
-public:
-    string solve(string input) {
-        // TODO: Implement your solution here
-        // Problem: ${problem.title}
-        // 
-        // ${problem.description}
-        
-        return "";
-    }
-    
-    void test() {
-        string test_input = "test input";
-        string result = solve(test_input);
-        cout << "Result: " << result << endl;
-    }
-};
-
-int main() {
-    Solution solution;
-    solution.test();
-    return 0;
-}`
-    }
-    
-    // JavaScript templates
-    if (lang === "javascript") {
-      if (title.includes('two sum') || title.includes('2sum') || description.includes('two sum')) {
-        return `class Solution {
-    twoSum(nums, target) {
-        // TODO: Implement the two sum algorithm
-        // Given an array of integers nums and an integer target,
-        // return indices of the two numbers such that they add up to target.
-        
-        return [];
-    }
-    
-    // Test cases
-    test() {
-        const nums1 = [2, 7, 11, 15];
-        const target1 = 9;
-        const result1 = this.twoSum(nums1, target1);
-        console.log("Test 1:", result1);
-        
-        const nums2 = [3, 2, 4];
-        const target2 = 6;
-        const result2 = this.twoSum(nums2, target2);
-        console.log("Test 2:", result2);
-    }
-}
-
-// Run tests
-const solution = new Solution();
-solution.test();`
-      }
-      
-      return `// TODO: Implement your solution here
-// Problem: ${problem.title}
-// 
-// ${problem.description}
-
-class Solution {
-    solve(input) {
         // Your solution here
-        return "";
+        for (int i = 0; i < nums.length; i++) {
+            for (int j = i + 1; j < nums.length; j++) {
+                if (nums[i] + nums[j] == target) {
+                    System.out.println("[" + i + ", " + j + "]");
+                    return;
+                }
+            }
+        }
+    }
+}`
+      }
+      
+      if (title.includes('string') || title.includes('palindrome') || description.includes('string')) {
+        return `public class Solution {
+    public static void main(String[] args) {
+        String s = "racecar";
+        
+        // Your solution here
+        int left = 0, right = s.length() - 1;
+        while (left < right) {
+            if (s.charAt(left) != s.charAt(right)) {
+                System.out.println("false");
+                return;
+            }
+            left++;
+            right--;
+        }
+        System.out.println("true");
+    }
+}`
+      }
+      
+      if (title.includes('math') || title.includes('calculate') || description.includes('math')) {
+        return `public class Solution {
+    public static void main(String[] args) {
+        int n = 5;
+        
+        // Your solution here
+        int result = 1;
+        for (int i = 1; i <= n; i++) {
+            result *= i;
+        }
+        System.out.println(result);
+    }
+}`
+      }
+      
+      // Default simple template
+      return `public class Solution {
+    public static void main(String[] args) {
+        // Your solution here
+        System.out.println("Hello World");
+    }
+}`
     }
     
-    test() {
-        const testInput = "test input";
-        const result = this.solve(testInput);
-        console.log("Result:", result);
-    }
-}
-
-// Run tests
-const solution = new Solution();
-solution.test();`
-    }
-    
-    return null
+    // For other languages, return simple templates
+    return `// Your solution here
+console.log("Hello World");`
   }
 
   const getTemplateType = () => {
     const title = problem.title.toLowerCase()
     const description = problem.description.toLowerCase()
     
-    if (title.includes('two sum') || title.includes('2sum') || description.includes('two sum')) return "Two Sum Algorithm"
-    if (title.includes('palindrome') || description.includes('palindrome')) return "Palindrome Check"
-    if (title.includes('fibonacci') || title.includes('fib') || description.includes('fibonacci')) return "Fibonacci Sequence"
-    if (title.includes('array') || title.includes('sort') || description.includes('array') || description.includes('sort')) return "Array Sorting"
-    if (title.includes('string') || title.includes('reverse') || description.includes('string') || description.includes('reverse')) return "String Manipulation"
+    if (title.includes('array') || title.includes('list') || description.includes('array') || description.includes('list')) return "Array Problem"
+    if (title.includes('string') || title.includes('palindrome') || description.includes('string') || description.includes('palindrome')) return "String Problem"
     if (title.includes('math') || title.includes('prime') || description.includes('math') || description.includes('prime')) return "Mathematical Algorithm"
     if (title.includes('tree') || title.includes('graph') || description.includes('tree') || description.includes('graph')) return "Tree/Graph Traversal"
     if (title.includes('dp') || title.includes('dynamic') || description.includes('dynamic programming')) return "Dynamic Programming"
@@ -639,11 +220,8 @@ solution.test();`
     const title = problem.title.toLowerCase()
     const description = problem.description.toLowerCase()
     
-    if (title.includes('two sum') || title.includes('2sum') || description.includes('two sum')) return "twoSum(int[] nums, int target)"
-    if (title.includes('palindrome') || description.includes('palindrome')) return "isPalindrome(String s)"
-    if (title.includes('fibonacci') || title.includes('fib') || description.includes('fibonacci')) return "fibonacci(int n)"
-    if (title.includes('array') || title.includes('sort') || description.includes('array') || description.includes('sort')) return "sortArray(int[] nums)"
-    if (title.includes('string') || title.includes('reverse') || description.includes('string') || description.includes('reverse')) return "reverseString(String s)"
+    if (title.includes('array') || title.includes('list') || description.includes('array') || description.includes('list')) return "twoSum(int[] nums, int target)"
+    if (title.includes('string') || title.includes('palindrome') || description.includes('string') || description.includes('palindrome')) return "isPalindrome(String s)"
     if (title.includes('math') || title.includes('prime') || description.includes('math') || description.includes('prime')) return "isPrime(int n)"
     if (title.includes('tree') || title.includes('graph') || description.includes('tree') || description.includes('graph')) return "maxDepth(TreeNode root)"
     if (title.includes('dp') || title.includes('dynamic') || description.includes('dynamic programming')) return "climbStairs(int n)"
@@ -672,16 +250,16 @@ solution.test();`
     const difficultyLevel = problem.difficulty_level
     if (!difficultyLevel) return null
 
-    const colors: Record<number, string> = {
-      1: "bg-green-500/10 text-green-700 border-green-500/20",
-      2: "bg-yellow-500/10 text-yellow-700 border-yellow-500/20", 
-      3: "bg-red-500/10 text-red-700 border-red-500/20",
+    const difficultyNames = {
+      1: "Easy",
+      2: "Medium", 
+      3: "Hard"
     }
 
-    const difficultyNames: Record<number, string> = {
-      1: "Beginner",
-      2: "Intermediate", 
-      3: "Advanced"
+    const colors = {
+      1: "bg-green-500/10 text-green-700 border-green-500/20",
+      2: "bg-yellow-500/10 text-yellow-700 border-yellow-500/20",
+      3: "bg-red-500/10 text-red-700 border-red-500/20"
     }
 
     return (
@@ -698,19 +276,8 @@ solution.test();`
     setCustomOutput("")
 
     try {
-      const result = await TestingService.executeCode(
-        code,
-        language,
-        customInput,
-        problem.time_limit,
-        problem.memory_limit,
-      )
-
-      if (result.success) {
-        setCustomOutput(result.output || "")
-      } else {
-        setCustomOutput(`Error: ${result.error}`)
-      }
+      const result = await TestingService.executeCode(code, language, customInput)
+      setCustomOutput(result.output || result.error || "No output")
     } catch (error) {
       setCustomOutput("Error: Failed to execute code")
     } finally {
@@ -725,14 +292,22 @@ solution.test();`
     setTestResults([])
 
     try {
-      const sampleTests = problem.test_cases.filter((tc) => tc.is_sample)
-      const results = await TestingService.runSampleTests(
-        code,
-        language,
-        sampleTests,
-        problem.time_limit,
-        problem.memory_limit,
-      )
+      const sampleTests = problem.test_cases.filter(tc => tc.is_sample)
+      const results: TestResult[] = []
+
+      for (const testCase of sampleTests) {
+        const result = await TestingService.executeCode(code, language, testCase.input)
+        const passed = result.output?.trim() === testCase.expected_output.trim()
+        
+        results.push({
+          passed,
+          input: testCase.input,
+          expected: testCase.expected_output,
+          actual: result.output || result.error || "No output",
+          executionTime: result.executionTime || 0,
+          memoryUsage: result.memoryUsage || 0
+        })
+      }
 
       setTestResults(results)
     } catch (error) {
@@ -746,27 +321,45 @@ solution.test();`
     if (!code.trim()) return
 
     setIsSubmitting(true)
-    setSubmissionResult(null)
 
     try {
-      const result = await TestingService.submitSolution(problem.id, code, language, userId)
+      // Run all test cases
+      const allTests = problem.test_cases
+      const results: TestResult[] = []
 
-      setSubmissionResult(result)
-      setIsTimerRunning(false)
-
-      // Show detailed results for failed submissions
-      if (result.status !== "accepted" && result.testResults) {
-        setTestResults(result.testResults)
+      for (const testCase of allTests) {
+        const result = await TestingService.executeCode(code, language, testCase.input)
+        const passed = result.output?.trim() === testCase.expected_output.trim()
+        
+        results.push({
+          passed,
+          input: testCase.input,
+          expected: testCase.expected_output,
+          actual: result.output || result.error || "No output",
+          executionTime: result.executionTime || 0,
+          memoryUsage: result.memoryUsage || 0
+        })
       }
-    } catch (error) {
-      console.error("Error submitting solution:", error)
-      setSubmissionResult({
-        status: "error",
-        score: 0,
-        executionTime: 0,
-        memoryUsed: 0,
-        testCasesPassed: 0,
-        totalTestCases: 0,
+
+      setTestResults(results)
+      
+      const passedTests = results.filter(r => r.passed).length
+      const totalTests = results.length
+      
+      if (passedTests === totalTests) {
+        setStatus("solved")
+      } else {
+        setStatus("attempted")
+      }
+
+      // Save progress to database
+      await TestingService.saveProgress(userId, problem.id, {
+        code,
+        language,
+        status: passedTests === totalTests ? "solved" : "attempted",
+        score: Math.round((passedTests / totalTests) * 100),
+        executionTime: results.reduce((sum, r) => sum + r.executionTime, 0),
+        totalTestCases: totalTests,
       })
     } finally {
       setIsSubmitting(false)
@@ -777,59 +370,53 @@ solution.test();`
     <div className="min-h-screen bg-[var(--background)] transition-colors duration-300">
       {/* Enhanced Header */}
       <header className="border-b border-[var(--border)] bg-[var(--card)] shadow-sm backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <Button variant="ghost" size="sm" asChild className="hover-lift">
-                <Link href="/dashboard">
+              <Button variant="ghost" size="sm" asChild>
+                <Link href="/problems">
                   <ArrowLeft className="h-4 w-4 mr-2" />
-                  Back to Dashboard
+                  Back to Problems
                 </Link>
               </Button>
-              <div className="text-sm text-[var(--muted-foreground)] bg-[var(--muted)]/50 px-3 py-1 rounded-lg">
-                <Clock className="h-4 w-4 inline mr-1" />
-                {formatTime(timeElapsed)}
+              <div className="h-6 w-px bg-[var(--border)]" />
+              <div className="flex items-center space-x-3">
+                <h1 className="text-xl font-semibold text-[var(--foreground)]">{problem.title}</h1>
+                {getStatusBadge()}
+                {getDifficultyBadge()}
               </div>
             </div>
-            <div className="flex items-center space-x-3">
-              <Select value={editorTheme} onValueChange={setEditorTheme}>
-                <SelectTrigger className="w-32">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="vs-dark">Dark</SelectItem>
-                  <SelectItem value="vs-light">Light</SelectItem>
-                </SelectContent>
-              </Select>
-              {getDifficultyBadge()}
-              {getStatusBadge()}
+            
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2 text-sm text-[var(--muted-foreground)]">
+                <Clock className="h-4 w-4" />
+                <span>{formatTime(timeElapsed)}</span>
+              </div>
+              <div className="flex items-center space-x-2 text-sm text-[var(--muted-foreground)]">
+                <Trophy className="h-4 w-4" />
+                <span>{problem.points} pts</span>
+              </div>
             </div>
           </div>
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[calc(100vh-200px)]">
-          {/* Enhanced Problem Panel */}
-          <div className="space-y-6 overflow-y-auto">
-            <Card className="card-modern hover-lift">
+      <div className="container mx-auto px-4 py-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Problem Description */}
+          <div className="space-y-6">
+            <Card>
               <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <CardTitle className="text-2xl mb-3 text-[var(--foreground)]">{problem.title}</CardTitle>
-                    <div className="flex items-center gap-4 text-sm">
-                      <div className="flex items-center gap-1 bg-[var(--primary)]/10 px-3 py-1 rounded-lg">
-                        <Trophy className="h-4 w-4 text-[var(--primary)]" />
-                        <span className="text-[var(--primary)] font-medium">{problem.points} pts</span>
-                      </div>
-                      <div className="flex items-center gap-1 bg-[var(--muted)]/50 px-3 py-1 rounded-lg">
-                        <Clock className="h-4 w-4 text-[var(--muted-foreground)]" />
-                        <span className="text-[var(--muted-foreground)]">{problem.time_limit / 1000}s</span>
-                      </div>
-                      <div className="flex items-center gap-1 bg-[var(--muted)]/50 px-3 py-1 rounded-lg">
-                        <Target className="h-4 w-4 text-[var(--muted-foreground)]" />
-                        <span className="text-[var(--muted-foreground)]">{problem.memory_limit} MB</span>
-                      </div>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-lg text-[var(--foreground)]">Problem Description</CardTitle>
+                  <div className="flex items-center space-x-2">
+                    <div className="flex items-center gap-1 bg-[var(--muted)]/50 px-3 py-1 rounded-lg">
+                      <Clock className="h-4 w-4 text-[var(--muted-foreground)]" />
+                      <span className="text-[var(--muted-foreground)]">{problem.time_limit / 1000}s</span>
+                    </div>
+                    <div className="flex items-center gap-1 bg-[var(--muted)]/50 px-3 py-1 rounded-lg">
+                      <Target className="h-4 w-4 text-[var(--muted-foreground)]" />
+                      <span className="text-[var(--muted-foreground)]">{problem.memory_limit} MB</span>
                     </div>
                   </div>
                 </div>
@@ -860,21 +447,21 @@ solution.test();`
                     <div>
                       <h4 className="font-semibold text-[var(--foreground)] mb-3">Sample Input</h4>
                       <pre className="bg-[var(--muted)]/50 p-4 rounded-xl text-sm overflow-x-auto border border-[var(--border)]">
-                        <code className="text-[var(--foreground)]">{problem.sample_input}</code>
+                        {problem.sample_input}
                       </pre>
                     </div>
                     <div>
                       <h4 className="font-semibold text-[var(--foreground)] mb-3">Sample Output</h4>
                       <pre className="bg-[var(--muted)]/50 p-4 rounded-xl text-sm overflow-x-auto border border-[var(--border)]">
-                        <code className="text-[var(--foreground)]">{problem.sample_output}</code>
+                        {problem.sample_output}
                       </pre>
                     </div>
                   </div>
 
                   {problem.explanation && (
-                    <div className="mt-6 p-4 bg-[var(--accent)]/10 rounded-xl">
+                    <div className="mt-6 p-4 bg-[var(--info)]/10 rounded-xl">
                       <h4 className="font-semibold text-[var(--foreground)] mb-3">Explanation</h4>
-                      <p className="text-sm text-[var(--muted-foreground)] whitespace-pre-wrap leading-relaxed">{problem.explanation}</p>
+                      <p className="text-sm text-[var(--muted-foreground)] whitespace-pre-wrap">{problem.explanation}</p>
                     </div>
                   )}
                 </div>
@@ -882,87 +469,148 @@ solution.test();`
             </Card>
           </div>
 
-          {/* Enhanced Java IDE */}
-          <div className="space-y-4">
-            <UnifiedJavaIDE
-              questionId={problem.id}
-              userId={userId}
-              questionTitle={problem.title}
-              questionDescription={problem.description}
-              testCases={problem.test_cases}
-              templateCode={getProblemSpecificTemplates(language) ?? undefined}
-              onExecutionComplete={(result) => {
-                console.log('Execution completed:', result);
-                // You can add additional logic here if needed
-              }}
-            />
+          {/* Code Editor */}
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-lg text-[var(--foreground)]">Code Editor</CardTitle>
+                  <div className="flex items-center space-x-2">
+                    <Select value={language} onValueChange={setLanguage}>
+                      <SelectTrigger className="w-32">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="java">Java</SelectItem>
+                        <SelectItem value="javascript">JavaScript</SelectItem>
+                        <SelectItem value="python">Python</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <UnifiedJavaIDE
+                  code={code}
+                  onCodeChange={setCode}
+                  language={language}
+                  theme={editorTheme}
+                  fontSize={fontSize}
+                />
+              </CardContent>
+            </Card>
 
-            {/* Enhanced Submit Panel */}
-            <Card className="card-modern">
-              <CardContent className="p-6">
-                <Button
-                  onClick={submitSolution}
-                  disabled={isSubmitting || !code.trim()}
-                  className="w-full btn-primary hover-glow text-[var(--primary-foreground)]"
-                >
-                  <Send className="h-4 w-4 mr-2" />
-                  {isSubmitting ? "Submitting..." : "Submit Solution"}
-                </Button>
-
-                {submissionResult && (
-                  <Card className="card-modern mt-6 border-2 border-[var(--border)]">
-                    <CardContent className="p-6">
-                      <div className="flex items-center gap-3 mb-4">
-                        <div className={`p-2 rounded-full ${
-                          submissionResult.status === "accepted" ? 'bg-[var(--success)]/10' : 
-                          submissionResult.status === "error" ? 'bg-[var(--destructive)]/10' : 
-                          'bg-[var(--destructive)]/10'
-                        }`}>
-                          {submissionResult.status === "accepted" ? (
-                            <CheckCircle className="h-6 w-6 text-[var(--success)]" />
-                          ) : submissionResult.status === "error" ? (
-                            <AlertCircle className="h-6 w-6 text-[var(--destructive)]" />
-                          ) : (
-                            <XCircle className="h-6 w-6 text-[var(--destructive)]" />
-                          )}
-                        </div>
-                        <span className={`font-semibold text-lg ${TestingService.getStatusColor(submissionResult.status)}`}>
-                          {TestingService.getStatusMessage(submissionResult.status)}
-                        </span>
+            {/* Test Controls */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg text-[var(--foreground)]">Test Your Solution</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <Tabs defaultValue="custom" className="w-full">
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="custom">Custom Test</TabsTrigger>
+                    <TabsTrigger value="sample">Sample Tests</TabsTrigger>
+                  </TabsList>
+                  
+                  <TabsContent value="custom" className="space-y-4">
+                    <div>
+                      <label className="text-sm font-medium text-[var(--foreground)] mb-2 block">Input</label>
+                      <Textarea
+                        value={customInput}
+                        onChange={(e) => setCustomInput(e.target.value)}
+                        placeholder="Enter test input..."
+                        className="min-h-[100px]"
+                      />
+                    </div>
+                    <Button 
+                      onClick={runCustomTest} 
+                      disabled={isRunning || !code.trim() || !customInput.trim()}
+                      className="w-full"
+                    >
+                      <Play className="h-4 w-4 mr-2" />
+                      {isRunning ? "Running..." : "Run Test"}
+                    </Button>
+                    {customOutput && (
+                      <div>
+                        <label className="text-sm font-medium text-[var(--foreground)] mb-2 block">Output</label>
+                        <pre className="bg-[var(--muted)]/50 p-4 rounded-xl text-sm overflow-x-auto border border-[var(--border)] min-h-[100px]">
+                          {customOutput}
+                        </pre>
                       </div>
-
-                      {submissionResult.status !== "error" && (
-                        <div className="grid grid-cols-2 gap-4 text-sm p-4 bg-[var(--muted)]/30 rounded-xl">
-                          <div className="font-medium text-[var(--foreground)]">Score: {submissionResult.score}/100</div>
-                          <div className="font-medium text-[var(--foreground)]">Time: {submissionResult.executionTime}ms</div>
-                          <div className="font-medium text-[var(--foreground)]">Memory: {Math.round(submissionResult.memoryUsed / 1024)}KB</div>
-                          <div className="font-medium text-[var(--foreground)]">
-                            Tests: {submissionResult.testCasesPassed}/{submissionResult.totalTestCases}
-                          </div>
-                        </div>
-                      )}
-
-                      {submissionResult.testResults && submissionResult.testResults.length > 0 && (
-                        <div className="mt-4 p-4 bg-[var(--muted)]/30 rounded-xl">
-                          <h4 className="text-sm font-semibold mb-3 text-[var(--foreground)]">Test Results:</h4>
-                          <div className="space-y-2 max-h-32 overflow-y-auto">
-                            {submissionResult.testResults.map((result: any, index: number) => (
-                              <div key={index} className="flex items-center gap-2 text-xs">
+                    )}
+                  </TabsContent>
+                  
+                  <TabsContent value="sample" className="space-y-4">
+                    <div className="flex space-x-2">
+                      <Button 
+                        onClick={runSampleTests} 
+                        disabled={isRunning || !code.trim()}
+                        className="flex-1"
+                      >
+                        <Play className="h-4 w-4 mr-2" />
+                        {isRunning ? "Running..." : "Run Sample Tests"}
+                      </Button>
+                      <Button 
+                        onClick={submitSolution} 
+                        disabled={isSubmitting || !code.trim()}
+                        variant="default"
+                        className="flex-1"
+                      >
+                        <Send className="h-4 w-4 mr-2" />
+                        {isSubmitting ? "Submitting..." : "Submit Solution"}
+                      </Button>
+                    </div>
+                    
+                    {testResults.length > 0 && (
+                      <div className="space-y-3">
+                        <h4 className="font-semibold text-[var(--foreground)]">Test Results</h4>
+                        {testResults.map((result, index) => (
+                          <div key={index} className={`p-4 rounded-xl border ${
+                            result.passed 
+                              ? "bg-green-500/10 border-green-500/20" 
+                              : "bg-red-500/10 border-red-500/20"
+                          }`}>
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="flex items-center space-x-2">
                                 {result.passed ? (
-                                  <CheckCircle className="h-3 w-3 text-[var(--success)]" />
+                                  <CheckCircle className="h-4 w-4 text-green-600" />
                                 ) : (
-                                  <XCircle className="h-3 w-3 text-[var(--destructive)]" />
+                                  <XCircle className="h-4 w-4 text-red-600" />
                                 )}
-                                <span className="text-[var(--foreground)]">Test {index + 1}</span>
-                                <span className="text-[var(--muted-foreground)]">{result.executionTime}ms</span>
+                                <span className="font-medium text-[var(--foreground)]">
+                                  Test Case {index + 1}
+                                </span>
                               </div>
-                            ))}
+                              <Badge variant={result.passed ? "default" : "destructive"}>
+                                {result.passed ? "Passed" : "Failed"}
+                              </Badge>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                              <div>
+                                <div className="font-medium text-[var(--muted-foreground)] mb-1">Input:</div>
+                                <pre className="bg-[var(--muted)]/50 p-2 rounded text-xs overflow-x-auto">
+                                  {result.input}
+                                </pre>
+                              </div>
+                              <div>
+                                <div className="font-medium text-[var(--muted-foreground)] mb-1">Expected:</div>
+                                <pre className="bg-[var(--muted)]/50 p-2 rounded text-xs overflow-x-auto">
+                                  {result.expected}
+                                </pre>
+                              </div>
+                              <div className="md:col-span-2">
+                                <div className="font-medium text-[var(--muted-foreground)] mb-1">Actual:</div>
+                                <pre className="bg-[var(--muted)]/50 p-2 rounded text-xs overflow-x-auto">
+                                  {result.actual}
+                                </pre>
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                )}
+                        ))}
+                      </div>
+                    )}
+                  </TabsContent>
+                </Tabs>
               </CardContent>
             </Card>
           </div>
