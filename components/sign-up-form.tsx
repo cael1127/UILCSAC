@@ -9,6 +9,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { supabase } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import { getSiteUrlForPath } from "@/lib/site-url"
 
 export default function SignUpForm() {
   const [email, setEmail] = useState("")
@@ -51,7 +52,7 @@ export default function SignUpForm() {
         email,
         password,
         options: {
-          emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/auth/sign-up-confirmation`,
+          emailRedirectTo: getSiteUrlForPath("/auth/sign-up-confirmation"),
           data: {
             first_name: firstName,
             last_name: lastName,

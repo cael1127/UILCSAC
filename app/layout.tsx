@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/sonner"
 import ThemeSwitcher from "@/components/theme-switcher"
 import ModernNavigation from "@/components/modern-navigation"
+import { getSiteUrl } from "@/lib/site-url"
 
 const inter = Inter({ 
   subsets: ["latin"],
@@ -28,7 +29,7 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
+  metadataBase: new URL(getSiteUrl()),
   alternates: {
     canonical: '/',
   },

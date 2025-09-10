@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
+import { getSiteUrl } from "@/lib/site-url"
 import { createClient } from "@/lib/supabase/server"
 
 interface SubmitRequest {
@@ -154,7 +155,7 @@ async function runAllTests(
   for (const testCase of testCases) {
     try {
       // Execute code with test case input
-      const response = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/api/execute`, {
+      const response = await fetch(`${getSiteUrl()}/api/execute`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

@@ -3,6 +3,7 @@
 import { createServerClient } from "@supabase/ssr"
 import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
+import { getSiteUrlForPath } from "@/lib/site-url"
 
 // Sign in action
 export async function signIn(prevState: any, formData: FormData) {
@@ -115,7 +116,7 @@ export async function signUp(prevState: any, formData: FormData) {
       options: {
         emailRedirectTo:
           process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL ||
-          `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/dashboard`,
+          getSiteUrlForPath("/dashboard"),
         data: {
           first_name: firstName.toString(),
           last_name: lastName.toString(),
