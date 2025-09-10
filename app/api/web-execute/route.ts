@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase/server';
 import { simpleJavaRuntimeFixed } from '@/lib/simple-java-runtime-fixed';
 import { enhancedJavaRuntime } from '@/lib/enhanced-java-runtime';
 
@@ -95,7 +96,12 @@ async function executeJavaViaPiston(code: string): Promise<ExecutionResult> {
 }
 
 // Try executing via Supabase Edge Function (real javac/java)
-async function executeJavaViaSupabase(code: string, userId?: string, questionId?: string, override?: { supabaseUrl?: string; anonKey?: string }): Promise<ExecutionResult> {
+async function executeJavaViaSupabase(
+  code: string,
+  userId?: string,
+  questionId?: string,
+  override?: { supabaseUrl?: string; anonKey?: string; accessToken?: string }
+): Promise<ExecutionResult> {
   const startTime = Date.now();
   try {
     const supabaseUrl = override?.supabaseUrl || process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -111,7 +117,8 @@ async function executeJavaViaSupabase(code: string, userId?: string, questionId?
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${supabaseAnonKey}`,
+        // Prefer a real user access token if provided; fall back to anon key
+        'Authorization': `Bearer ${override?.accessToken || supabaseAnonKey}`,
         'apikey': supabaseAnonKey,
       },
       body: JSON.stringify({ code, userId, questionId })
@@ -208,6 +215,7 @@ export async function POST(request: NextRequest) {
     const hdr = request.headers;
     const hdrSupabaseUrl = hdr.get('x-supabase-url') || undefined;
     const hdrAnonKey = hdr.get('x-supabase-anon-key') || undefined;
+    const hdrAccessToken = hdr.get('x-supabase-access-token') || undefined;
 
     if (!code || !language) {
       return NextResponse.json(
@@ -216,14 +224,44 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Get user session token if available (server-side)
+    let serverAccessToken: string | undefined = undefined;
+    try {
+      const supabase = await createClient();
+      const { data: sessionData } = await supabase.auth.getSession();
+      serverAccessToken = sessionData?.session?.access_token || undefined;
+    } catch (e) {
+      // ignore; we'll fall back to anon
+    }
+
     // Execute the code
     let executionResult: ExecutionResult;
     if (language === 'java') {
       try {
-        // Try Piston first (real Java), then Supabase Edge if configured, else browser fallback
-        let result = await executeJavaViaPiston(code);
-        if (!result.success && (hdrSupabaseUrl || hdrAnonKey || process.env.NEXT_PUBLIC_SUPABASE_URL)) {
-          result = await executeJavaViaSupabase(code, userId, questionId, { supabaseUrl: hdrSupabaseUrl, anonKey: hdrAnonKey });
+        // Prefer Supabase Edge in production when configured; otherwise fall back
+        const edgeConfigured = !!(hdrSupabaseUrl || process.env.NEXT_PUBLIC_SUPABASE_URL);
+        const preferEdge = edgeConfigured && process.env.NODE_ENV === 'production';
+
+        let result: ExecutionResult;
+        if (preferEdge) {
+          result = await executeJavaViaSupabase(code, userId, questionId, {
+            supabaseUrl: hdrSupabaseUrl,
+            anonKey: hdrAnonKey,
+            accessToken: hdrAccessToken || serverAccessToken,
+          });
+          if (!result.success) {
+            result = await executeJavaViaPiston(code);
+          }
+        } else {
+          // Development or not configured: try Piston first, then Edge
+          result = await executeJavaViaPiston(code);
+          if (!result.success && edgeConfigured) {
+            result = await executeJavaViaSupabase(code, userId, questionId, {
+              supabaseUrl: hdrSupabaseUrl,
+              anonKey: hdrAnonKey,
+              accessToken: hdrAccessToken || serverAccessToken,
+            });
+          }
         }
         if (!result.success) {
           const customInput = testCases && testCases.length === 1 && testCases[0].input ? testCases[0].input : undefined;
