@@ -82,7 +82,7 @@ export default function SignUpForm() {
       } else {
         const errorResult = await resp.json()
         console.error('Email check failed:', errorResult)
-        setError("Unable to verify email. Please try again.")
+        setError("This email is in use already. Please login.")
         setLoading(false)
         return
       }
