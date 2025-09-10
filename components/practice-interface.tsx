@@ -250,21 +250,23 @@ console.log("Hello World");`
     const difficultyLevel = problem.difficulty_level
     if (!difficultyLevel) return null
 
-    const difficultyNames = {
+    const difficultyNames: Record<number, string> = {
       1: "Easy",
       2: "Medium", 
       3: "Hard"
     }
 
-    const colors = {
+    const colors: Record<number, string> = {
       1: "bg-green-500/10 text-green-700 border-green-500/20",
       2: "bg-yellow-500/10 text-yellow-700 border-yellow-500/20",
       3: "bg-red-500/10 text-red-700 border-red-500/20"
     }
 
+    const level = Number(difficultyLevel)
+
     return (
-      <Badge className={colors[difficultyLevel] || "bg-[var(--muted)]/10 text-[var(--foreground)] border-[var(--border)]/20"}>
-        {difficultyNames[difficultyLevel] || "Unknown"}
+      <Badge className={colors[level] || "bg-[var(--muted)]/10 text-[var(--foreground)] border-[var(--border)]/20"}>
+        {difficultyNames[level] || "Unknown"}
       </Badge>
     )
   }
@@ -305,7 +307,7 @@ console.log("Hello World");`
           expected: testCase.expected_output,
           actual: result.output || result.error || "No output",
           executionTime: result.executionTime || 0,
-          memoryUsage: result.memoryUsage || 0
+          memoryUsage: (result as any).memoryUsed || (result as any).memoryUsage || 0
         })
       }
 
@@ -337,7 +339,7 @@ console.log("Hello World");`
           expected: testCase.expected_output,
           actual: result.output || result.error || "No output",
           executionTime: result.executionTime || 0,
-          memoryUsage: result.memoryUsage || 0
+          memoryUsage: (result as any).memoryUsed || (result as any).memoryUsage || 0
         })
       }
 
@@ -352,15 +354,7 @@ console.log("Hello World");`
         setStatus("attempted")
       }
 
-      // Save progress to database
-      await TestingService.saveProgress(userId, problem.id, {
-        code,
-        language,
-        status: passedTests === totalTests ? "solved" : "attempted",
-        score: Math.round((passedTests / totalTests) * 100),
-        executionTime: results.reduce((sum, r) => sum + r.executionTime, 0),
-        totalTestCases: totalTests,
-      })
+      // Optionally save submission (disabled: API method not present)
     } finally {
       setIsSubmitting(false)
     }
@@ -491,11 +485,11 @@ console.log("Hello World");`
               </CardHeader>
               <CardContent>
                 <UnifiedJavaIDE
-                  code={code}
-                  onCodeChange={setCode}
-                  language={language}
-                  theme={editorTheme}
-                  fontSize={fontSize}
+                  questionId={problem.id}
+                  userId={userId}
+                  questionTitle={problem.title}
+                  questionDescription={problem.description}
+                  templateCode={code || undefined}
                 />
               </CardContent>
             </Card>

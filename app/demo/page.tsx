@@ -1,4 +1,4 @@
-import { SimpleJavaIDE } from '@/components/simple-java-ide';
+import { UnifiedJavaIDE } from '@/components/unified-java-ide';
 
 export default function DemoPage() {
   return (
@@ -37,7 +37,7 @@ export default function DemoPage() {
         {/* IDE Section */}
         <div className="mb-8">
           <h2 className="text-2xl font-bold mb-6 text-center">Try the Java IDE</h2>
-          <SimpleJavaIDE
+          <UnifiedJavaIDE
             questionId={"demo-question"}
             userId={"demo-user"}
             questionTitle="Java Programming Demo"
