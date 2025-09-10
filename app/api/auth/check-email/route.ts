@@ -17,29 +17,39 @@ export async function POST(request: NextRequest) {
 
     const admin = createSupabaseClient(supabaseUrl, serviceRoleKey)
 
-    // Prefer direct admin email lookup if available; fallback to listUsers filter
-    const tryGetByEmail = async () => {
-      const adminApi: any = (admin as any).auth?.admin
+    // Try to get user by email using admin API
+    const adminApi: any = (admin as any).auth?.admin
+    
+    try {
+      // First try: getUserByEmail if available
       if (adminApi && 'getUserByEmail' in adminApi && typeof adminApi.getUserByEmail === 'function') {
-        return await adminApi.getUserByEmail(email.toLowerCase())
+        const { data, error } = await adminApi.getUserByEmail(email.toLowerCase())
+        if (error) {
+          // If user not found, that's fine - email doesn't exist
+          const notFound = (error as any)?.status === 404 || /not\s*found/i.test((error as any)?.message || "")
+          if (notFound) {
+            return NextResponse.json({ exists: false })
+          }
+          // Other errors are real problems
+          return NextResponse.json({ error: "Lookup failed" }, { status: 500 })
+        }
+        // User found
+        return NextResponse.json({ exists: !!data?.user })
       }
-      // Fallback: list first 200 users and search (last resort in older SDKs)
-      const list = await adminApi.listUsers({ page: 1, perPage: 200 })
-      const found = list.data?.users?.find((u: any) => u.email?.toLowerCase() === email.toLowerCase())
-      return { data: { user: found || null }, error: null }
-    }
-
-    const { data, error } = await tryGetByEmail()
-    if (error) {
-      // If endpoint returns not found, treat as not existing
-      const notFound = (error as any)?.status === 404 || /not\s*found/i.test((error as any)?.message || "")
-      if (!notFound) {
+      
+      // Fallback: list users and search
+      const { data: listData, error: listError } = await adminApi.listUsers({ page: 1, perPage: 200 })
+      if (listError) {
         return NextResponse.json({ error: "Lookup failed" }, { status: 500 })
       }
+      
+      const found = listData?.users?.find((u: any) => u.email?.toLowerCase() === email.toLowerCase())
+      return NextResponse.json({ exists: !!found })
+      
+    } catch (err: any) {
+      console.error('Email check error:', err)
+      return NextResponse.json({ error: "Lookup failed" }, { status: 500 })
     }
-
-    const exists = !!data?.user
-    return NextResponse.json({ exists })
   } catch (err: any) {
     return NextResponse.json({ error: err?.message || "Unexpected error" }, { status: 500 })
   }

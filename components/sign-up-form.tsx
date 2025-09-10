@@ -62,18 +62,29 @@ export default function SignUpForm() {
 
     try {
       // Server-side authoritative check against Supabase Auth via service role API route
+      console.log('Checking email:', email)
       const resp = await fetch('/api/auth/check-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email })
       })
+      
+      console.log('Email check response status:', resp.status)
+      
       if (resp.ok) {
-        const { exists } = await resp.json()
-        if (exists) {
+        const result = await resp.json()
+        console.log('Email check result:', result)
+        if (result.exists) {
           setError("This email is already in use. Try signing in or use a different email.")
           setLoading(false)
           return
         }
+      } else {
+        const errorResult = await resp.json()
+        console.error('Email check failed:', errorResult)
+        setError("Unable to verify email. Please try again.")
+        setLoading(false)
+        return
       }
 
       const { error: signUpError } = await supabase.auth.signUp({
