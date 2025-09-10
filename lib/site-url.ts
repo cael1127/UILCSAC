@@ -3,6 +3,10 @@
  * Priority: NEXT_PUBLIC_SITE_URL > URL > DEPLOY_PRIME_URL > localhost
  */
 export function getSiteUrl(): string {
+  // Prefer runtime origin in the browser to avoid localhost in emails
+  if (typeof window !== 'undefined' && window.location?.origin) {
+    return window.location.origin
+  }
   return (
     process.env.NEXT_PUBLIC_SITE_URL ||
     process.env.URL ||

@@ -114,9 +114,11 @@ export async function signUp(prevState: any, formData: FormData) {
       email: email.toString(),
       password: password.toString(),
       options: {
+        // Always use the production/base URL when in production, ignoring DEV override
         emailRedirectTo:
-          process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL ||
-          getSiteUrlForPath("/dashboard"),
+          (process.env.NODE_ENV === 'production'
+            ? getSiteUrlForPath("/dashboard")
+            : (process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL || getSiteUrlForPath("/dashboard"))),
         data: {
           first_name: firstName.toString(),
           last_name: lastName.toString(),
