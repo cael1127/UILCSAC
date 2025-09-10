@@ -209,7 +209,7 @@ export default async function DashboardPage() {
             <div className="flex items-center justify-between">
               <h3 className="text-2xl font-bold text-[var(--foreground)]">Recent Problems</h3>
               <Button asChild className="btn-primary hover-glow text-[var(--primary-foreground)]">
-                <Link href="/problems">View All Problems</Link>
+                <Link href="/dashboard">View All Problems</Link>
               </Button>
             </div>
             <ProblemGrid userId={user.id} />

@@ -181,7 +181,7 @@ export default async function LearningPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
                              <Button asChild size="lg" className="bg-ut-orange hover:bg-ut-orange/90 text-[var(--primary-foreground)] font-semibold">
-                <Link href="/problems">Practice Problems</Link>
+                <Link href="/dashboard">Practice Problems</Link>
               </Button>
               <Button asChild variant="outline" size="lg" className="border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--muted)] hover:text-[var(--muted-foreground)]">
                 <Link href="/dashboard">View Dashboard</Link>

@@ -39,7 +39,7 @@ export default function NotFound() {
             </Button>
             
             <Button asChild variant="outline" className="border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--muted)] hover:text-[var(--muted-foreground)]">
-              <Link href="/problems">
+              <Link href="/dashboard">
                 <Code className="h-4 w-4 mr-2" />
                 Problems
               </Link>

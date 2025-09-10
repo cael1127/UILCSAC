@@ -368,9 +368,9 @@ console.log("Hello World");`
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <Button variant="ghost" size="sm" asChild>
-                <Link href="/problems">
+                <Link href="/dashboard">
                   <ArrowLeft className="h-4 w-4 mr-2" />
-                  Back to Problems
+                  Back to Dashboard
                 </Link>
               </Button>
               <div className="h-6 w-px bg-[var(--border)]" />
