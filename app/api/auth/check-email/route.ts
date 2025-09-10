@@ -18,7 +18,6 @@ export async function POST(request: NextRequest) {
     const admin = createSupabaseClient(supabaseUrl, serviceRoleKey)
 
     // Prefer direct admin email lookup if available; fallback to listUsers filter
-    // @ts-expect-error: getUserByEmail may not be typed in some versions; guarded by try/catch
     const tryGetByEmail = async () => {
       if (admin.auth?.admin?.getUserByEmail) {
         return await admin.auth.admin.getUserByEmail(email.toLowerCase())
