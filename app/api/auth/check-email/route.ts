@@ -19,11 +19,12 @@ export async function POST(request: NextRequest) {
 
     // Prefer direct admin email lookup if available; fallback to listUsers filter
     const tryGetByEmail = async () => {
-      if (admin.auth?.admin?.getUserByEmail) {
-        return await admin.auth.admin.getUserByEmail(email.toLowerCase())
+      const adminApi: any = (admin as any).auth?.admin
+      if (adminApi && 'getUserByEmail' in adminApi && typeof adminApi.getUserByEmail === 'function') {
+        return await adminApi.getUserByEmail(email.toLowerCase())
       }
       // Fallback: list first 200 users and search (last resort in older SDKs)
-      const list = await admin.auth.admin.listUsers({ page: 1, perPage: 200 })
+      const list = await adminApi.listUsers({ page: 1, perPage: 200 })
       const found = list.data?.users?.find((u: any) => u.email?.toLowerCase() === email.toLowerCase())
       return { data: { user: found || null }, error: null }
     }
