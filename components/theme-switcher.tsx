@@ -199,7 +199,7 @@ export default function ThemeSwitcher() {
                             </Badge>
                           )}
                         </div>
-                        <div className="text-sm text-[var(--muted-foreground)] mt-1">{theme.description}</div>
+                        <div className="text-sm text-[var(--muted-foreground)] mt-1 line-clamp-2">{theme.description}</div>
                       </div>
                       
                       {isActive && (
