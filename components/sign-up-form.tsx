@@ -47,6 +47,19 @@ export default function SignUpForm() {
       return
     }
 
+    // Basic email/password validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      setError("Please enter a valid email address.")
+      setLoading(false)
+      return
+    }
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters.")
+      setLoading(false)
+      return
+    }
+
     try {
       const { error: signUpError } = await supabase.auth.signUp({
         email,
@@ -61,7 +74,14 @@ export default function SignUpForm() {
       })
 
       if (signUpError) {
-        setError(signUpError.message)
+        const msg = signUpError.message.toLowerCase()
+        if (msg.includes('user already registered') || msg.includes('email') && msg.includes('exists')) {
+          setError("This email is already in use. Try signing in or use a different email.")
+        } else if (msg.includes('weak password')) {
+          setError("Password is too weak. Please choose a stronger password.")
+        } else {
+          setError(signUpError.message)
+        }
       } else {
         // Redirect to confirmation page
         router.push("/auth/sign-up-confirmation")

@@ -440,7 +440,9 @@ export const UnifiedJavaIDE = React.memo(function UnifiedJavaIDE({
         }
       } else {
         setExecutionResult(result);
-        setCustomOutput(`Error: ${result.error}`);
+        const diag = (result as any).diagnostics?.[0];
+        const loc = diag?.line ? ` (line ${diag.line}${diag.column ? ", col " + diag.column : ''})` : '';
+        setCustomOutput(`Error${loc}: ${result.error}`);
       }
     } catch (error) {
       console.error('❌ Execution error:', error);

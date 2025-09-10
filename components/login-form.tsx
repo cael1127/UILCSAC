@@ -37,6 +37,19 @@ export default function LoginForm() {
     setError(null)
 
     try {
+      // Basic client-side email/password validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      if (!emailRegex.test(email)) {
+        setError("Please enter a valid email address.")
+        setLoading(false)
+        return
+      }
+      if (password.length < 6) {
+        setError("Password must be at least 6 characters.")
+        setLoading(false)
+        return
+      }
+
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -44,12 +57,14 @@ export default function LoginForm() {
 
       if (error) {
         // Handle specific error types
-        if (error.message.includes('429') || error.message.includes('rate limit')) {
+        if (error.message.includes('429') || error.message.toLowerCase().includes('rate limit')) {
           setError("Too many login attempts. Please wait a few minutes and try again.")
-        } else if (error.message.includes('Invalid login credentials')) {
+        } else if (error.message.toLowerCase().includes('invalid login credentials')) {
           setError("Invalid email or password. Please check your credentials.")
+        } else if (error.message.toLowerCase().includes('email not confirmed')) {
+          setError("Please confirm your email before signing in.")
         } else {
-          setError(error.message)
+          setError("Invalid email or password. Please check your credentials.")
         }
       } else {
         // Redirect to success page

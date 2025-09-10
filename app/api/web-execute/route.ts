@@ -12,6 +12,12 @@ interface ExecutionResult {
   memoryUsage: number;
   testResults?: any;
   variables?: Record<string, any>;
+  diagnostics?: Array<{
+    line?: number;
+    column?: number;
+    type: 'error' | 'warning' | 'runtime';
+    message: string;
+  }>;
 }
 
 // Helper function to run test cases
@@ -93,6 +99,44 @@ async function executeJavaViaPiston(code: string): Promise<ExecutionResult> {
       variables: {},
     };
   }
+}
+
+function normalizeAndAnnotateResult(sourceCode: string, result: ExecutionResult): ExecutionResult {
+  const diagnostics: ExecutionResult['diagnostics'] = [];
+
+  // Parse common error formats from Piston/Edge/browser runtimes
+  const errorText = (result.error || '').toString();
+  if (errorText) {
+    // javac style: Solution.java:12: error: cannot find symbol
+    const javacMatch = errorText.match(/:(\d+):\s*error:\s*(.*)/);
+    if (javacMatch) {
+      diagnostics.push({
+        line: Number.parseInt(javacMatch[1] as any, 10),
+        type: 'error',
+        message: javacMatch[2] || errorText,
+      });
+    }
+
+    // java runtime stack trace: at Solution.main(Solution.java:23)
+    const stackMatch = errorText.match(/\.java:(\d+)\)?/);
+    if (stackMatch) {
+      diagnostics.push({
+        line: Number.parseInt(stackMatch[1] as any, 10),
+        type: 'runtime',
+        message: errorText.split('\n')[0] || 'Runtime error',
+      });
+    }
+
+    if (diagnostics.length === 0) {
+      diagnostics.push({ type: 'error', message: errorText });
+    }
+  }
+
+  return {
+    ...result,
+    success: !!result.success && !result.error, // treat any non-empty error as failure
+    diagnostics,
+  };
 }
 
 // Try executing via Supabase Edge Function (real javac/java)
@@ -267,7 +311,7 @@ export async function POST(request: NextRequest) {
           const customInput = testCases && testCases.length === 1 && testCases[0].input ? testCases[0].input : undefined;
           result = await executeJavaInBrowser(code, customInput);
         }
-        executionResult = result;
+        executionResult = normalizeAndAnnotateResult(code, result);
         executionResult.testResults = testCases ? runTestCases(code, testCases) : undefined;
       } catch (javaError: any) {
         // Handle Java runtime errors
@@ -283,7 +327,7 @@ export async function POST(request: NextRequest) {
       }
     } else {
       // For other languages, you'd implement similar interpreters
-      executionResult = {
+      executionResult = normalizeAndAnnotateResult(code, {
         success: false,
         output: '',
         error: `Language ${language} not yet supported`,
@@ -291,7 +335,7 @@ export async function POST(request: NextRequest) {
         memoryUsage: 0,
         testResults: null,
         variables: {}
-      };
+      });
     }
 
     // Return the execution result
@@ -303,6 +347,7 @@ export async function POST(request: NextRequest) {
       memoryUsage: executionResult.memoryUsage || 0,
       testResults: executionResult.testResults,
       variables: executionResult.variables || {},
+      diagnostics: executionResult.diagnostics || [],
       environment: {
         name: 'Real Java Runtime',
         version: '1.0.0',

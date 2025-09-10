@@ -52,10 +52,11 @@ const LazyUnifiedJavaIDE = React.lazy(() =>
 );
 
 // Memoized question display component
-const QuestionDisplay = memo(({ question, onAnswerSelect, selectedAnswer }: {
+const QuestionDisplay = memo(({ question, onAnswerSelect, selectedAnswer, disabled }: {
   question: Question;
   onAnswerSelect: (answerId: string) => void;
   selectedAnswer: string;
+  disabled?: boolean;
 }) => (
   <div className="space-y-4">
     <div className="space-y-2">
@@ -75,6 +76,7 @@ const QuestionDisplay = memo(({ question, onAnswerSelect, selectedAnswer }: {
               value={option.id}
               checked={selectedAnswer === option.id}
               onChange={() => onAnswerSelect(option.id)}
+              disabled={!!disabled}
               className="sr-only"
             />
             <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
@@ -86,7 +88,7 @@ const QuestionDisplay = memo(({ question, onAnswerSelect, selectedAnswer }: {
                 <div className="w-2 h-2 rounded-full bg-[var(--primary-foreground)]" />
               )}
             </div>
-                              <span className="flex-1 text-[var(--foreground)]">{option.option_text}</span>
+            <span className={`flex-1 text-[var(--foreground)] ${disabled ? 'opacity-60' : ''}`}>{option.option_text}</span>
           </label>
         ))}
       </div>
@@ -385,11 +387,17 @@ export default function ModuleInterface({ moduleId, userId }: ModuleInterfacePro
     fetchModuleAndQuestions();
   }, [fetchModuleAndQuestions]);
 
+  const [lockedQuestionIds, setLockedQuestionIds] = useState<Set<string>>(new Set());
+
   const handleAnswerSelect = (answerId: string) => {
+    const qid = questions[currentQuestionIndex]?.id;
+    if (!qid) return;
+    if (lockedQuestionIds.has(qid)) return; // prevent changes once locked
+
     setSelectedAnswer(answerId);
     setUserAnswers(prev => ({
       ...prev,
-      [questions[currentQuestionIndex].id]: answerId
+      [qid]: answerId
     }));
   };
 
@@ -403,7 +411,7 @@ export default function ModuleInterface({ moduleId, userId }: ModuleInterfacePro
       setScore(prev => prev + currentQuestion.points);
     }
 
-    // Save user response to database
+    // Save user response to database and lock the question
     try {
       const { error } = await supabase
         .from('user_question_responses')
@@ -419,6 +427,7 @@ export default function ModuleInterface({ moduleId, userId }: ModuleInterfacePro
       if (error) {
         console.error('Error saving response:', error);
       }
+      setLockedQuestionIds(prev => new Set(prev).add(currentQuestion.id));
     } catch (error) {
       console.error('Error saving response:', error);
     }
@@ -738,6 +747,7 @@ export default function ModuleInterface({ moduleId, userId }: ModuleInterfacePro
                 question={currentQuestion}
                 onAnswerSelect={handleAnswerSelect}
                 selectedAnswer={selectedAnswer}
+                disabled={lockedQuestionIds.has(currentQuestion.id)}
               />
             </CardContent>
           </Card>
@@ -850,15 +860,7 @@ export default function ModuleInterface({ moduleId, userId }: ModuleInterfacePro
           {/* Enhanced Navigation - Only show when not displaying answer feedback */}
           {!showAnswerFeedback && (
             <div className="flex justify-between gap-4">
-              <Button
-                variant="outline"
-                onClick={() => setCurrentQuestionIndex(prev => Math.max(0, prev - 1))}
-                disabled={currentQuestionIndex === 0}
-                className="btn-outline hover-lift text-[var(--foreground)]"
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Previous
-              </Button>
+              <div />
 
               <Button
                 onClick={handleAnswerSubmit}
