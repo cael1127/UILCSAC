@@ -445,6 +445,7 @@ export default function ModuleInterface({ moduleId, userId }: ModuleInterfacePro
     setScore(0);
     setShowResults(false);
     setShowAnswerFeedback(false);
+    setLockedQuestionIds(new Set());
   };
 
   const handleNextQuestion = async () => {
