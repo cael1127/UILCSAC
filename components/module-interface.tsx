@@ -329,8 +329,16 @@ export default function ModuleInterface({ moduleId, userId }: ModuleInterfacePro
         return;
       }
 
-      // Randomize options for each question
-      const questionsWithRandomizedOptions = questionsData.map(q => ({
+      // Remove placeholder/starter questions defensively (in case DB cleanup not applied yet)
+      const filteredQuestions = (questionsData || []).filter((q: any) => {
+        const text = (q.question_text || '').toLowerCase();
+        if (text.includes('which concept best relates to this module')) return false;
+        if (text.includes('complete the code snippet relevant to')) return false;
+        return true;
+      });
+
+      // Randomize options for each remaining question
+      const questionsWithRandomizedOptions = filteredQuestions.map(q => ({
         ...q,
         question_options: q.question_options ? randomizeOptions(q.question_options) : []
       }));
