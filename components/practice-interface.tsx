@@ -129,71 +129,168 @@ export default function PracticeInterface({ problem, userId }: PracticeInterface
     }
   }, [language])
 
+  // Prefill custom input with sample_input if available
+  useEffect(() => {
+    if (!customInput && problem.sample_input) {
+      setCustomInput(problem.sample_input)
+    }
+  }, [problem.sample_input, customInput])
+
   const getProblemSpecificTemplates = (lang: string) => {
     const title = problem.title.toLowerCase()
     const description = problem.description.toLowerCase()
     
     if (lang === "java") {
-      // Simple, clean templates
-      if (title.includes('array') || title.includes('list') || description.includes('array')) {
-        return `public class Solution {
-    public static void main(String[] args) {
-        int[] nums = {2, 7, 11, 15};
-        int target = 9;
-        
-        // Your solution here
+      // Two Sum / Arrays style problems
+      if (title.includes("two sum") || description.includes("two sum") || title.includes('array') || description.includes('array')) {
+        return `import java.util.*;
+
+public class Solution {
+    // Return indices i j (space-separated) or -1 if none
+    static String twoSum(int[] nums, int target) {
+        Map<Integer,Integer> map = new HashMap<>();
         for (int i = 0; i < nums.length; i++) {
-            for (int j = i + 1; j < nums.length; j++) {
-                if (nums[i] + nums[j] == target) {
-                    System.out.println("[" + i + ", " + j + "]");
-                    return;
-                }
+            int need = target - nums[i];
+            if (map.containsKey(need)) {
+                return map.get(need) + " " + i;
             }
+            map.put(nums[i], i);
         }
+        return "-1";
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int n = sc.nextInt();
+        int[] nums = new int[n];
+        for (int i = 0; i < n; i++) nums[i] = sc.nextInt();
+        int target = sc.nextInt();
+        System.out.println(twoSum(nums, target));
     }
 }`
       }
-      
-      if (title.includes('string') || title.includes('palindrome') || description.includes('string')) {
-        return `public class Solution {
-    public static void main(String[] args) {
-        String s = "racecar";
-        
-        // Your solution here
-        int left = 0, right = s.length() - 1;
-        while (left < right) {
-            if (s.charAt(left) != s.charAt(right)) {
-                System.out.println("false");
-                return;
-            }
-            left++;
-            right--;
+
+      // Valid Anagram / Strings
+      if (title.includes('anagram') || description.includes('anagram') || title.includes('string') || description.includes('string')) {
+        return `import java.util.*;
+
+public class Solution {
+    static boolean isAnagram(String s, String t) {
+        if (s.length() != t.length()) return false;
+        int[] cnt = new int[26];
+        for (int i = 0; i < s.length(); i++) {
+            cnt[s.charAt(i) - 'a']++;
+            cnt[t.charAt(i) - 'a']--;
         }
-        System.out.println("true");
+        for (int x : cnt) if (x != 0) return false; 
+        return true;
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        String s = sc.nextLine().trim();
+        String t = sc.nextLine().trim();
+        System.out.println(isAnagram(s, t));
     }
 }`
       }
-      
-      if (title.includes('math') || title.includes('calculate') || description.includes('math')) {
-        return `public class Solution {
-    public static void main(String[] args) {
-        int n = 5;
-        
-        // Your solution here
-        int result = 1;
+
+      // FizzBuzz / Math
+      if (title.contains('fizzbuzz') || description.includes('fizzbuzz') || title.includes('math') || description.includes('math')) {
+        return `import java.util.*;
+
+public class Solution {
+    static List<String> fizzBuzz(int n) {
+        List<String> res = new ArrayList<>();
         for (int i = 1; i <= n; i++) {
-            result *= i;
+            if (i % 15 == 0) res.add("FizzBuzz");
+            else if (i % 3 == 0) res.add("Fizz");
+            else if (i % 5 == 0) res.add("Buzz");
+            else res.add(Integer.toString(i));
         }
-        System.out.println(result);
+        return res;
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int n = sc.nextInt();
+        List<String> res = fizzBuzz(n);
+        for (int i = 0; i < res.size(); i++) {
+            System.out.print(res.get(i));
+            if (i + 1 < res.size()) System.out.print(" ");
+        }
+        System.out.println();
     }
 }`
       }
-      
-      // Default simple template
-      return `public class Solution {
+
+      // Climbing Stairs / DP
+      if (title.includes('climbing stairs') || description.includes('climbing stairs') || title.includes('dp') || description.includes('dynamic')) {
+        return `import java.util.*;
+
+public class Solution {
+    static int climbStairs(int n) {
+        if (n <= 2) return n;
+        int a = 1, b = 2;
+        for (int i = 3; i <= n; i++) {
+            int c = a + b; a = b; b = c;
+        }
+        return b;
+    }
+
     public static void main(String[] args) {
-        // Your solution here
-        System.out.println("Hello World");
+        Scanner sc = new Scanner(System.in);
+        int n = sc.nextInt();
+        System.out.println(climbStairs(n));
+    }
+}`
+      }
+
+      // Maximum Depth of Binary Tree (skeleton with TODO input parsing)
+      if (title.includes('maximum depth') || description.includes('binary tree') || title.includes('tree') || description.includes('tree')) {
+        return `import java.util.*;
+
+public class Solution {
+    static class TreeNode {
+        int val; TreeNode left, right;
+        TreeNode(int v){ val = v; }
+    }
+
+    // TODO: implement parser for level-order input like: 3 9 20 null null 15 7
+    static TreeNode parseTree(Scanner sc) {
+        // For now, return null and let students implement if required
+        return null;
+    }
+
+    static int maxDepth(TreeNode root) {
+        if (root == null) return 0;
+        return 1 + Math.max(maxDepth(root.left), maxDepth(root.right));
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        TreeNode root = parseTree(sc);
+        System.out.println(maxDepth(root));
+    }
+}`
+      }
+
+      // Generic fallback: solve(String input) with main reading stdin
+      return `import java.util.*;
+
+public class Solution {
+    static String solve(String input) {
+        // TODO: implement your solution using the full input string
+        return input.trim();
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        StringBuilder sb = new StringBuilder();
+        while (sc.hasNextLine()) {
+            sb.append(sc.nextLine()).append('\n');
+        }
+        System.out.print(solve(sb.toString()));
     }
 }`
     }

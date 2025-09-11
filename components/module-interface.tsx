@@ -63,7 +63,7 @@ const QuestionDisplay = memo(({ question, onAnswerSelect, selectedAnswer, disabl
       <h3 className="text-lg font-semibold text-[var(--foreground)]">{question.question_text}</h3>
     </div>
     
-    {question.question_type === 'multiple_choice' && question.question_options && (
+    {question.question_type?.toLowerCase() === 'multiple_choice' && question.question_options && (
       <div className="space-y-2">
         {question.question_options.map((option) => (
           <label
@@ -346,7 +346,6 @@ export default function ModuleInterface({ moduleId, userId }: ModuleInterfacePro
           question_options (*)
         `)
         .eq('module_id', moduleId)
-        .eq('is_active', true)
         .order('order_index', { ascending: true });
 
       if (questionsError) {
