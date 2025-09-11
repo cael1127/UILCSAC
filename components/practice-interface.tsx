@@ -196,7 +196,7 @@ public class Solution {
       }
 
       // FizzBuzz / Math
-      if (title.contains('fizzbuzz') || description.includes('fizzbuzz') || title.includes('math') || description.includes('math')) {
+      if (title.includes('fizzbuzz') || description.includes('fizzbuzz') || title.includes('math') || description.includes('math')) {
         return `import java.util.*;
 
 public class Solution {
