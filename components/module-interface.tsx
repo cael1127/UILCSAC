@@ -162,6 +162,77 @@ export default function ModuleInterface({ moduleId, userId }: ModuleInterfacePro
     return question.question_options?.find(opt => opt.is_correct)?.option_text || '';
   }, []);
 
+  // Helpers to show provided code and a sample input for "predict the output" questions
+  const extractCodeFromExplanation = useCallback((explanation?: string) => {
+    if (!explanation) return null;
+    const match = explanation.match(/```[a-zA-Z]*\n([\s\S]*?)```/);
+    return match ? match[1].trim() : null;
+  }, []);
+
+  const deriveCodeAndInput = useCallback((question: Question) => {
+    const text = (question.question_text || '').toLowerCase();
+    const explCode = extractCodeFromExplanation(question.explanation);
+    if (explCode) return { code: explCode, input: '' };
+
+    // Fallback templates for common topics used in seeds
+    if (text.includes('binary search') || text.includes('sorted array') || text.includes('target; print index')) {
+      return {
+        code: `import java.util.*;
+
+public class Main {
+  static int bs(int[] a, int t){
+    int l=0,r=a.length-1; 
+    while(l<=r){
+      int m=(l+r)>>>1;
+      if(a[m]==t) return m;
+      if(a[m]<t) l=m+1; else r=m-1;
+    }
+    return -1;
+  }
+  public static void main(String[] args){
+    Scanner sc=new Scanner(System.in);
+    int n=sc.nextInt();
+    int[] a=new int[n];
+    for(int i=0;i<n;i++) a[i]=sc.nextInt();
+    int t=sc.nextInt();
+    System.out.println(bs(a,t));
+  }
+}`,
+        input: '5\n1 3 5 7 9\n7'
+      };
+    }
+
+    if (text.includes('fizz') || text.includes('buzz')) {
+      return {
+        code: `import java.util.*; public class Main { public static void main(String[] args){ Scanner sc=new Scanner(System.in); int n=sc.nextInt(); for(int i=1;i<=n;i++){ if(i%15==0) System.out.print("FizzBuzz"); else if(i%3==0) System.out.print("Fizz"); else if(i%5==0) System.out.print("Buzz"); else System.out.print(i); if(i<n) System.out.print(" "); } } }`,
+        input: '5'
+      };
+    }
+
+    if (text.includes('climb') || text.includes('stairs')) {
+      return {
+        code: `import java.util.*; public class Main { static int f(int n){ if(n<=2) return n; int a=1,b=2; for(int i=3;i<=n;i++){ int c=a+b; a=b; b=c; } return b; } public static void main(String[] args){ Scanner sc=new Scanner(System.in); int n=sc.nextInt(); System.out.println(f(n)); } }`,
+        input: '4'
+      };
+    }
+
+    if (text.includes('two sum')) {
+      return {
+        code: `import java.util.*; public class Main { static String s(int[] a,int t){ Map<Integer,Integer> m=new HashMap<>(); for(int i=0;i<a.length;i++){ int need=t-a[i]; if(m.containsKey(need)) return m.get(need)+" "+i; m.put(a[i],i);} return "-1";} public static void main(String[] args){ Scanner sc=new Scanner(System.in); int n=sc.nextInt(); int[] a=new int[n]; for(int i=0;i<n;i++) a[i]=sc.nextInt(); int t=sc.nextInt(); System.out.println(s(a,t)); } }`,
+        input: '4\n2 7 11 15\n9'
+      };
+    }
+
+    if (text.includes('anagram')) {
+      return {
+        code: `import java.util.*; public class Main { static boolean ok(String s,String t){ if(s.length()!=t.length()) return false; int[] c=new int[26]; for(int i=0;i<s.length();i++){ c[s.charAt(i)-'a']++; c[t.charAt(i)-'a']--; } for(int x:c) if(x!=0) return false; return true;} public static void main(String[] args){ Scanner sc=new Scanner(System.in); String s=sc.nextLine().trim(); String t=sc.nextLine().trim(); System.out.println(ok(s,t)); } }`,
+        input: 'anagram\nnagaram'
+      };
+    }
+
+    return { code: '', input: '' };
+  }, [extractCodeFromExplanation]);
+
   const getDefaultJavaTemplate = useCallback((question: Question) => {
     // Generate a basic Java template based on question content
     const questionText = (question.question_text || '').toLowerCase();
@@ -332,8 +403,20 @@ export default function ModuleInterface({ moduleId, userId }: ModuleInterfacePro
       // Remove placeholder/starter questions defensively (in case DB cleanup not applied yet)
       const filteredQuestions = (questionsData || []).filter((q: any) => {
         const text = (q.question_text || '').toLowerCase();
+        const expl = (q.explanation || '').toLowerCase();
+        // Remove known placeholder patterns
         if (text.includes('which concept best relates to this module')) return false;
         if (text.includes('complete the code snippet relevant to')) return false;
+        if (expl.includes('checks basic understanding of the module topic')) return false;
+        if (expl.includes('students should write a minimal correct snippet')) return false;
+        // Remove generic MCQ with options A,B,C,D only
+        if (q.question_type?.toLowerCase() === 'multiple_choice' && Array.isArray(q.question_options)) {
+          const opts = q.question_options.map((o: any) => (o.option_text || '').trim().toLowerCase()).sort();
+          const generic = ['a','b','c','d'];
+          if (opts.length === 4 && opts.every((v: string, i: number) => v === generic[i])) {
+            return false;
+          }
+        }
         return true;
       });
 
@@ -785,7 +868,7 @@ export default function ModuleInterface({ moduleId, userId }: ModuleInterfacePro
             </Card>
           )}
 
-          {/* Prediction Answer Box for non-MC questions */}
+          {/* Provided Code + Prediction Answer for non-MC questions */}
           {!isMultipleChoice && (
             <Card className="card-modern hover-lift">
               <CardHeader>
@@ -800,6 +883,25 @@ export default function ModuleInterface({ moduleId, userId }: ModuleInterfacePro
                 </p>
               </CardHeader>
               <CardContent>
+                {(() => {
+                  const info = deriveCodeAndInput(currentQuestion);
+                  return (
+                    <>
+                      {info.code && (
+                        <div className="mb-4">
+                          <div className="text-sm font-medium text-[var(--foreground)] mb-2">Code</div>
+                          <pre className="bg-[var(--muted)]/40 p-3 rounded-md overflow-x-auto text-sm"><code>{info.code}</code></pre>
+                        </div>
+                      )}
+                      {info.input && (
+                        <div className="mb-4">
+                          <div className="text-sm font-medium text-[var(--foreground)] mb-2">Sample Input</div>
+                          <pre className="bg-[var(--muted)]/40 p-3 rounded-md overflow-x-auto text-sm"><code>{info.input}</code></pre>
+                        </div>
+                      )}
+                    </>
+                  );
+                })()}
                 <Textarea
                   value={typedAnswer}
                   onChange={(e) => setTypedAnswer(e.target.value)}
