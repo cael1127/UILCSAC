@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
 import { ArrowLeft, ArrowRight, CheckCircle, XCircle, Play, RotateCcw, Zap, Clock, Code } from 'lucide-react';
 import { UnifiedJavaIDE } from '@/components/unified-java-ide';
@@ -103,6 +104,7 @@ export default function ModuleInterface({ moduleId, userId }: ModuleInterfacePro
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState('');
+  const [typedAnswer, setTypedAnswer] = useState('');
   const [userAnswers, setUserAnswers] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -125,34 +127,7 @@ export default function ModuleInterface({ moduleId, userId }: ModuleInterfacePro
   }, [questions]);
 
   // IDE visibility logic
-  const shouldShowIDE = useMemo(() => {
-    if (!questions[currentQuestionIndex] ) return false;
-    const currentQuestion = questions[currentQuestionIndex];
-    
-    // Debug log to see what question types we have
-    console.log('🔍 Question Debug:', {
-      type: currentQuestion.question_type,
-      title: currentQuestion.question_text,
-      isMultipleChoice: currentQuestion.question_type === 'multiple_choice',
-      shouldShowIDE: currentQuestion.question_type !== 'multiple_choice'
-    });
-    
-    // Show IDE for any question that is NOT multiple choice
-    // This includes written problems, programming, coding, etc.
-    // Also show IDE if question type is undefined/null (fallback case)
-    const questionType = currentQuestion.question_type?.toLowerCase();
-    
-    // Explicitly include common written problem types
-    if (questionType === 'written' || questionType === 'essay' || questionType === 'text' || 
-        questionType === 'programming' || questionType === 'coding' || questionType === 'algorithm') {
-      return true;
-    }
-    
-    // Show IDE for any non-multiple choice question
-    const finalResult = questionType !== 'multiple_choice';
-    console.log('🎯 Final IDE decision:', finalResult);
-    return finalResult;
-  }, [questions, currentQuestionIndex]);
+  const shouldShowIDE = false;
 
   const isMultipleChoice = useMemo(() => {
     if (!questions[currentQuestionIndex] ) return false;
@@ -401,10 +376,18 @@ export default function ModuleInterface({ moduleId, userId }: ModuleInterfacePro
   };
 
   const handleAnswerSubmit = async () => {
-    if (!selectedAnswer) return;
-
     const currentQuestion = questions[currentQuestionIndex];
-    const isCorrect = selectedAnswer === getCorrectAnswer(currentQuestion);
+    const isMC = isMultipleChoice;
+    if (isMC && !selectedAnswer) return;
+    if (!isMC && !typedAnswer.trim()) return;
+
+    let isCorrect = false;
+    if (isMC) {
+      isCorrect = selectedAnswer === getCorrectAnswer(currentQuestion);
+    } else {
+      const expected = (currentQuestion.correct_answer || '').trim();
+      isCorrect = typedAnswer.trim() === expected;
+    }
     
     if (isCorrect) {
       setScore(prev => prev + currentQuestion.points);
@@ -417,7 +400,7 @@ export default function ModuleInterface({ moduleId, userId }: ModuleInterfacePro
         .upsert({
           user_id: userId,
           question_id: currentQuestion.id,
-          response_text: selectedAnswer,
+          response_text: isMC ? selectedAnswer : typedAnswer.trim(),
           is_correct: isCorrect,
           points_earned: isCorrect ? currentQuestion.points : 0,
           submitted_at: new Date().toISOString()
@@ -433,13 +416,14 @@ export default function ModuleInterface({ moduleId, userId }: ModuleInterfacePro
 
     // Show answer feedback
     setLastAnswerCorrect(isCorrect);
-    setLastAnswerExplanation(generateFullExplanation(currentQuestion, selectedAnswer));
+    setLastAnswerExplanation(generateFullExplanation(currentQuestion, isMC ? selectedAnswer : typedAnswer.trim()));
     setShowAnswerFeedback(true);
   };
 
   const handleRetry = () => {
     setCurrentQuestionIndex(0);
     setSelectedAnswer('');
+    setTypedAnswer('');
     setUserAnswers({});
     setScore(0);
     setShowResults(false);
@@ -451,6 +435,7 @@ export default function ModuleInterface({ moduleId, userId }: ModuleInterfacePro
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(prev => prev + 1);
       setSelectedAnswer('');
+      setTypedAnswer('');
       setShowAnswerFeedback(false);
     } else {
       // Module completed! Save progress to database
@@ -792,43 +777,27 @@ export default function ModuleInterface({ moduleId, userId }: ModuleInterfacePro
             </Card>
           )}
 
-          {/* Enhanced Code Editor - Only for Programming Questions */}
-          {shouldShowIDE && (
+          {/* Prediction Answer Box for non-MC questions */}
+          {!isMultipleChoice && (
             <Card className="card-modern hover-lift">
               <CardHeader>
                 <CardTitle className="text-xl text-[var(--foreground)] flex items-center gap-3">
                   <div className="p-2 rounded-lg bg-[var(--primary)]/10">
                     <Code className="h-5 w-5 text-[var(--primary)]" />
                   </div>
-                  {currentQuestion?.question_type === 'written' ? 'Java IDE for Written Problem' : 'Java IDE'}
+                  Predict the Output
                 </CardTitle>
                 <p className="text-[var(--muted-foreground)] leading-relaxed">
-                  {currentQuestion?.question_type === 'written' 
-                    ? 'Write and test your Java solution for this written problem. Use the code editor to implement your answer.'
-                    : 'Write and test your Java code here. Use this to practice and experiment with solutions.'
-                  }
+                  Run the given code mentally or in your own environment and enter the exact output below.
                 </p>
               </CardHeader>
               <CardContent>
-                <Suspense fallback={
-                  <div className="h-64 bg-[var(--muted)]/30 rounded-xl flex items-center justify-center">
-                    <div className="text-center">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--primary)] mx-auto mb-3"></div>
-                      <p className="text-sm text-[var(--muted-foreground)]">Loading Java IDE...</p>
-                    </div>
-                  </div>
-                }>
-                  <LazyUnifiedJavaIDE
-                    key={`${currentQuestion.id}-${currentQuestion.question_type}`}
-                    questionId={currentQuestion.id}
-                    userId={userId}
-                    questionTitle={currentQuestion.question_text}
-                    questionDescription={currentQuestion.explanation || ''}
-                    templateCode={getDefaultJavaTemplate(currentQuestion)}
-                    testCases={[]}
-                    onExecutionComplete={() => {}}
-                  />
-                </Suspense>
+                <Textarea
+                  value={typedAnswer}
+                  onChange={(e) => setTypedAnswer(e.target.value)}
+                  placeholder="Type the exact output here"
+                  className="min-h-[120px]"
+                />
               </CardContent>
             </Card>
           )}
@@ -864,7 +833,7 @@ export default function ModuleInterface({ moduleId, userId }: ModuleInterfacePro
 
               <Button
                 onClick={handleAnswerSubmit}
-                disabled={!selectedAnswer}
+                disabled={isMultipleChoice ? !selectedAnswer : !typedAnswer.trim()}
                 className="btn-primary hover-glow text-[var(--primary-foreground)]"
               >
                 {isLastQuestion ? (

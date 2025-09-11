@@ -79,13 +79,7 @@ export default function SignUpForm() {
           setLoading(false)
           return
         }
-      } else {
-        const errorResult = await resp.json()
-        console.error('Email check failed:', errorResult)
-        setError("This email is in use already. Please login.")
-        setLoading(false)
-        return
-      }
+      } // if non-OK, proceed anyway to let Supabase enforce uniqueness
 
       const { error: signUpError } = await supabase.auth.signUp({
         email,
