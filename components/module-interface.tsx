@@ -894,13 +894,13 @@ public class Main {
                 {info.code && (
                   <div className="mb-4">
                     <div className="text-sm font-medium text-[var(--foreground)] mb-2">Code</div>
-                    <pre className="bg-[var(--muted)]/40 p-3 rounded-md overflow-x-auto text-sm"><code>{info.code}</code></pre>
+                    <pre className="bg-[var(--muted)]/40 p-3 rounded-md overflow-x-auto text-sm whitespace-pre-wrap font-mono text-[var(--foreground)]"><code>{info.code}</code></pre>
                   </div>
                 )}
                 {info.input && (
                   <div className="mb-4">
                     <div className="text-sm font-medium text-[var(--foreground)] mb-2">Sample Input</div>
-                    <pre className="bg-[var(--muted)]/40 p-3 rounded-md overflow-x-auto text-sm"><code>{info.input}</code></pre>
+                    <pre className="bg-[var(--muted)]/40 p-3 rounded-md overflow-x-auto text-sm whitespace-pre-wrap font-mono text-[var(--foreground)]"><code>{info.input}</code></pre>
                   </div>
                 )}
                 <Textarea
