@@ -204,28 +204,102 @@ public class Main {
 
     if (text.includes('fizz') || text.includes('buzz')) {
       return {
-        code: `import java.util.*; public class Main { public static void main(String[] args){ Scanner sc=new Scanner(System.in); int n=sc.nextInt(); for(int i=1;i<=n;i++){ if(i%15==0) System.out.print("FizzBuzz"); else if(i%3==0) System.out.print("Fizz"); else if(i%5==0) System.out.print("Buzz"); else System.out.print(i); if(i<n) System.out.print(" "); } } }`,
+        code: `import java.util.*;
+
+public class Main {
+  public static void main(String[] args) {
+    Scanner sc = new Scanner(System.in);
+    int n = sc.nextInt();
+    for (int i = 1; i <= n; i++) {
+      if (i % 15 == 0) System.out.print("FizzBuzz");
+      else if (i % 3 == 0) System.out.print("Fizz");
+      else if (i % 5 == 0) System.out.print("Buzz");
+      else System.out.print(i);
+      if (i < n) System.out.print(" ");
+    }
+  }
+}`,
         input: '5'
       };
     }
 
     if (text.includes('climb') || text.includes('stairs')) {
       return {
-        code: `import java.util.*; public class Main { static int f(int n){ if(n<=2) return n; int a=1,b=2; for(int i=3;i<=n;i++){ int c=a+b; a=b; b=c; } return b; } public static void main(String[] args){ Scanner sc=new Scanner(System.in); int n=sc.nextInt(); System.out.println(f(n)); } }`,
+        code: `import java.util.*;
+
+public class Main {
+  static int f(int n) {
+    if (n <= 2) return n;
+    int a = 1, b = 2;
+    for (int i = 3; i <= n; i++) {
+      int c = a + b;
+      a = b;
+      b = c;
+    }
+    return b;
+  }
+
+  public static void main(String[] args) {
+    Scanner sc = new Scanner(System.in);
+    int n = sc.nextInt();
+    System.out.println(f(n));
+  }
+}`,
         input: '4'
       };
     }
 
     if (text.includes('two sum')) {
       return {
-        code: `import java.util.*; public class Main { static String s(int[] a,int t){ Map<Integer,Integer> m=new HashMap<>(); for(int i=0;i<a.length;i++){ int need=t-a[i]; if(m.containsKey(need)) return m.get(need)+" "+i; m.put(a[i],i);} return "-1";} public static void main(String[] args){ Scanner sc=new Scanner(System.in); int n=sc.nextInt(); int[] a=new int[n]; for(int i=0;i<n;i++) a[i]=sc.nextInt(); int t=sc.nextInt(); System.out.println(s(a,t)); } }`,
+        code: `import java.util.*;
+
+public class Main {
+  static String s(int[] a, int t) {
+    Map<Integer, Integer> m = new HashMap<>();
+    for (int i = 0; i < a.length; i++) {
+      int need = t - a[i];
+      if (m.containsKey(need)) return m.get(need) + " " + i;
+      m.put(a[i], i);
+    }
+    return "-1";
+  }
+
+  public static void main(String[] args) {
+    Scanner sc = new Scanner(System.in);
+    int n = sc.nextInt();
+    int[] a = new int[n];
+    for (int i = 0; i < n; i++) a[i] = sc.nextInt();
+    int t = sc.nextInt();
+    System.out.println(s(a, t));
+  }
+}`,
         input: '4\n2 7 11 15\n9'
       };
     }
 
     if (text.includes('anagram')) {
       return {
-        code: `import java.util.*; public class Main { static boolean ok(String s,String t){ if(s.length()!=t.length()) return false; int[] c=new int[26]; for(int i=0;i<s.length();i++){ c[s.charAt(i)-'a']++; c[t.charAt(i)-'a']--; } for(int x:c) if(x!=0) return false; return true;} public static void main(String[] args){ Scanner sc=new Scanner(System.in); String s=sc.nextLine().trim(); String t=sc.nextLine().trim(); System.out.println(ok(s,t)); } }`,
+        code: `import java.util.*;
+
+public class Main {
+  static boolean ok(String s, String t) {
+    if (s.length() != t.length()) return false;
+    int[] c = new int[26];
+    for (int i = 0; i < s.length(); i++) {
+      c[s.charAt(i) - 'a']++;
+      c[t.charAt(i) - 'a']--;
+    }
+    for (int x : c) if (x != 0) return false;
+    return true;
+  }
+
+  public static void main(String[] args) {
+    Scanner sc = new Scanner(System.in);
+    String s = sc.nextLine().trim();
+    String t = sc.nextLine().trim();
+    System.out.println(ok(s, t));
+  }
+}`,
         input: 'anagram\nnagaram'
       };
     }
@@ -233,7 +307,36 @@ public class Main {
     // Graph BFS shortest path (common seed wording)
     if ((text.includes('graph') || text.includes('bfs') || text.includes('shortest path')) && text.includes('undirected')) {
       return {
-        code: `import java.util.*; public class Main { public static void main(String[] args){ Scanner sc=new Scanner(System.in); int n=sc.nextInt(), m=sc.nextInt(); List<Integer>[] g=new ArrayList[n+1]; for(int i=1;i<=n;i++) g[i]=new ArrayList<>(); for(int i=0;i<m;i++){ int u=sc.nextInt(), v=sc.nextInt(); g[u].add(v); g[v].add(u);} int s=sc.nextInt(), t=sc.nextInt(); int[] dist=new int[n+1]; Arrays.fill(dist,-1); ArrayDeque<Integer> q=new ArrayDeque<>(); dist[s]=0; q.add(s); while(!q.isEmpty()){ int u=q.poll(); if(u==t) break; for(int v: g[u]) if(dist[v]==-1){ dist[v]=dist[u]+1; q.add(v);} } System.out.println(dist[t]); } }`,
+        code: `import java.util.*;
+
+public class Main {
+  public static void main(String[] args) {
+    Scanner sc = new Scanner(System.in);
+    int n = sc.nextInt(), m = sc.nextInt();
+    List<Integer>[] g = new ArrayList[n + 1];
+    for (int i = 1; i <= n; i++) g[i] = new ArrayList<>();
+    for (int i = 0; i < m; i++) {
+      int u = sc.nextInt(), v = sc.nextInt();
+      g[u].add(v);
+      g[v].add(u);
+    }
+    int s = sc.nextInt(), t = sc.nextInt();
+    int[] dist = new int[n + 1];
+    Arrays.fill(dist, -1);
+    ArrayDeque<Integer> q = new ArrayDeque<>();
+    dist[s] = 0;
+    q.add(s);
+    while (!q.isEmpty()) {
+      int u = q.poll();
+      if (u == t) break;
+      for (int v : g[u]) if (dist[v] == -1) {
+        dist[v] = dist[u] + 1;
+        q.add(v);
+      }
+    }
+    System.out.println(dist[t]);
+  }
+}`,
         input: '4 3\n1 2\n2 3\n3 4\n1 4'
       };
     }
