@@ -230,6 +230,14 @@ public class Main {
       };
     }
 
+    // Graph BFS shortest path (common seed wording)
+    if ((text.includes('graph') || text.includes('bfs') || text.includes('shortest path')) && text.includes('undirected')) {
+      return {
+        code: `import java.util.*; public class Main { public static void main(String[] args){ Scanner sc=new Scanner(System.in); int n=sc.nextInt(), m=sc.nextInt(); List<Integer>[] g=new ArrayList[n+1]; for(int i=1;i<=n;i++) g[i]=new ArrayList<>(); for(int i=0;i<m;i++){ int u=sc.nextInt(), v=sc.nextInt(); g[u].add(v); g[v].add(u);} int s=sc.nextInt(), t=sc.nextInt(); int[] dist=new int[n+1]; Arrays.fill(dist,-1); ArrayDeque<Integer> q=new ArrayDeque<>(); dist[s]=0; q.add(s); while(!q.isEmpty()){ int u=q.poll(); if(u==t) break; for(int v: g[u]) if(dist[v]==-1){ dist[v]=dist[u]+1; q.add(v);} } System.out.println(dist[t]); } }`,
+        input: '4 3\n1 2\n2 3\n3 4\n1 4'
+      };
+    }
+
     return { code: '', input: '' };
   }, [extractCodeFromExplanation]);
 
@@ -869,7 +877,7 @@ public class Main {
           )}
 
           {/* Provided Code + Prediction Answer for non-MC questions */}
-          {!isMultipleChoice && (
+          {(() => { const info = deriveCodeAndInput(currentQuestion); const shouldShowPredict = !isMultipleChoice && (!!info.code || !!info.input); return shouldShowPredict ? (
             <Card className="card-modern hover-lift">
               <CardHeader>
                 <CardTitle className="text-xl text-[var(--foreground)] flex items-center gap-3">
@@ -883,25 +891,18 @@ public class Main {
                 </p>
               </CardHeader>
               <CardContent>
-                {(() => {
-                  const info = deriveCodeAndInput(currentQuestion);
-                  return (
-                    <>
-                      {info.code && (
-                        <div className="mb-4">
-                          <div className="text-sm font-medium text-[var(--foreground)] mb-2">Code</div>
-                          <pre className="bg-[var(--muted)]/40 p-3 rounded-md overflow-x-auto text-sm"><code>{info.code}</code></pre>
-                        </div>
-                      )}
-                      {info.input && (
-                        <div className="mb-4">
-                          <div className="text-sm font-medium text-[var(--foreground)] mb-2">Sample Input</div>
-                          <pre className="bg-[var(--muted)]/40 p-3 rounded-md overflow-x-auto text-sm"><code>{info.input}</code></pre>
-                        </div>
-                      )}
-                    </>
-                  );
-                })()}
+                {info.code && (
+                  <div className="mb-4">
+                    <div className="text-sm font-medium text-[var(--foreground)] mb-2">Code</div>
+                    <pre className="bg-[var(--muted)]/40 p-3 rounded-md overflow-x-auto text-sm"><code>{info.code}</code></pre>
+                  </div>
+                )}
+                {info.input && (
+                  <div className="mb-4">
+                    <div className="text-sm font-medium text-[var(--foreground)] mb-2">Sample Input</div>
+                    <pre className="bg-[var(--muted)]/40 p-3 rounded-md overflow-x-auto text-sm"><code>{info.input}</code></pre>
+                  </div>
+                )}
                 <Textarea
                   value={typedAnswer}
                   onChange={(e) => setTypedAnswer(e.target.value)}
@@ -910,7 +911,7 @@ public class Main {
                 />
               </CardContent>
             </Card>
-          )}
+          ) : null; })()}
 
           {/* Message for Multiple Choice Questions */}
           {isMultipleChoice && (
@@ -924,7 +925,7 @@ public class Main {
             </Card>
           )}
 
-          {/* Message for Written Problems */}
+          {/* Message and IDE for Written Problems */}
           {!isMultipleChoice && currentQuestion?.question_type === 'written' && (
             <Card className="card-ut border-dashed border-[var(--border)] bg-blue-50 dark:bg-blue-950/20">
               <CardContent className="py-4 text-center">
@@ -934,6 +935,18 @@ public class Main {
                 </div>
               </CardContent>
             </Card>
+          )}
+
+          {!isMultipleChoice && currentQuestion?.question_type === 'written' && (
+            <Suspense fallback={<div className="text-[var(--muted-foreground)]">Loading IDE...</div>}>
+              <LazyUnifiedJavaIDE
+                questionId={currentQuestion.id}
+                userId={userId}
+                questionTitle={module?.name}
+                questionDescription={currentQuestion.question_text}
+                templateCode={getDefaultJavaTemplate(currentQuestion)}
+              />
+            </Suspense>
           )}
 
           {/* Enhanced Navigation - Only show when not displaying answer feedback */}
