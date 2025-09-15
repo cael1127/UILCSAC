@@ -48,7 +48,7 @@ function runTestCases(code: string, testCases: any[]): any[] {
 type Backend = 'piston' | 'edge' | 'stub'
 
 // Execute Java using Piston (public code runner)
-async function executeJavaViaPiston(code: string): Promise<ExecutionResult & { backend: Backend }> {
+async function executeJavaViaPiston(code: string, stdin?: string): Promise<ExecutionResult & { backend: Backend }> {
   const startTime = Date.now();
   try {
     const resp = await fetch('https://emkc.org/api/v2/piston/execute', {
@@ -57,7 +57,12 @@ async function executeJavaViaPiston(code: string): Promise<ExecutionResult & { b
       body: JSON.stringify({
         language: 'java',
         version: '15.0.2',
-        files: [{ name: 'Solution.java', content: code }]
+        files: [{ name: 'Solution.java', content: code }],
+        stdin: stdin || '',
+        args: [],
+        compile_timeout: 10000,
+        run_timeout: 10000,
+        run_memory_limit: -1,
       })
     });
 
@@ -296,11 +301,16 @@ export async function POST(request: NextRequest) {
     let executionResult: ExecutionResult;
     if (language === 'java') {
       try {
+        // Determine stdin from provided test cases (use the first test's input when present)
+        const primaryInput = Array.isArray(testCases) && testCases.length > 0
+          ? (testCases[0]?.input || '')
+          : undefined;
+
         // Force Piston in production and by default. Edge path disabled for reliability.
-        let result = await executeJavaViaPiston(code);
+        let result = await executeJavaViaPiston(code, primaryInput);
         const backend = result.backend;
         if (!result.success) {
-          const customInput = testCases && testCases.length === 1 && testCases[0].input ? testCases[0].input : undefined;
+          const customInput = testCases && testCases.length >= 1 && testCases[0].input ? testCases[0].input : undefined;
           const stubResult = await executeJavaInBrowser(code, customInput);
           // Provide clearer error when falling back
           if (!stubResult.success) {
