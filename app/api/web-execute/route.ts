@@ -45,8 +45,10 @@ function runTestCases(code: string, testCases: any[]): any[] {
   return results;
 }
 
+type Backend = 'piston' | 'edge' | 'stub'
+
 // Execute Java using Piston (public code runner)
-async function executeJavaViaPiston(code: string): Promise<ExecutionResult> {
+async function executeJavaViaPiston(code: string): Promise<ExecutionResult & { backend: Backend }> {
   const startTime = Date.now();
   try {
     const resp = await fetch('https://emkc.org/api/v2/piston/execute', {
@@ -69,6 +71,7 @@ async function executeJavaViaPiston(code: string): Promise<ExecutionResult> {
         memoryUsage: 0,
         testResults: undefined,
         variables: {},
+        backend: 'piston',
       };
     }
 
@@ -85,6 +88,7 @@ async function executeJavaViaPiston(code: string): Promise<ExecutionResult> {
       memoryUsage: 0,
       testResults: undefined,
       variables: {},
+      backend: 'piston',
     };
   } catch (error: any) {
     return {
@@ -95,6 +99,7 @@ async function executeJavaViaPiston(code: string): Promise<ExecutionResult> {
       memoryUsage: 0,
       testResults: undefined,
       variables: {},
+      backend: 'piston',
     };
   }
 }
@@ -143,7 +148,7 @@ async function executeJavaViaSupabase(
   userId?: string,
   questionId?: string,
   override?: { supabaseUrl?: string; anonKey?: string; accessToken?: string }
-): Promise<ExecutionResult> {
+): Promise<ExecutionResult & { backend: Backend }> {
   const startTime = Date.now();
   try {
     const supabaseUrl = override?.supabaseUrl || process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -179,7 +184,8 @@ async function executeJavaViaSupabase(
       executionTime: result.executionTime || (Date.now() - startTime),
       memoryUsage: result.memoryUsage || 0,
       testResults: undefined,
-      variables: result.variables || {}
+      variables: result.variables || {},
+      backend: 'edge',
     };
   } catch (error: any) {
     return {
@@ -189,13 +195,14 @@ async function executeJavaViaSupabase(
       executionTime: Date.now() - startTime,
       memoryUsage: 0,
       testResults: undefined,
-      variables: {}
+      variables: {},
+      backend: 'edge',
     };
   }
 }
 
 // Enhanced Java execution function with better console output (browser fallback)
-async function executeJavaInBrowser(code: string, customInput?: string): Promise<ExecutionResult> {
+async function executeJavaInBrowser(code: string, customInput?: string): Promise<ExecutionResult & { backend: 'stub' }> {
   const startTime = Date.now();
   
   try {
@@ -238,7 +245,8 @@ async function executeJavaInBrowser(code: string, customInput?: string): Promise
       executionTime,
       memoryUsage: Math.random() * 10 + 5, // Simulate realistic memory usage
       testResults: undefined,
-      variables: result.variables || {}
+      variables: result.variables || {},
+      backend: 'stub',
     };
     
   } catch (error: any) {
@@ -252,7 +260,8 @@ async function executeJavaInBrowser(code: string, customInput?: string): Promise
       executionTime,
       memoryUsage: 0,
       testResults: undefined,
-      variables: {}
+      variables: {},
+      backend: 'stub',
     };
   }
 }
@@ -287,34 +296,17 @@ export async function POST(request: NextRequest) {
     let executionResult: ExecutionResult;
     if (language === 'java') {
       try {
-        // Prefer Supabase Edge in production when configured; otherwise fall back
-        const edgeConfigured = !!(hdrSupabaseUrl || process.env.NEXT_PUBLIC_SUPABASE_URL);
-        const preferEdge = edgeConfigured && process.env.NODE_ENV === 'production';
-
-        let result: ExecutionResult;
-        if (preferEdge) {
-          result = await executeJavaViaSupabase(code, userId, questionId, {
-            supabaseUrl: hdrSupabaseUrl,
-            anonKey: hdrAnonKey,
-            accessToken: hdrAccessToken || serverAccessToken,
-          });
-          if (!result.success) {
-            result = await executeJavaViaPiston(code);
-          }
-        } else {
-          // Development or not configured: try Piston first, then Edge
-          result = await executeJavaViaPiston(code);
-          if (!result.success && edgeConfigured) {
-            result = await executeJavaViaSupabase(code, userId, questionId, {
-              supabaseUrl: hdrSupabaseUrl,
-              anonKey: hdrAnonKey,
-              accessToken: hdrAccessToken || serverAccessToken,
-            });
-          }
-        }
+        // Force Piston in production and by default. Edge path disabled for reliability.
+        let result = await executeJavaViaPiston(code);
+        const backend = result.backend;
         if (!result.success) {
           const customInput = testCases && testCases.length === 1 && testCases[0].input ? testCases[0].input : undefined;
-          result = await executeJavaInBrowser(code, customInput);
+          const stubResult = await executeJavaInBrowser(code, customInput);
+          // Provide clearer error when falling back
+          if (!stubResult.success) {
+            stubResult.error = stubResult.error || 'Execution unavailable. Please try again later.';
+          }
+          result = stubResult;
         }
         executionResult = normalizeAndAnnotateResult(code, result);
         executionResult.testResults = testCases ? runTestCases(code, testCases) : undefined;
@@ -344,6 +336,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Return the execution result
+    // Determine backend label from available data
+    const backend = (executionResult as any).backend || (executionResult.error?.includes('Piston') ? 'piston' : 'stub');
+
     return NextResponse.json({
       success: executionResult.success,
       output: executionResult.output,
@@ -353,6 +348,7 @@ export async function POST(request: NextRequest) {
       testResults: executionResult.testResults,
       variables: executionResult.variables || {},
       diagnostics: executionResult.diagnostics || [],
+      backend,
       environment: {
         name: 'Real Java Runtime',
         version: '1.0.0',

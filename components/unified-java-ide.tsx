@@ -32,6 +32,7 @@ interface ExecutionResult {
   memoryUsage: number;
   variables?: Record<string, any>;
   warnings?: string[];
+  backend?: 'piston' | 'edge' | 'stub';
 }
 
 interface TestCase {
@@ -562,6 +563,11 @@ export const UnifiedJavaIDE = React.memo(function UnifiedJavaIDE({
             <Badge variant="outline" className="text-xs border-green-600 text-green-600">
               {Math.round(executionResult.memoryUsage)}MB
             </Badge>
+            {executionResult.backend && (
+              <Badge variant="outline" className="text-xs">
+                Backend: {executionResult.backend.toUpperCase()}
+              </Badge>
+            )}
           </div>
           
           {executionResult.output && (
@@ -603,6 +609,11 @@ export const UnifiedJavaIDE = React.memo(function UnifiedJavaIDE({
             <Badge variant="outline" className="text-xs border-red-600 text-red-600">
               {executionResult.executionTime}ms
             </Badge>
+            {executionResult.backend && (
+              <Badge variant="outline" className="text-xs">
+                Backend: {executionResult.backend.toUpperCase()}
+              </Badge>
+            )}
           </div>
           
           <div className="bg-destructive/10 border border-destructive/20 p-3 rounded-md">
