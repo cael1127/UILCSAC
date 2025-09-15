@@ -47,17 +47,36 @@ function runTestCases(code: string, testCases: any[]): any[] {
 
 type Backend = 'piston' | 'edge' | 'stub'
 
+// Normalize user code to use a public class Main and file Main.java for Piston
+function prepareJavaForPiston(source: string): { fileName: string; content: string } {
+  let content = source;
+  // If there's a public class that's not Main, rename it to Main
+  const publicClassRegex = /public\s+class\s+(\w+)/;
+  const match = content.match(publicClassRegex);
+  if (match && match[1] !== 'Main') {
+    content = content.replace(publicClassRegex, 'public class Main');
+  } else if (!/public\s+class\s+Main\b/.test(content)) {
+    // If no public class found, wrap the code in a Main class with a main method
+    // But prefer minimal intervention: only when there's clearly no class declaration
+    if (!/class\s+\w+/.test(content)) {
+      content = `import java.util.*;\npublic class Main {\n  public static void main(String[] args) throws Exception {\n    ${source}\n  }\n}`;
+    }
+  }
+  return { fileName: 'Main.java', content };
+}
+
 // Execute Java using Piston (public code runner)
 async function executeJavaViaPiston(code: string, stdin?: string): Promise<ExecutionResult & { backend: Backend }> {
   const startTime = Date.now();
   try {
+    const prepared = prepareJavaForPiston(code);
     const resp = await fetch('https://emkc.org/api/v2/piston/execute', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         language: 'java',
         version: '15.0.2',
-        files: [{ name: 'Solution.java', content: code }],
+        files: [{ name: prepared.fileName, content: prepared.content }],
         stdin: stdin || '',
         args: [],
         compile_timeout: 10000,
@@ -308,16 +327,6 @@ export async function POST(request: NextRequest) {
 
         // Force Piston in production and by default. Edge path disabled for reliability.
         let result = await executeJavaViaPiston(code, primaryInput);
-        const backend = result.backend;
-        if (!result.success) {
-          const customInput = testCases && testCases.length >= 1 && testCases[0].input ? testCases[0].input : undefined;
-          const stubResult = await executeJavaInBrowser(code, customInput);
-          // Provide clearer error when falling back
-          if (!stubResult.success) {
-            stubResult.error = stubResult.error || 'Execution unavailable. Please try again later.';
-          }
-          result = stubResult;
-        }
         executionResult = normalizeAndAnnotateResult(code, result);
         executionResult.testResults = testCases ? runTestCases(code, testCases) : undefined;
       } catch (javaError: any) {
