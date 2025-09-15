@@ -49,11 +49,13 @@ export const createClient = cache(async (): Promise<any> => {
           get(name: string) {
             return cookieStore.get(name)?.value
           },
-          set(name: string, value: string, options: any) {
-            cookieStore.set({ name, value, ...options })
+          // No-ops in Server Components to comply with Next.js 15:
+          // Cookie writes must happen in Server Actions or Route Handlers.
+          set(_name: string, _value: string, _options: any) {
+            // intentionally empty
           },
-          remove(name: string, options: any) {
-            cookieStore.set({ name, value: '', ...options })
+          remove(_name: string, _options: any) {
+            // intentionally empty
           },
         },
       }
