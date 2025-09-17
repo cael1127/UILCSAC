@@ -10,6 +10,18 @@
   --slate-gray: #7c90a0;
   --dim-gray: #747274;
   --ivory: #f4f9e9;
+  /* Maroon Color theme for cult */
+  /* CSS HEX */
+--falu-red: #7a2121ff;
+--antiflash-white: #eaeaebff;
+--jet: #323334ff;
+
+/* CSS HSL (reference only; using HEX variables above) */
+/* --falu-red: hsla(0, 57%, 30%, 1); */
+/* --antiflash-white: hsla(240, 2%, 92%, 1); */
+/* --jet: hsla(210, 2%, 20%, 1); */
+
+/* SCSS examples removed (not valid in plain CSS) */
   
   /* Warm Sunset Theme Colors */
   --bittersweet: #ff785a;
@@ -68,6 +80,30 @@
   --border: #e5e7eb;
   --input: #f8f9fa;
   --ring: var(--ut-orange);
+}
+
+/* Maroon Theme */
+.theme-maroon {
+  --primary: var(--falu-red);
+  --primary-foreground: var(--antiflash-white);
+  --secondary: var(--jet);
+  --secondary-foreground: var(--antiflash-white);
+  --accent: var(--falu-red);
+  --accent-foreground: var(--antiflash-white);
+  
+  --background: var(--antiflash-white);
+  --foreground: var(--jet);
+  --muted: #efefef;
+  --muted-foreground: #5a5b5c;
+  
+  --card: var(--antiflash-white);
+  --card-foreground: var(--jet);
+  --popover: var(--antiflash-white);
+  --popover-foreground: var(--jet);
+  
+  --border: #dedfe0;
+  --input: #f3f3f4;
+  --ring: var(--falu-red);
 }
 
 /* Warm Sunset Theme */
@@ -452,6 +488,17 @@ textarea::placeholder {
 .text-bondi-blue { color: var(--bondi-blue); }
 .border-bondi-blue { border-color: var(--bondi-blue); }
 
+/* Maroon utilities */
+.bg-falu-red { background-color: var(--falu-red); }
+.text-falu-red { color: var(--falu-red); }
+.border-falu-red { border-color: var(--falu-red); }
+.bg-antiflash-white { background-color: var(--antiflash-white); }
+.text-antiflash-white { color: var(--antiflash-white); }
+.border-antiflash-white { border-color: var(--antiflash-white); }
+.bg-jet { background-color: var(--jet); }
+.text-jet { color: var(--jet); }
+.border-jet { border-color: var(--jet); }
+
 /* Theme-specific gradients */
 .gradient-ut {
   background: linear-gradient(135deg, var(--ut-orange), var(--smoky-black));
@@ -467,6 +514,10 @@ textarea::placeholder {
 
 .gradient-bondi-blue {
   background: linear-gradient(135deg, var(--bondi-blue), var(--ivory));
+}
+
+.gradient-maroon {
+  background: linear-gradient(135deg, var(--falu-red), var(--jet));
 }
 
 /* Enhanced hover effects */

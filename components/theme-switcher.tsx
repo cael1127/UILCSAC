@@ -19,6 +19,17 @@ const themes = [
     isDefault: true
   },
   {
+    id: 'theme-maroon',
+    name: 'Maroon',
+    description: 'Deep maroon with light contrast and bold accents',
+    icon: Moon,
+    gradient: 'gradient-maroon',
+    primaryColor: 'bg-falu-red',
+    secondaryColor: 'bg-antiflash-white',
+    preview: 'linear-gradient(135deg, #7a2121, #323334)',
+    isDefault: false
+  },
+  {
     id: 'theme-warm-sunset',
     name: 'Warm Sunset',
     description: 'Energetic sunset colors with vibrant warmth',
@@ -73,7 +84,7 @@ export default function ThemeSwitcher() {
   const applyTheme = (themeId: string) => {
     try {
       // Remove all existing theme classes
-      document.documentElement.classList.remove('theme-ut-orange', 'theme-warm-sunset', 'theme-ocean-vibes', 'theme-bondi-blue')
+      document.documentElement.classList.remove('theme-ut-orange', 'theme-maroon', 'theme-warm-sunset', 'theme-ocean-vibes', 'theme-bondi-blue')
       
       // Add the new theme class
       document.documentElement.classList.add(themeId)
@@ -113,6 +124,7 @@ export default function ThemeSwitcher() {
         className={`
           relative overflow-hidden rounded-full w-14 h-14 shadow-xl
           ${currentTheme === 'theme-ut-orange' ? 'bg-ut-orange hover:bg-ut-orange/90' : 
+            currentTheme === 'theme-maroon' ? 'bg-falu-red hover:bg-falu-red/90' :
             currentTheme === 'theme-warm-sunset' ? 'bg-bittersweet hover:bg-bittersweet/90' :
             currentTheme === 'theme-ocean-vibes' ? 'bg-sea-green hover:bg-sea-green/90' :
             'bg-bondi-blue hover:bg-bondi-blue/90'} 
