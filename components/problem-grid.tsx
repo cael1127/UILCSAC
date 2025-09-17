@@ -244,7 +244,7 @@ export default function ProblemGrid({ userId }: ProblemGridProps) {
                 {/* Action Button */}
                 <Button 
                   asChild 
-                  className="w-full bg-ut-orange hover:bg-ut-orange/90 text-smoky-black font-semibold"
+                  className="w-full bg-[var(--primary)] hover:bg-[color-mix(in_srgb,var(--primary)_90%,white)] text-[var(--primary-foreground)] font-semibold"
                 >
                   <Link href={`/problems/${problem.id}/practice`}>
                     {problem.user_progress?.[0] ? 'Continue Problem' : 'Start Problem'}

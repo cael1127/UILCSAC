@@ -979,7 +979,7 @@ public class Main {
             </Card>
           )}
 
-          {/* Provided Code + Prediction Answer for non-MC questions */}
+          {/* Provided Code + Prediction Answer for non-MC questions (reading code) */}
           {(() => { const info = deriveCodeAndInput(currentQuestion); const shouldShowPredict = !isMultipleChoice && (!!info.code || !!info.input); return shouldShowPredict ? (
             <Card className="card-modern hover-lift">
               <CardHeader>
@@ -996,14 +996,30 @@ public class Main {
               <CardContent>
                 {info.code && (
                   <div className="mb-4">
-                    <div className="text-sm font-medium text-[var(--foreground)] mb-2">Code</div>
-                    <pre className="bg-[var(--muted)]/40 p-3 rounded-md overflow-x-auto text-sm whitespace-pre-wrap font-mono text-[var(--foreground)]"><code>{info.code}</code></pre>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="text-sm font-medium text-[var(--foreground)]">Java Code</div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="btn-outline text-[var(--foreground)]"
+                        onClick={() => {
+                          try { navigator.clipboard.writeText(info.code); } catch {}
+                        }}
+                      >
+                        Copy
+                      </Button>
+                    </div>
+                    <pre className="bg-[var(--muted)]/40 p-3 rounded-md overflow-x-auto text-sm font-mono whitespace-pre leading-relaxed text-[var(--foreground)]" style={{ tabSize: 2 }}>
+<code>{info.code}</code>
+</pre>
                   </div>
                 )}
                 {info.input && (
                   <div className="mb-4">
                     <div className="text-sm font-medium text-[var(--foreground)] mb-2">Sample Input</div>
-                    <pre className="bg-[var(--muted)]/40 p-3 rounded-md overflow-x-auto text-sm whitespace-pre-wrap font-mono text-[var(--foreground)]"><code>{info.input}</code></pre>
+                    <pre className="bg-[var(--muted)]/30 p-3 rounded-md overflow-x-auto text-sm font-mono whitespace-pre leading-relaxed text-[var(--foreground)]" style={{ tabSize: 2 }}>
+<code>{info.input}</code>
+</pre>
                   </div>
                 )}
                 <Textarea

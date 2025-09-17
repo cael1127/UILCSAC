@@ -576,17 +576,17 @@ h6 { font-size: 1rem; }
 
 /* UT-specific card styling */
 .card-ut {
-  background: var(--ivory);
-  border: 1px solid #e5e7eb;
+  background: var(--card);
+  border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 1.5rem;
   transition: all 0.3s ease;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px 0 color-mix(in srgb, var(--foreground) 10%, transparent);
 }
 
 .card-ut:hover {
-  border-color: var(--ut-orange);
-  box-shadow: 0 8px 25px -5px rgba(251, 139, 36, 0.15);
+  border-color: var(--ring);
+  box-shadow: 0 8px 25px -5px color-mix(in srgb, var(--primary) 20%, transparent);
   transform: translateY(-2px);
 }
 
