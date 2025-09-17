@@ -6,12 +6,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = getSiteUrl()
 
   const staticEntries: MetadataRoute.Sitemap = [
-    { url: `${baseUrl}/`, changefreq: 'weekly', priority: 1 },
-    { url: `${baseUrl}/dashboard`, changefreq: 'weekly', priority: 0.8 },
-    { url: `${baseUrl}/learning`, changefreq: 'weekly', priority: 0.9 },
-    { url: `${baseUrl}/problems`, changefreq: 'weekly', priority: 0.9 },
-    { url: `${baseUrl}/auth/login`, changefreq: 'yearly', priority: 0.3 },
-    { url: `${baseUrl}/auth/sign-up`, changefreq: 'yearly', priority: 0.3 },
+    { url: `${baseUrl}/`, changeFrequency: 'weekly', priority: 1 },
+    { url: `${baseUrl}/dashboard`, changeFrequency: 'weekly', priority: 0.8 },
+    { url: `${baseUrl}/learning`, changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${baseUrl}/problems`, changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${baseUrl}/auth/login`, changeFrequency: 'yearly', priority: 0.3 },
+    { url: `${baseUrl}/auth/sign-up`, changeFrequency: 'yearly', priority: 0.3 },
   ]
 
   if (!isSupabaseConfigured) {
@@ -46,7 +46,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         dynamicEntries.push({
           url: `${baseUrl}/learning/${p.id}`,
           lastModified: p.updated_at ? new Date(p.updated_at) : undefined,
-          changefreq: 'weekly',
+          changeFrequency: 'weekly',
           priority: 0.8,
         })
       }
@@ -57,7 +57,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         dynamicEntries.push({
           url: `${baseUrl}/learning/${m.learning_path_id}/module/${m.id}`,
           lastModified: m.updated_at ? new Date(m.updated_at) : undefined,
-          changefreq: 'weekly',
+          changeFrequency: 'weekly',
           priority: 0.7,
         })
       }
@@ -68,7 +68,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         dynamicEntries.push({
           url: `${baseUrl}/problems/${pr.id}/practice`,
           lastModified: pr.updated_at ? new Date(pr.updated_at) : undefined,
-          changefreq: 'weekly',
+          changeFrequency: 'weekly',
           priority: 0.7,
         })
       }

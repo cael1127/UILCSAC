@@ -38,7 +38,7 @@ export default async function ProblemsPage() {
     .order("name", { ascending: true })
 
   return (
-    <div className="min-h-screen bg-ivory">
+    <div className="min-h-screen bg-[var(--background)]">
       {/* Header */}
               <header className="border-b border-[var(--border)] bg-[var(--card)] shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -169,10 +169,10 @@ export default async function ProblemsPage() {
                 )}
 
                 {/* Action Button */}
-                                 <Button 
-                   asChild 
-                   className="w-full bg-ut-orange hover:bg-ut-orange/90 text-[var(--primary-foreground)] font-semibold"
-                 >
+                <Button 
+                  asChild 
+                  className="w-full bg-[var(--primary)] hover:bg-[color-mix(in_srgb,var(--primary)_90%,white)] text-[var(--primary-foreground)] font-semibold"
+                >
                   <Link href={`/problems/${problem.id}`}>
                     Start Problem
                     <Code className="h-4 w-4 ml-2" />
@@ -200,7 +200,7 @@ export default async function ProblemsPage() {
         )}
 
         {/* Quick Start Section */}
-        <div className="mt-16 bg-[var(--card)] border border-[var(--border)] rounded-lg p-8">
+            <div className="mt-16 bg-[var(--card)] border border-[var(--border)] rounded-lg p-8">
           <div className="text-center">
                          <h3 className="text-2xl font-bold text-[var(--foreground)] mb-4">
               Ready to Practice?
@@ -210,7 +210,7 @@ export default async function ProblemsPage() {
               Each problem includes detailed explanations and test cases.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                             <Button asChild size="lg" className="bg-ut-orange hover:bg-ut-orange/90 text-[var(--primary-foreground)] font-semibold">
+              <Button asChild size="lg" className="bg-[var(--primary)] hover:bg-[color-mix(in_srgb,var(--primary)_90%,white)] text-[var(--primary-foreground)] font-semibold">
                 <Link href="/learning">Learning Paths</Link>
               </Button>
               <Button asChild variant="outline" size="lg" className="border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--muted)] hover:text-[var(--muted-foreground)]">
