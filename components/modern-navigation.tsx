@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { 
@@ -14,6 +14,8 @@ import {
   Trophy,
   Home
 } from 'lucide-react';
+import { supabase } from '@/lib/supabase/client';
+import { useRouter } from 'next/navigation';
 
 interface ModernNavigationProps {
   user?: {
@@ -26,6 +28,53 @@ interface ModernNavigationProps {
 
 export default function ModernNavigation({ user, onLogout }: ModernNavigationProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [authUser, setAuthUser] = useState<ModernNavigationProps['user'] | null>(user ?? null);
+  const router = useRouter();
+
+  // Sync with Supabase auth state on the client
+  useEffect(() => {
+    let isMounted = true;
+
+    const init = async () => {
+      try {
+        const { data } = await supabase.auth.getSession();
+        if (!isMounted) return;
+        const sUser = data?.session?.user;
+        if (sUser) {
+          setAuthUser({ id: sUser.id, email: sUser.email || '' });
+        } else {
+          setAuthUser(null);
+        }
+      } catch {
+        // ignore
+      }
+    };
+
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      const sUser = session?.user;
+      setAuthUser(sUser ? { id: sUser.id, email: sUser.email || '' } : null);
+    });
+
+    init();
+    return () => {
+      isMounted = false;
+      sub.subscription.unsubscribe();
+    };
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      if (onLogout) {
+        onLogout();
+        return;
+      }
+      await supabase.auth.signOut();
+      setAuthUser(null);
+      router.push('/auth/login');
+    } catch {
+      // ignore
+    }
+  };
 
   const navigation = [
     { name: 'Home', href: '/', icon: Home },
@@ -67,20 +116,20 @@ export default function ModernNavigation({ user, onLogout }: ModernNavigationPro
 
           {/* User Menu / Auth Buttons */}
           <div className="hidden md:flex items-center space-x-4">
-            {user ? (
+            {authUser ? (
               <div className="flex items-center space-x-4">
                 <div className="flex items-center space-x-2">
                   <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
                     <User className="h-4 w-4 text-primary" />
                   </div>
                   <span className="text-sm font-medium text-foreground">
-                    {user.name || user.email}
+                    {authUser.name || authUser.email}
                   </span>
                 </div>
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={onLogout}
+                  onClick={handleLogout}
                   className="btn-outline"
                 >
                   <LogOut className="h-4 w-4 mr-2" />
@@ -140,7 +189,7 @@ export default function ModernNavigation({ user, onLogout }: ModernNavigationPro
               
               {/* Mobile User Menu */}
               <div className="border-t pt-4 mt-4">
-                {user ? (
+                {authUser ? (
                   <div className="space-y-2">
                     <div className="flex items-center space-x-2 px-3 py-2">
                       <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
@@ -148,10 +197,10 @@ export default function ModernNavigation({ user, onLogout }: ModernNavigationPro
                       </div>
                       <div>
                         <div className="text-sm font-medium text-foreground">
-                          {user.name || user.email}
+                          {authUser.name || authUser.email}
                         </div>
                         <div className="text-xs text-muted-foreground">
-                          {user.email}
+                          {authUser.email}
                         </div>
                       </div>
                     </div>
@@ -159,7 +208,7 @@ export default function ModernNavigation({ user, onLogout }: ModernNavigationPro
                       variant="outline"
                       size="sm"
                       onClick={() => {
-                        onLogout?.();
+                        handleLogout();
                         setIsMenuOpen(false);
                       }}
                       className="w-full justify-start btn-outline"
