@@ -436,6 +436,28 @@ export const UnifiedJavaIDE = React.memo(function UnifiedJavaIDE({
         // Add to execution history
         setExecutionHistory(prev => [result, ...prev.slice(0, 9)]);
         
+        // Fire-and-forget: log execution to Supabase (if configured server-side)
+        try {
+          const payload = {
+            code,
+            success: true,
+            output: result.output || '',
+            error: result.error || '',
+            execution_time: result.executionTime || 0,
+            memory_usage: result.memoryUsage || 0,
+            language: 'java',
+            environment: result.backend || 'web-execute',
+            question_id: questionId || null,
+            user_id: userId || null,
+          } as any
+          // Best effort logging; ignore errors
+          fetch('/api/code-executions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          }).catch(() => {})
+        } catch {}
+
         if (onExecutionComplete) {
           onExecutionComplete(result);
         }
@@ -755,9 +777,9 @@ export const UnifiedJavaIDE = React.memo(function UnifiedJavaIDE({
               <TabsTrigger value="samples">Sample Tests</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="console" className="space-y-4">
+            <TabsContent value="console" className="space-y-4" aria-live="polite">
               {!executionResult ? (
-                <div className="text-center py-6 text-[var(--muted-foreground)]">
+                <div className="text-center py-6 text-[var(--muted-foreground)]" aria-busy={isExecuting}>
                   <Terminal className="h-8 w-8 mx-auto mb-2 opacity-50" />
                   <p>No code executed yet. Run your code to see results here.</p>
                 </div>
@@ -776,7 +798,7 @@ export const UnifiedJavaIDE = React.memo(function UnifiedJavaIDE({
                   className="min-h-[80px] font-mono text-sm"
                 />
               </div>
-              <Button onClick={runCustomTest} disabled={isExecuting || !code.trim()}>
+              <Button onClick={runCustomTest} disabled={isExecuting || !code.trim()} aria-busy={isExecuting} aria-live="polite">
                 <Play className="h-4 w-4 mr-2" />
                 {isExecuting ? 'Running...' : 'Run Custom Test'}
               </Button>
@@ -791,7 +813,7 @@ export const UnifiedJavaIDE = React.memo(function UnifiedJavaIDE({
             </TabsContent>
 
             <TabsContent value="samples" className="space-y-4">
-              <Button onClick={runSampleTests} disabled={isExecuting || !code.trim()}>
+              <Button onClick={runSampleTests} disabled={isExecuting || !code.trim()} aria-busy={isExecuting} aria-live="polite">
                 <Play className="h-4 w-4 mr-2" />
                 {isExecuting ? 'Running...' : 'Run Sample Tests'}
               </Button>

@@ -152,9 +152,9 @@ export default function ProblemGrid({ userId }: ProblemGridProps) {
 
   if (loading) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-6" aria-busy={true} aria-live="polite">
         <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-ut-orange mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-ut-orange mx-auto mb-4" aria-hidden="true"></div>
           <p className="text-[var(--muted-foreground)]">Loading problems...</p>
         </div>
       </div>
@@ -163,10 +163,10 @@ export default function ProblemGrid({ userId }: ProblemGridProps) {
 
   if (error) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-6" role="alert" aria-live="assertive">
         <div className="text-center py-12">
-          <div className="h-12 w-12 text-destructive mx-auto mb-4">⚠️</div>
-                      <h3 className="text-lg font-medium text-[var(--foreground)] mb-2">Error loading problems</h3>
+          <div className="h-12 w-12 text-destructive mx-auto mb-4" aria-hidden="true">⚠️</div>
+          <h3 className="text-lg font-medium text-[var(--foreground)] mb-2">Error loading problems</h3>
           <p className="text-[var(--muted-foreground)] mb-4">{error}</p>
           <Button onClick={fetchProblems} variant="outline" className="border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--muted)] hover:text-[var(--muted-foreground)]">
             Try Again

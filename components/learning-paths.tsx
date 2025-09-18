@@ -276,9 +276,9 @@ export default function LearningPaths({ userId }: LearningPathsProps) {
 
   if (loading) {
     return (
-      <div className="space-y-8">
+      <div className="space-y-8" aria-busy={true} aria-live="polite">
         <div className="text-center py-16">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--primary)] mx-auto mb-6"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--primary)] mx-auto mb-6" aria-hidden="true"></div>
           <p className="text-[var(--muted-foreground)] text-lg">Loading learning paths...</p>
         </div>
       </div>

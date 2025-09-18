@@ -423,9 +423,13 @@ public class Main {
     let explanation = question.explanation || '';
     
     if (!explanation) {
-      explanation = isCorrect 
-        ? `Correct! You selected the right answer.`
-        : `Incorrect. The correct answer is: ${getCorrectAnswerText(question)}`;
+      // Structured default explanation
+      const correctText = getCorrectAnswerText(question)
+      if (isCorrect) {
+        explanation = `Why it's correct:\n- This option matches the concept tested in the question.\n\nKey takeaways:\n- Remember the definition and typical use-case.\n- Watch out for commonly confused terms.`
+      } else {
+        explanation = `Why your answer is incorrect:\n- It likely confuses a related concept.\n\nCorrect answer: ${correctText}\n\nHow to reason next time:\n- Identify the core concept the question targets.\n- Eliminate options that contradict definitions or standard behavior.`
+      }
     }
     
     return explanation;
@@ -962,8 +966,44 @@ public class Main {
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="p-6 bg-[var(--muted)]/30 rounded-xl">
-                  <h4 className="font-semibold text-[var(--foreground)] mb-3 text-lg">Explanation:</h4>
-                  <p className="text-[var(--foreground)] leading-relaxed">{lastAnswerExplanation}</p>
+                  <h4 className="font-semibold text-[var(--foreground)] mb-3 text-lg">Explanation</h4>
+                  <pre className="whitespace-pre-wrap text-[var(--foreground)] leading-relaxed">{lastAnswerExplanation}</pre>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <span className="text-sm text-[var(--muted-foreground)]">Was this explanation helpful?</span>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      className="btn-outline px-3 py-1 rounded-md text-sm"
+                      onClick={async () => {
+                        try {
+                          await fetch('/api/explanations/feedback', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ questionId: currentQuestion.id, userId, isHelpful: true })
+                          })
+                        } catch {}
+                      }}
+                    >
+                      Yes
+                    </button>
+                    <button
+                      type="button"
+                      className="btn-outline px-3 py-1 rounded-md text-sm"
+                      onClick={async () => {
+                        try {
+                          await fetch('/api/explanations/feedback', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ questionId: currentQuestion.id, userId, isHelpful: false })
+                          })
+                        } catch {}
+                      }}
+                    >
+                      No
+                    </button>
+                  </div>
                 </div>
                 
                 <div className="flex justify-end">

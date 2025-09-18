@@ -35,7 +35,7 @@ export default function ModernNavigation({ user, onLogout }: ModernNavigationPro
   ];
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60" role="navigation" aria-label="Primary">
       <div className="container-modern">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
@@ -106,6 +106,9 @@ export default function ModernNavigation({ user, onLogout }: ModernNavigationPro
               size="sm"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="btn-outline"
+              aria-expanded={isMenuOpen}
+              aria-controls="mobile-menu"
+              aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
             >
               {isMenuOpen ? (
                 <X className="h-4 w-4" />
@@ -118,7 +121,7 @@ export default function ModernNavigation({ user, onLogout }: ModernNavigationPro
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="md:hidden border-t bg-background">
+          <div id="mobile-menu" className="md:hidden border-t bg-background">
             <div className="space-y-1 px-2 pb-3 pt-2">
               {navigation.map((item) => {
                 const Icon = item.icon;

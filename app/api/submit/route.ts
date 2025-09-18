@@ -154,20 +154,34 @@ async function runAllTests(
 
   for (const testCase of testCases) {
     try {
-      // Execute code with test case input
-      const response = await fetch(`${getSiteUrl()}/api/execute`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          code,
-          language,
-          input: testCase.input,
-          timeLimit,
-          memoryLimit,
-        }),
-      })
-
-      const execution = await response.json()
+      let execution: any
+      if ((language || '').toLowerCase() === 'java') {
+        // Use real Java executor (Piston-backed) for Java submissions
+        const response = await fetch(`${getSiteUrl()}/api/web-execute`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            code,
+            language: 'java',
+            testCases: [{ input: testCase.input, expected: testCase.expected_output }],
+          }),
+        })
+        execution = await response.json()
+      } else {
+        // Fallback to mock executor for other languages
+        const response = await fetch(`${getSiteUrl()}/api/execute`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            code,
+            language,
+            input: testCase.input,
+            timeLimit,
+            memoryLimit,
+          }),
+        })
+        execution = await response.json()
+      }
 
       if (!execution.success) {
         results.push({
@@ -176,7 +190,7 @@ async function runAllTests(
           expected: testCase.expected_output,
           actual: "",
           executionTime: execution.executionTime || 0,
-          memoryUsed: execution.memoryUsed || 0,
+          memoryUsed: execution.memoryUsed || execution.memoryUsage || 0,
           error: execution.error,
         })
         continue
@@ -193,7 +207,7 @@ async function runAllTests(
         expected: expectedOutput,
         actual: actualOutput,
         executionTime: execution.executionTime || 0,
-        memoryUsed: execution.memoryUsed || 0,
+        memoryUsed: execution.memoryUsed || execution.memoryUsage || 0,
       })
     } catch (error) {
       results.push({

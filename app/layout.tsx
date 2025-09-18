@@ -114,13 +114,18 @@ export default function RootLayout({
         )}
       </head>
       <body className={inter.className}>
+        {/* Skip to content for keyboard users */}
+        <a href="#main-content" className="skip-link">Skip to main content</a>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <ModernNavigation />
+          <main id="main-content" role="main">
+            {children}
+          </main>
           <ThemeSwitcher />
           <Toaster />
         </ThemeProvider>

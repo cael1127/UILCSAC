@@ -9,7 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ArrowLeft, Play, Send, Clock, Trophy, Target, CheckCircle, XCircle, AlertCircle } from "lucide-react"
 import Link from "next/link"
-import { UnifiedJavaIDE } from "./unified-java-ide"
+import dynamic from 'next/dynamic'
+const UnifiedJavaIDE = dynamic(() => import('./unified-java-ide').then(m => m.UnifiedJavaIDE), { ssr: false, loading: () => null })
 import { TestingService } from "@/lib/testing-service"
 
 interface TestCase {
@@ -653,7 +654,7 @@ console.log("Hello World");`
                     </div>
                     
                     {testResults.length > 0 && (
-                      <div className="space-y-3">
+                      <div className="space-y-3" aria-live="polite">
                         <h4 className="font-semibold text-[var(--foreground)]">Test Results</h4>
                         {testResults.map((result, index) => (
                           <div key={index} className={`p-4 rounded-xl border ${
@@ -695,6 +696,41 @@ console.log("Hello World");`
                                   {result.actual}
                                 </pre>
                               </div>
+                            </div>
+                            <div className="mt-3 flex items-center gap-2">
+                              <span className="text-xs text-[var(--muted-foreground)]">Was this explanation helpful?</span>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="btn-outline"
+                                onClick={async () => {
+                                  try {
+                                    await fetch('/api/explanations/feedback', {
+                                      method: 'POST',
+                                      headers: { 'Content-Type': 'application/json' },
+                                      body: JSON.stringify({ questionId: problem.id, userId, isHelpful: true })
+                                    })
+                                  } catch {}
+                                }}
+                              >
+                                Yes
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="btn-outline"
+                                onClick={async () => {
+                                  try {
+                                    await fetch('/api/explanations/feedback', {
+                                      method: 'POST',
+                                      headers: { 'Content-Type': 'application/json' },
+                                      body: JSON.stringify({ questionId: problem.id, userId, isHelpful: false })
+                                    })
+                                  } catch {}
+                                }}
+                              >
+                                No
+                              </Button>
                             </div>
                           </div>
                         ))}

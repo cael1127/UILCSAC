@@ -2,6 +2,9 @@ import type { MetadataRoute } from 'next'
 import { getSiteUrl } from '@/lib/site-url'
 import { createClient, isSupabaseConfigured } from '@/lib/supabase/server'
 
+// Allow dynamic rendering since Supabase server client accesses cookies
+export const dynamic = 'force-dynamic'
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = getSiteUrl()
 

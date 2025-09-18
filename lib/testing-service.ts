@@ -26,6 +26,43 @@ export class TestingService {
     memoryLimit = 256,
   ): Promise<ExecutionResult> {
     try {
+      // Use real Java executor when language is Java; otherwise fall back to mock executor
+      if ((language || '').toLowerCase() === 'java') {
+        const supaUrlHeader = (process.env.NEXT_PUBLIC_SUPABASE_URL || (typeof window !== 'undefined' ? (localStorage.getItem('NEXT_PUBLIC_SUPABASE_URL') || '') : '')) as string
+        const supaAnonHeader = (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || (typeof window !== 'undefined' ? (localStorage.getItem('NEXT_PUBLIC_SUPABASE_ANON_KEY') || '') : '')) as string
+
+        const webExecResponse = await fetch("/api/web-execute", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            // Pass Supabase keys via headers to the API route (optional but helps SSR/Edge)
+            ...(supaUrlHeader ? { 'x-supabase-url': supaUrlHeader } : {}),
+            ...(supaAnonHeader ? { 'x-supabase-anon-key': supaAnonHeader } : {}),
+          },
+          body: JSON.stringify({
+            code,
+            language: 'java',
+            // Wrap single input into a test case; executor will run the first input as stdin
+            testCases: input ? [{ input, expected: 'custom' }] : [],
+          }),
+        })
+
+        if (!webExecResponse.ok) {
+          throw new Error(`HTTP error! status: ${webExecResponse.status}`)
+        }
+
+        const result = await webExecResponse.json()
+        // Normalize to TestingService's ExecutionResult shape
+        return {
+          success: !!result.success,
+          output: result.output,
+          error: result.error,
+          executionTime: result.executionTime,
+          memoryUsed: result.memoryUsage,
+        }
+      }
+
+      // Non-Java fallback: mock executor
       const response = await fetch("/api/execute", {
         method: "POST",
         headers: {
