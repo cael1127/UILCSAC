@@ -78,8 +78,6 @@ export default function ModernNavigation({ user, onLogout }: ModernNavigationPro
 
   const navigation = [
     { name: 'Home', href: '/', icon: Home },
-    { name: 'Problems', href: '/problems', icon: Code },
-    { name: 'Learning', href: '/learning', icon: BookOpen },
     { name: 'Dashboard', href: '/dashboard', icon: Trophy },
   ];
 
