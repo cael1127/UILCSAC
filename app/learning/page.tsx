@@ -80,7 +80,8 @@ export default async function LearningPage() {
             const userPathProgress = progressMap.get(path.id)
             const totalModules = path.total_modules || 0
             const completedModules = userPathProgress?.completed_modules || 0
-            const progressPercentage = totalModules > 0 ? (completedModules / totalModules) * 100 : 0
+            const rawProgress = totalModules > 0 ? (completedModules / totalModules) * 100 : 0
+            const progressPercentage = Math.min(100, Math.max(0, rawProgress))
             const difficulty = (path.difficulty ?? 'beginner') as string
             const difficultyVariant = difficulty === 'beginner' ? 'default' : difficulty === 'intermediate' ? 'secondary' : 'destructive'
             const difficultyLabel = difficulty ? (difficulty.charAt(0).toUpperCase() + difficulty.slice(1)) : 'Beginner'
@@ -131,7 +132,7 @@ export default async function LearningPage() {
                       <div className="w-full bg-slate-gray/20 rounded-full h-2">
                         <div 
                           className="bg-ut-orange h-2 rounded-full transition-all duration-300"
-                          style={{ width: `${progressPercentage}%` }}
+                          style={{ width: `${Math.min(100, Math.max(0, progressPercentage))}%` }}
                         />
                       </div>
                     </div>

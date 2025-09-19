@@ -121,7 +121,8 @@ export default function LearningPaths({ userId }: LearningPathsProps) {
 
     const completed = progress.completed_modules || 0
     const total = pathModulesCount
-    const percentage = total > 0 ? Math.round((completed / total) * 100) : 0
+    const rawPercentage = total > 0 ? Math.round((completed / total) * 100) : 0
+    const percentage = Math.min(100, Math.max(0, rawPercentage))
 
     return {
       isStarted: true,

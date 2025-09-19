@@ -115,6 +115,7 @@ export default function ModuleInterface({ moduleId, userId }: ModuleInterfacePro
   const [lastAnswerCorrect, setLastAnswerCorrect] = useState(false);
   const [lastAnswerExplanation, setLastAnswerExplanation] = useState('');
   const [nextModule, setNextModule] = useState<PathModule | null>(null);
+  const [modulePreviouslyCompleted, setModulePreviouslyCompleted] = useState(false);
 
   // Memoized calculations
   const progress = useMemo(() => {
@@ -466,8 +467,10 @@ public class Main {
         const totalEarned = moduleProgress.reduce((sum, response) => sum + (response.points_earned || 0), 0);
         setShowResults(true);
         setScore(totalEarned);
+        setModulePreviouslyCompleted(true);
         console.log('Module already completed, showing results with score:', totalEarned);
       } else {
+        setModulePreviouslyCompleted(false);
         console.log('Module not completed yet, showing questions. Answered:', moduleProgress?.length || 0, 'of', questionsList.length);
       }
     } catch (error) {
@@ -666,9 +669,27 @@ public class Main {
         console.error('Error fetching current progress:', fetchError);
         return;
       }
+      // Determine if we should increment completed modules (avoid double-counting re-dos)
+      const shouldIncrement = !modulePreviouslyCompleted;
 
-      // Calculate new progress
-      const newCompletedModules = (currentProgress?.completed_modules || 0) + 1;
+      // Fetch total number of active modules in this path to clamp max
+      const { data: pathModuleIds, error: countError } = await supabase
+        .from('path_modules')
+        .select('id')
+        .eq('learning_path_id', module.learning_path_id)
+        .eq('is_active', true);
+
+      if (countError) {
+        console.error('Error fetching modules for count:', countError);
+      }
+
+      const totalModulesInPath = (pathModuleIds?.length || 0);
+
+      // Calculate new progress, clamped to total modules
+      const newCompletedModules = Math.min(
+        totalModulesInPath > 0 ? totalModulesInPath : Infinity,
+        (currentProgress?.completed_modules || 0) + (shouldIncrement ? 1 : 0)
+      );
       const newTotalScore = (currentProgress?.total_score || 0) + score;
 
       // Get next module in the learning path
@@ -682,7 +703,7 @@ public class Main {
         .single();
 
       const nextModuleId = nextModule?.id || null;
-      const isPathCompleted = !nextModuleId;
+      const isPathCompleted = !nextModuleId || (totalModulesInPath > 0 && newCompletedModules >= totalModulesInPath);
 
       if (currentProgress) {
         // Update existing progress

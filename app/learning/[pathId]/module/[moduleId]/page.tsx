@@ -85,13 +85,13 @@ export default async function LearningModulePage({ params }: LearningModulePageP
   })
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[var(--background)]">
       {/* Header */}
-      <header className="border-b border-border bg-card">
+      <header className="border-b border-[var(--border)] bg-[var(--card)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
-              <h1 className="text-xl font-bold text-card-foreground">Learning Module</h1>
+              <h1 className="text-xl font-bold text-[var(--foreground)]">{module.name}</h1>
             </div>
           </div>
         </div>
