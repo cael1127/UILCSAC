@@ -383,9 +383,11 @@ export default function LearningPaths({ userId }: LearningPathsProps) {
                     </Button>
                   )}
                   
-                  <Button variant="outline" size="sm" className="btn-outline hover-lift text-[var(--foreground)]">
-                    <BookOpen className="h-4 w-4 mr-2" />
-                    Preview
+                  <Button asChild variant="outline" size="sm" className="btn-outline hover-lift text-[var(--foreground)]">
+                    <Link href={`/learning/${path.id}`}>
+                      <BookOpen className="h-4 w-4 mr-2" />
+                      Preview
+                    </Link>
                   </Button>
                 </div>
               </CardContent>
