@@ -96,7 +96,7 @@ importers:
         specifier: ^0.1.0
         version: 0.1.0(@supabase/supabase-js@2.55.0)
       '@supabase/supabase-js':
-        specifier: latest
+        specifier: 2.55.0
         version: 2.55.0
       autoprefixer:
         specifier: ^10.4.20
@@ -129,7 +129,7 @@ importers:
         specifier: ^0.454.0
         version: 0.454.0(react@18.3.1)
       monaco-editor:
-        specifier: latest
+        specifier: 0.52.2
         version: 0.52.2
       next:
         specifier: 15.2.4

@@ -239,9 +239,8 @@ export default function PracticeTestQuestionRenderer({
         return (
           <div className="space-y-4">
             <TextAnalyzer 
-              text={question.question_text}
-              onAnalysisChange={handleAnswerChange}
-              initialAnalysis={currentAnswer}
+              passage={question.question_text}
+              showAnalysisTools={true}
             />
           </div>
         )
@@ -298,7 +297,7 @@ export default function PracticeTestQuestionRenderer({
             </div>
             <div>
               <CardTitle className="text-lg text-[var(--foreground)]">
-                Question {question.test_order_index || 1}
+                Question {question.order_index || 1}
               </CardTitle>
               <div className="flex gap-2 mt-2">
                 <Badge className={getDifficultyColor(question.difficulty_level)}>
