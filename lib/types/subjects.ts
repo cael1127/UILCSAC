@@ -78,7 +78,7 @@ export type QuestionType =
   | 'true_false'
   | 'fill_in_blank'
 
-export type MediaType = 'text' | 'image' | 'audio' | 'video' | 'latex'
+export type MediaType = 'text' | 'image' | 'audio' | 'video' | 'latex' | 'chemistry' | 'physics'
 
 export interface PracticeTest {
   id: string
