@@ -25,7 +25,7 @@ export default async function LoginPage() {
             <span className="text-2xl">🎓</span>
           </div>
           <h1 className="text-3xl font-bold" style={{ color: 'var(--foreground)' }}>Welcome Back</h1>
-          <p style={{ color: 'var(--muted-foreground)' }}>Sign in to continue your UIL CS Academy journey</p>
+          <p style={{ color: 'var(--muted-foreground)' }}>Sign in to continue your UIL Academy journey</p>
         </div>
         <LoginForm />
       </div>

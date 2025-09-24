@@ -12,10 +12,14 @@ import Link from "next/link"
 
 interface LearningPath {
   id: string
+  subject_id: string
   name: string
   description: string
   difficulty_level: number
   estimated_hours: number
+  prerequisites?: string[]
+  learning_objectives?: string[]
+  tags?: string[]
 }
 
 interface PathModule {
@@ -37,9 +41,10 @@ interface UserProgress {
 
 interface LearningPathsProps {
   userId: string
+  subjectFilter?: string // Optional subject filter
 }
 
-export default function LearningPaths({ userId }: LearningPathsProps) {
+export default function LearningPaths({ userId, subjectFilter }: LearningPathsProps) {
   const router = useRouter()
   const [learningPaths, setLearningPaths] = useState<LearningPath[]>([])
   const [pathModules, setPathModules] = useState<PathModule[]>([])
@@ -48,7 +53,7 @@ export default function LearningPaths({ userId }: LearningPathsProps) {
 
   useEffect(() => {
     fetchLearningPaths()
-  }, [userId])
+  }, [userId, subjectFilter])
 
 
 
@@ -56,11 +61,30 @@ export default function LearningPaths({ userId }: LearningPathsProps) {
     try {
       setLoading(true)
 
-      // Fetch learning paths
-      const { data: paths, error: pathsError } = await supabase
+      // Fetch learning paths with optional subject filter
+      let pathsQuery = supabase
         .from("learning_paths")
-        .select("*")
+        .select(`
+          *,
+          subject:subjects(*)
+        `)
         .eq("is_active", true)
+      
+      // Apply subject filter if provided
+      if (subjectFilter) {
+        // First get the subject ID from the subject name
+        const { data: subjectData } = await supabase
+          .from("subjects")
+          .select("id")
+          .eq("name", subjectFilter)
+          .single()
+        
+        if (subjectData) {
+          pathsQuery = pathsQuery.eq("subject_id", subjectData.id)
+        }
+      }
+      
+      const { data: paths, error: pathsError } = await pathsQuery
         .order("difficulty_level", { ascending: true })
 
       if (pathsError) {

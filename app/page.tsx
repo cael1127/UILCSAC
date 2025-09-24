@@ -39,13 +39,13 @@ export default function HomePage() {
             
             {/* Enhanced Title */}
             <h1 className="text-5xl font-bold tracking-tight sm:text-6xl lg:text-8xl animate-slide-up" style={{ color: 'var(--foreground)' }}>
-              Master Competitive Programming
+              Master All UIL Competitions
             </h1>
             
             {/* Enhanced Subtitle */}
             <p className="mx-auto max-w-3xl text-xl sm:text-2xl animate-slide-up leading-relaxed" style={{ color: 'var(--muted-foreground)' }}>
-              The most comprehensive platform for UIL Computer Science competitions. 
-              Practice with real-time Java execution, structured learning paths, and expert-curated problems.
+              The most comprehensive platform for all UIL competitions. 
+              Master Computer Science, Mathematics, Science, Literature, and Spelling with structured learning paths and expert-curated content.
             </p>
             
             {/* Enhanced CTA Buttons */}
@@ -75,7 +75,7 @@ export default function HomePage() {
               Everything You Need to Excel
             </h2>
             <p className="mx-auto max-w-3xl text-xl text-[var(--muted-foreground)]">
-              Comprehensive tools and resources designed specifically for competitive programming success
+              Comprehensive tools and resources designed specifically for UIL competition success
             </p>
           </div>
           
@@ -85,24 +85,24 @@ export default function HomePage() {
                 <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--primary)]/10 group-hover:bg-[var(--primary)]/20 transition-colors duration-300">
                   <Code className="h-8 w-8 text-[var(--primary)]" />
                 </div>
-                <CardTitle className="text-xl text-[var(--foreground)]">Advanced Java Runtime</CardTitle>
+                <CardTitle className="text-xl text-[var(--foreground)]">Multi-Subject Platform</CardTitle>
                 <CardDescription className="text-[var(--muted-foreground)]">
-                  Write, test, and run Java code with our enhanced runtime supporting complex calculations, data structures, and modern Java features.
+                  Master all UIL subjects in one platform: Computer Science with Java runtime, Mathematics with mental math tools, Science with formula support, Literature analysis, and Spelling practice.
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <ul className="space-modern-sm text-sm text-[var(--muted-foreground)]">
                   <li className="flex items-center">
                     <CheckCircle className="mr-2 h-4 w-4 text-[var(--success)]" />
-                    Real-time code execution
+                    5 UIL subjects covered
                   </li>
                   <li className="flex items-center">
                     <CheckCircle className="mr-2 h-4 w-4 text-[var(--success)]" />
-                    Complete data structure support
+                    Unified progress tracking
                   </li>
                   <li className="flex items-center">
                     <CheckCircle className="mr-2 h-4 w-4 text-[var(--success)]" />
-                    Advanced mathematical functions
+                    Subject-specific tools
                   </li>
                 </ul>
               </CardContent>
@@ -115,7 +115,7 @@ export default function HomePage() {
                 </div>
                 <CardTitle className="text-xl text-[var(--foreground)]">Structured Learning</CardTitle>
                 <CardDescription className="text-[var(--muted-foreground)]">
-                  Progressive curriculum designed by competitive programming experts to build skills from fundamentals to advanced techniques.
+                  Progressive curriculum designed by UIL competition experts to build skills from fundamentals to advanced techniques.
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -172,12 +172,12 @@ export default function HomePage() {
         <div className="container-modern">
           <div className="grid-modern grid-modern-3 text-center">
             <div className="space-modern-sm p-6 rounded-2xl bg-[var(--card)]/50 hover-lift">
-              <div className="text-5xl font-bold text-[var(--primary)] mb-2">1000+</div>
-              <div className="text-[var(--muted-foreground)] text-lg">Practice Problems</div>
+              <div className="text-5xl font-bold text-[var(--primary)] mb-2">5</div>
+              <div className="text-[var(--muted-foreground)] text-lg">UIL Subjects</div>
             </div>
             <div className="space-modern-sm p-6 rounded-2xl bg-[var(--card)]/50 hover-lift">
-              <div className="text-5xl font-bold text-[var(--primary)] mb-2">50+</div>
-              <div className="text-[var(--muted-foreground)] text-lg">Learning Modules</div>
+              <div className="text-5xl font-bold text-[var(--primary)] mb-2">25+</div>
+              <div className="text-[var(--muted-foreground)] text-lg">Learning Paths</div>
             </div>
             <div className="space-modern-sm p-6 rounded-2xl bg-[var(--card)]/50 hover-lift">
               <div className="text-5xl font-bold text-[var(--primary)] mb-2">24/7</div>
@@ -200,7 +200,7 @@ export default function HomePage() {
               Ready to Dominate UIL Competitions?
             </h2>
             <p className="mx-auto max-w-3xl text-xl" style={{ color: 'var(--muted-foreground)' }}>
-              Join thousands of students who have improved their competitive programming skills with our platform. 
+              Join thousands of students who have improved their UIL competition skills with our platform. 
               Start your journey to competition success today.
             </p>
             <div className="flex flex-col sm:flex-row gap-6 justify-center mt-8">
@@ -226,14 +226,14 @@ export default function HomePage() {
               <div className="p-2 rounded-lg bg-[var(--primary)]/10">
                 <Code className="h-8 w-8 text-[var(--primary)]" />
               </div>
-              <span className="text-2xl font-bold text-[var(--foreground)]">UIL CS Academy</span>
+              <span className="text-2xl font-bold text-[var(--foreground)]">UIL Academy</span>
             </div>
             <p className="text-[var(--muted-foreground)] text-lg max-w-2xl mx-auto">
-              Built for competitive programming excellence. Empowering the next generation of computer scientists.
+              Built for UIL competition excellence. Empowering students across all academic disciplines.
             </p>
             <div className="flex items-center justify-center gap-6 mt-6">
               <div className="text-sm text-[var(--muted-foreground)]">
-                © 2024 UIL CS Academy. All rights reserved.
+                © 2024 UIL Academy. All rights reserved.
               </div>
             </div>
           </div>

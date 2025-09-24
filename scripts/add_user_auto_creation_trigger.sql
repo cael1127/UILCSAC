@@ -1,5 +1,5 @@
 -- =============================================================================
--- UIL CS Academy - Add User Auto-Creation Trigger
+-- UIL Academy - Add User Auto-Creation Trigger
 -- =============================================================================
 -- This script adds a database trigger to automatically create user records
 -- when new users sign up through Supabase Auth

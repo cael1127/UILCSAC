@@ -24,8 +24,8 @@ export default async function SignUpPage() {
           <div className="w-16 h-16 bg-[var(--primary)]/10 rounded-full flex items-center justify-center mx-auto mb-4">
             <span className="text-2xl">🚀</span>
           </div>
-          <h1 className="text-3xl font-bold" style={{ color: 'var(--foreground)' }}>Join UIL CS Academy</h1>
-          <p style={{ color: 'var(--muted-foreground)' }}>Create your account to start your competitive programming journey</p>
+          <h1 className="text-3xl font-bold" style={{ color: 'var(--foreground)' }}>Join UIL Academy</h1>
+          <p style={{ color: 'var(--muted-foreground)' }}>Create your account to start your UIL competition journey</p>
         </div>
         <SignUpForm />
       </div>

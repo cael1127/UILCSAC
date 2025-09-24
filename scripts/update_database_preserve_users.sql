@@ -235,7 +235,7 @@ CREATE TABLE IF NOT EXISTS code_executions (
 -- Insert Learning Paths
 INSERT INTO learning_paths (id, name, description, difficulty_level, estimated_hours) VALUES
 ('550e8400-e29b-41d4-a716-446655440001', 'UIL CS Fundamentals', 'Core Java programming and basic algorithms for UIL Computer Science', 1, 20),
-('550e8400-e29b-41d4-a716-446655440002', 'UIL Data Structures', 'Essential data structures for competitive programming', 2, 25),
+('550e8400-e29b-41d4-a716-446655440002', 'UIL Data Structures', 'Essential data structures for UIL Computer Science competitions', 2, 25),
 ('550e8400-e29b-41d4-a716-446655440003', 'UIL Advanced Topics', 'Advanced algorithms and problem-solving techniques', 3, 30),
 ('550e8400-e29b-41d4-a716-446655440004', 'UIL Contest Preparation', 'Time management and contest strategies', 3, 15),
 ('550e8400-e29b-41d4-a716-446655440005', 'UIL Problem Patterns', 'Common problem types and solution patterns', 2, 20);

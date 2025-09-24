@@ -1,4 +1,4 @@
--- Complete Database Setup for UIL CS Academy (FIXED VERSION)
+-- Complete Database Setup for UIL Academy (FIXED VERSION)
 -- This single script sets up all tables, policies, and sample data
 -- Run this entire script in your Supabase SQL Editor
 
@@ -980,7 +980,7 @@ CREATE TRIGGER on_auth_user_created
 -- =====================================================
 
 -- This script has completed successfully!
--- Your UIL CS Academy database is now fully set up with:
+-- Your UIL Academy database is now fully set up with:
 -- ✅ All existing tables dropped and recreated cleanly
 -- ✅ All required tables created with proper relationships
 -- ✅ Row Level Security enabled

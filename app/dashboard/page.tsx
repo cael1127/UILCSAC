@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { LogOut, User, Trophy, Clock, Target, BookOpen, Code } from "lucide-react"
 import { signOut } from "@/lib/actions"
-import ProblemGrid from "@/components/problem-grid"
-import LearningPaths from "@/components/learning-paths"
+import SubjectSelector from "@/components/subject-selector"
+import TeacherDashboard from "@/components/teacher-dashboard"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 // Force dynamic rendering for this page
@@ -89,7 +89,7 @@ export default async function DashboardPage() {
                 <div className="p-2 rounded-lg bg-[var(--primary)]/10">
                   <Code className="h-6 w-6 text-[var(--primary)]" />
                 </div>
-                <h1 className="text-xl font-bold text-[var(--foreground)]">UIL CS Academy</h1>
+                <h1 className="text-xl font-bold text-[var(--foreground)]">UIL Academy</h1>
               </div>
             </div>
             <div className="flex items-center space-x-4">
@@ -118,7 +118,7 @@ export default async function DashboardPage() {
               Welcome back, {userProfile?.first_name || userProfile?.email || 'User'}! 👋
             </h2>
             <p className="text-[var(--muted-foreground)] text-lg">
-              Continue your competitive programming journey with our structured learning paths and practice problems.
+              Continue your UIL competition journey with structured learning paths and practice problems across all subjects.
             </p>
           </div>
         </div>
@@ -188,43 +188,35 @@ export default async function DashboardPage() {
           </Card>
         </div>
 
-        {/* Enhanced Main Content Tabs */}
-        <Tabs defaultValue="problems" className="space-y-8">
-          <TabsList className="grid w-full grid-cols-2 bg-[var(--card)] border border-[var(--border)] p-1 rounded-xl">
-            <TabsTrigger 
-              value="problems" 
-              className="data-[state=active]:bg-[var(--primary)] data-[state=active]:text-[var(--primary-foreground)] data-[state=inactive]:text-[var(--foreground)] rounded-lg transition-all duration-300"
-            >
-              Practice Problems
-            </TabsTrigger>
-            <TabsTrigger 
-              value="learning" 
-              className="data-[state=active]:bg-[var(--primary)] data-[state=active]:text-[var(--primary-foreground)] data-[state=inactive]:text-[var(--foreground)] rounded-lg transition-all duration-300"
-            >
-              Learning Paths
-            </TabsTrigger>
-          </TabsList>
+        {/* Main Content */}
+        {userProfile?.role === 'teacher' ? (
+          <Tabs defaultValue="subjects" className="space-y-8">
+            <TabsList className="grid w-full grid-cols-2 bg-[var(--card)] border border-[var(--border)] p-1 rounded-xl">
+              <TabsTrigger 
+                value="subjects" 
+                className="data-[state=active]:bg-[var(--primary)] data-[state=active]:text-[var(--primary-foreground)] data-[state=inactive]:text-[var(--foreground)] rounded-lg transition-all duration-300"
+              >
+                Choose Subject
+              </TabsTrigger>
+              <TabsTrigger 
+                value="teacher" 
+                className="data-[state=active]:bg-[var(--primary)] data-[state=active]:text-[var(--primary-foreground)] data-[state=inactive]:text-[var(--foreground)] rounded-lg transition-all duration-300"
+              >
+                Teacher Dashboard
+              </TabsTrigger>
+            </TabsList>
 
-          <TabsContent value="problems" className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h3 className="text-2xl font-bold text-[var(--foreground)]">Recent Problems</h3>
-              <Button asChild className="btn-primary hover-glow text-[var(--primary-foreground)]">
-                <Link href="/dashboard">View All Problems</Link>
-              </Button>
-            </div>
-            <ProblemGrid userId={user.id} />
-          </TabsContent>
+            <TabsContent value="subjects" className="space-y-6">
+              <SubjectSelector userId={user.id} />
+            </TabsContent>
 
-          <TabsContent value="learning" className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h3 className="text-2xl font-bold text-[var(--foreground)]">Your Learning Paths</h3>
-              <Button asChild className="btn-primary hover-glow text-[var(--primary-foreground)]">
-                <Link href="/learning">View All Paths</Link>
-              </Button>
-            </div>
-            <LearningPaths userId={user.id} />
-          </TabsContent>
-        </Tabs>
+            <TabsContent value="teacher" className="space-y-6">
+              <TeacherDashboard userId={user.id} />
+            </TabsContent>
+          </Tabs>
+        ) : (
+          <SubjectSelector userId={user.id} />
+        )}
       </div>
     </div>
   )

@@ -118,7 +118,7 @@ export default function SignUpForm() {
       <CardHeader>
         <CardTitle style={{ color: 'var(--foreground)' }}>Create Account</CardTitle>
         <CardDescription style={{ color: 'var(--muted-foreground)' }}>
-          Sign up to get started with UIL CS Academy
+          Sign up to get started with UIL Academy
         </CardDescription>
       </CardHeader>
       <CardContent>

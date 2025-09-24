@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/sonner"
 import ThemeSwitcher from "@/components/theme-switcher"
 import ModernNavigation from "@/components/modern-navigation"
+import { MathJaxProvider } from "@/components/tools/math-renderer"
 import { getSiteUrl } from "@/lib/site-url"
 
 const inter = Inter({ 
@@ -16,14 +17,14 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "UIL CS Academy",
-    template: "%s | UIL CS Academy"
+    default: "UIL Academy",
+    template: "%s | UIL Academy"
   },
-  description: "Master competitive programming with our comprehensive platform designed for UIL Computer Science competitions. Practice problems, track progress, and excel in competitions.",
-  keywords: ["UIL", "Computer Science", "Competitive Programming", "Java", "Learning Platform"],
-  authors: [{ name: "UIL CS Academy Team" }],
-  creator: "UIL CS Academy",
-  publisher: "UIL CS Academy",
+  description: "Master all UIL competitions with our comprehensive platform covering Computer Science, Mathematics, Science, Literature, and Spelling. Structured learning paths, practice problems, and progress tracking.",
+  keywords: ["UIL", "Computer Science", "Mathematics", "Science", "Literature", "Spelling", "Competition", "Learning Platform"],
+  authors: [{ name: "UIL Academy Team" }],
+  creator: "UIL Academy",
+  publisher: "UIL Academy",
   formatDetection: {
     email: false,
     address: false,
@@ -34,17 +35,17 @@ export const metadata: Metadata = {
     canonical: '/',
   },
   openGraph: {
-    title: "UIL CS Academy",
-    description: "Master competitive programming with our comprehensive platform designed for UIL Computer Science competitions.",
+    title: "UIL Academy",
+    description: "Master all UIL competitions with our comprehensive platform covering Computer Science, Mathematics, Science, Literature, and Spelling.",
     url: '/',
-    siteName: 'UIL CS Academy',
+    siteName: 'UIL Academy',
     locale: 'en_US',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'UIL CS Academy',
-    description: 'Master competitive programming with our comprehensive platform designed for UIL Computer Science competitions.',
+    title: 'UIL Academy',
+    description: 'Master all UIL competitions with our comprehensive platform covering Computer Science, Mathematics, Science, Literature, and Spelling.',
   },
   robots: {
     index: true,
@@ -122,12 +123,14 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <ModernNavigation />
-          <main id="main-content" role="main">
-            {children}
-          </main>
-          <ThemeSwitcher />
-          <Toaster />
+          <MathJaxProvider>
+            <ModernNavigation />
+            <main id="main-content" role="main">
+              {children}
+            </main>
+            <ThemeSwitcher />
+            <Toaster />
+          </MathJaxProvider>
         </ThemeProvider>
       </body>
     </html>
