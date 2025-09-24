@@ -24,7 +24,6 @@ import {
 import MathRenderer, { MathJaxProvider, MixedContentRenderer, ChemistryRenderer, PhysicsEquation } from '@/components/tools/math-renderer'
 import AudioPlayer, { SpellingDictation, PronunciationPractice } from '@/components/tools/audio-player'
 import TextAnalyzer, { PoetryAnalyzer } from '@/components/tools/text-analyzer'
-import { UnifiedJavaIDE } from '@/components/unified-java-ide'
 
 import type { EnhancedQuestion, QuestionType, MediaType } from '@/lib/types/subjects'
 
@@ -201,14 +200,17 @@ export default function PracticeTestQuestionRenderer({
 
       case 'code_completion':
         return (
-          <div className="border border-[var(--border)] rounded-lg overflow-hidden">
-            <UnifiedJavaIDE
-              templateCode={question.question_text}
-              onCodeChange={handleAnswerChange}
-              initialCode={currentAnswer}
-              height="400px"
-            />
-          </div>
+          <Textarea
+            value={currentAnswer}
+            onChange={(e) => handleAnswerChange(e.target.value)}
+            placeholder="Write your code here..."
+            className="min-h-[300px] w-full font-mono"
+            style={{
+              backgroundColor: 'var(--background)',
+              color: 'var(--foreground)',
+              borderColor: 'var(--border)'
+            }}
+          />
         )
 
       case 'dictation':
