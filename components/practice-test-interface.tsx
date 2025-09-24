@@ -23,7 +23,7 @@ import {
   ArrowRight
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
-import EnhancedQuestionRenderer from '@/components/enhanced-question-renderer'
+import PracticeTestQuestionRenderer from '@/components/practice-test-question-renderer'
 import type { PracticeTest, EnhancedQuestion, UserPracticeTestAttempt } from '@/lib/types/subjects'
 
 interface PracticeTestInterfaceProps {
@@ -170,22 +170,33 @@ export default function PracticeTestInterface({
     }
   }
 
-  const handleAnswer = useCallback((answer: string, isCorrect: boolean) => {
+  const handleAnswerChange = useCallback((answer: string) => {
     const currentQuestion = questions[currentQuestionIndex]
     if (!currentQuestion) return
 
-    const timeSpent = Math.round((Date.now() - questionStartTime) / 1000)
-    
+    // Don't automatically determine correctness - that will be done when test is submitted
     setUserAnswers(prev => new Map(prev.set(currentQuestion.id, {
       questionId: currentQuestion.id,
       answer,
-      isCorrect,
-      timeSpent
+      isCorrect: false, // Will be calculated on submission
+      timeSpent: 0 // Will be calculated on submission
     })))
-  }, [currentQuestionIndex, questions, questionStartTime])
+  }, [currentQuestionIndex, questions])
 
   const navigateToQuestion = (index: number) => {
     if (index >= 0 && index < questions.length) {
+      // Save time spent on current question before navigating
+      if (currentQuestionIndex >= 0 && userAnswers.has(questions[currentQuestionIndex]?.id)) {
+        const timeSpent = Math.round((Date.now() - questionStartTime) / 1000)
+        const currentAnswer = userAnswers.get(questions[currentQuestionIndex].id)
+        if (currentAnswer) {
+          setUserAnswers(prev => new Map(prev.set(questions[currentQuestionIndex].id, {
+            ...currentAnswer,
+            timeSpent: currentAnswer.timeSpent + timeSpent
+          })))
+        }
+      }
+      
       setCurrentQuestionIndex(index)
       setQuestionStartTime(Date.now())
     }
@@ -199,13 +210,54 @@ export default function PracticeTestInterface({
     if (!attemptId || isTestCompleted) return
 
     try {
-      const totalScore = Array.from(userAnswers.values())
+      // Calculate correctness for all answered questions
+      const updatedAnswers = new Map(userAnswers)
+      
+      Array.from(userAnswers.entries()).forEach(([questionId, answer]) => {
+        const question = questions.find(q => q.id === questionId)
+        if (!question) return
+
+        let isCorrect = false
+        
+        switch (question.question_type) {
+          case 'multiple_choice':
+            const correctOption = question.options?.find(opt => opt.is_correct)
+            isCorrect = answer.answer === correctOption?.option_text
+            break
+          
+          case 'short_answer':
+          case 'calculation':
+            // Normalize answers for comparison
+            const normalizedAnswer = answer.answer.trim().toLowerCase()
+            const normalizedCorrect = question.correct_answer?.trim().toLowerCase() || ''
+            isCorrect = normalizedAnswer === normalizedCorrect
+            break
+          
+          case 'true_false':
+            isCorrect = answer.answer.toLowerCase() === question.correct_answer?.toLowerCase()
+            break
+          
+          default:
+            // For other types, just check if answer matches
+            isCorrect = answer.answer.trim() === question.correct_answer?.trim()
+        }
+
+        // Update the answer with correctness
+        updatedAnswers.set(questionId, {
+          ...answer,
+          isCorrect
+        })
+      })
+
+      setUserAnswers(updatedAnswers)
+
+      const totalScore = Array.from(updatedAnswers.values())
         .reduce((sum, answer) => {
           const question = questions.find(q => q.id === answer.questionId)
           return sum + (answer.isCorrect ? (question?.test_points || 1) : 0)
         }, 0)
 
-      const totalTimeSpent = Array.from(userAnswers.values())
+      const totalTimeSpent = Array.from(updatedAnswers.values())
         .reduce((sum, answer) => sum + answer.timeSpent, 0)
 
       // Update attempt record
@@ -553,11 +605,10 @@ export default function PracticeTestInterface({
           {/* Current Question */}
           <div className="lg:col-span-3 space-y-6">
             {currentQuestion && (
-              <EnhancedQuestionRenderer
+              <PracticeTestQuestionRenderer
                 question={currentQuestion}
-                onAnswer={handleAnswer}
+                onAnswerChange={handleAnswerChange}
                 userAnswer={userAnswers.get(currentQuestion.id)?.answer}
-                isAnswered={userAnswers.has(currentQuestion.id)}
                 timeRemaining={currentQuestion.time_limit_seconds || undefined}
               />
             )}
