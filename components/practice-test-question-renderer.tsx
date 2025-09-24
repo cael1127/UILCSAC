@@ -42,6 +42,7 @@ interface PracticeTestQuestionRendererProps {
   userAnswer?: string
   timeRemaining?: number
   className?: string
+  showHints?: boolean
 }
 
 export default function PracticeTestQuestionRenderer({
@@ -49,7 +50,8 @@ export default function PracticeTestQuestionRenderer({
   onAnswerChange,
   userAnswer,
   timeRemaining,
-  className = ''
+  className = '',
+  showHints = false
 }: PracticeTestQuestionRendererProps) {
   const [currentAnswer, setCurrentAnswer] = useState(userAnswer || '')
   const [timeLeft, setTimeLeft] = useState(timeRemaining)
@@ -346,8 +348,8 @@ export default function PracticeTestQuestionRenderer({
           {renderAnswerInput()}
         </div>
 
-        {/* Hints/Additional Info */}
-        {question.explanation && (
+        {/* Hints/Additional Info - Only show when explicitly enabled */}
+        {showHints && question.explanation && (
           <div className="bg-[var(--muted)]/30 rounded-lg p-4">
             <div className="flex items-start gap-2">
               <Lightbulb className="h-5 w-5 text-[var(--primary)] mt-0.5 flex-shrink-0" />

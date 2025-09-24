@@ -610,6 +610,7 @@ export default function PracticeTestInterface({
                 onAnswerChange={handleAnswerChange}
                 userAnswer={userAnswers.get(currentQuestion.id)?.answer}
                 timeRemaining={currentQuestion.time_limit_seconds || undefined}
+                showHints={false}
               />
             )}
 
