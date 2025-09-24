@@ -233,8 +233,11 @@ export default function PracticeTestInterface({
   }
 
   const calculateScore = () => {
-    const correctAnswers = Array.from(userAnswers.values()).filter(a => a.isCorrect).length
-    return Math.round((correctAnswers / questions.length) * 100)
+    const answeredQuestions = Array.from(userAnswers.values())
+    if (answeredQuestions.length === 0) return 0
+    
+    const correctAnswers = answeredQuestions.filter(a => a.isCorrect).length
+    return Math.round((correctAnswers / answeredQuestions.length) * 100)
   }
 
   const formatTime = (seconds: number) => {
@@ -389,8 +392,9 @@ export default function PracticeTestInterface({
 
   // Test completion screen
   if (isTestCompleted) {
-    const score = calculateScore()
     const totalCorrect = Array.from(userAnswers.values()).filter(a => a.isCorrect).length
+    const totalAnswered = Array.from(userAnswers.values()).length
+    const score = totalAnswered > 0 ? Math.round((totalCorrect / totalAnswered) * 100) : 0
     
     return (
       <div className={`practice-test-interface ${className}`}>
@@ -418,7 +422,7 @@ export default function PracticeTestInterface({
                 
                 <div className="text-center p-6 bg-[var(--muted)]/30 rounded-lg">
                   <div className="text-4xl font-bold text-[var(--foreground)] mb-2">
-                    {totalCorrect}/{questions.length}
+                    {totalCorrect}/{totalAnswered}
                   </div>
                   <div className="text-[var(--muted-foreground)]">Correct Answers</div>
                 </div>
