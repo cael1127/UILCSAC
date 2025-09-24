@@ -55,49 +55,144 @@ const LazyUnifiedJavaIDE = React.lazy(() =>
 );
 
 // Memoized question display component
-const QuestionDisplay = memo(({ question, onAnswerSelect, selectedAnswer, disabled }: {
+const QuestionDisplay = memo(({ question, onAnswerSelect, selectedAnswer, disabled, typedAnswer, onTypedAnswerChange }: {
   question: Question;
   onAnswerSelect: (answerId: string) => void;
   selectedAnswer: string;
   disabled?: boolean;
-}) => (
-  <div className="space-y-4">
-    <div className="space-y-2">
-      <h3 className="text-lg font-semibold text-[var(--foreground)]">{question.question_text}</h3>
-    </div>
-    
-    {question.question_type?.toLowerCase() === 'multiple_choice' && question.question_options && (
+  typedAnswer?: string;
+  onTypedAnswerChange?: (answer: string) => void;
+}) => {
+  const renderAnswerInput = () => {
+    switch (question.question_type?.toLowerCase()) {
+      case 'multiple_choice':
+        return question.question_options && (
+          <div className="space-y-2">
+            {question.question_options.map((option) => (
+              <label
+                key={option.id}
+                className="flex items-center space-x-2 p-3 border border-[var(--border)] rounded-lg cursor-pointer hover:bg-[var(--muted)]/5 transition-colors bg-[var(--card)]"
+              >
+                <input
+                  type="radio"
+                  name="answer"
+                  value={option.id}
+                  checked={selectedAnswer === option.id}
+                  onChange={() => onAnswerSelect(option.id)}
+                  disabled={!!disabled}
+                  className="sr-only"
+                />
+                <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                  selectedAnswer === option.id 
+                    ? 'border-[var(--primary)] bg-[var(--primary)]' 
+                    : 'border-[var(--border)]'
+                }`}>
+                  {selectedAnswer === option.id && (
+                    <div className="w-2 h-2 rounded-full bg-[var(--primary-foreground)]" />
+                  )}
+                </div>
+                <span className={`flex-1 text-[var(--foreground)] ${disabled ? 'opacity-60' : ''}`}>{option.option_text}</span>
+              </label>
+            ))}
+          </div>
+        );
+
+      case 'short_answer':
+      case 'calculation':
+        return (
+          <input
+            type="text"
+            value={typedAnswer || ''}
+            onChange={(e) => onTypedAnswerChange?.(e.target.value)}
+            placeholder="Enter your answer..."
+            disabled={!!disabled}
+            className="w-full p-3 border border-[var(--border)] rounded-md bg-[var(--background)] text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-[var(--primary)]"
+          />
+        );
+
+      case 'essay':
+      case 'written_response':
+        return (
+          <textarea
+            value={typedAnswer || ''}
+            onChange={(e) => onTypedAnswerChange?.(e.target.value)}
+            placeholder="Write your response here..."
+            disabled={!!disabled}
+            className="min-h-[200px] w-full p-3 border border-[var(--border)] rounded-md bg-[var(--background)] text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-[var(--primary)]"
+          />
+        );
+
+      case 'true_false':
+        return (
+          <div className="space-y-2">
+            <label className="flex items-center space-x-2 p-3 border border-[var(--border)] rounded-lg cursor-pointer hover:bg-[var(--muted)]/5 transition-colors bg-[var(--card)]">
+              <input
+                type="radio"
+                name="true_false"
+                value="true"
+                checked={selectedAnswer === 'true'}
+                onChange={() => onAnswerSelect('true')}
+                disabled={!!disabled}
+                className="sr-only"
+              />
+              <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                selectedAnswer === 'true' 
+                  ? 'border-[var(--primary)] bg-[var(--primary)]' 
+                  : 'border-[var(--border)]'
+              }`}>
+                {selectedAnswer === 'true' && (
+                  <div className="w-2 h-2 rounded-full bg-[var(--primary-foreground)]" />
+                )}
+              </div>
+              <span className={`flex-1 text-[var(--foreground)] ${disabled ? 'opacity-60' : ''}`}>True</span>
+            </label>
+            <label className="flex items-center space-x-2 p-3 border border-[var(--border)] rounded-lg cursor-pointer hover:bg-[var(--muted)]/5 transition-colors bg-[var(--card)]">
+              <input
+                type="radio"
+                name="true_false"
+                value="false"
+                checked={selectedAnswer === 'false'}
+                onChange={() => onAnswerSelect('false')}
+                disabled={!!disabled}
+                className="sr-only"
+              />
+              <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                selectedAnswer === 'false' 
+                  ? 'border-[var(--primary)] bg-[var(--primary)]' 
+                  : 'border-[var(--border)]'
+              }`}>
+                {selectedAnswer === 'false' && (
+                  <div className="w-2 h-2 rounded-full bg-[var(--primary-foreground)]" />
+                )}
+              </div>
+              <span className={`flex-1 text-[var(--foreground)] ${disabled ? 'opacity-60' : ''}`}>False</span>
+            </label>
+          </div>
+        );
+
+      default:
+        return (
+          <input
+            type="text"
+            value={typedAnswer || ''}
+            onChange={(e) => onTypedAnswerChange?.(e.target.value)}
+            placeholder="Enter your answer..."
+            disabled={!!disabled}
+            className="w-full p-3 border border-[var(--border)] rounded-md bg-[var(--background)] text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-[var(--primary)]"
+          />
+        );
+    }
+  };
+
+  return (
+    <div className="space-y-4">
       <div className="space-y-2">
-        {question.question_options.map((option) => (
-          <label
-            key={option.id}
-            className="flex items-center space-x-2 p-3 border border-[var(--border)] rounded-lg cursor-pointer hover:bg-[var(--muted)]/5 transition-colors bg-[var(--card)]"
-          >
-            <input
-              type="radio"
-              name="answer"
-              value={option.id}
-              checked={selectedAnswer === option.id}
-              onChange={() => onAnswerSelect(option.id)}
-              disabled={!!disabled}
-              className="sr-only"
-            />
-            <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-              selectedAnswer === option.id 
-                ? 'border-[var(--primary)] bg-[var(--primary)]' 
-                : 'border-[var(--border)]'
-            }`}>
-              {selectedAnswer === option.id && (
-                <div className="w-2 h-2 rounded-full bg-[var(--primary-foreground)]" />
-              )}
-            </div>
-            <span className={`flex-1 text-[var(--foreground)] ${disabled ? 'opacity-60' : ''}`}>{option.option_text}</span>
-          </label>
-        ))}
+        <h3 className="text-lg font-semibold text-[var(--foreground)]">{question.question_text}</h3>
       </div>
-    )}
-  </div>
-));
+      {renderAnswerInput()}
+    </div>
+  );
+});
 
 QuestionDisplay.displayName = 'QuestionDisplay';
 
@@ -135,7 +230,7 @@ export default function ModuleInterface({ moduleId, userId }: ModuleInterfacePro
   const isMultipleChoice = useMemo(() => {
     if (!questions[currentQuestionIndex] ) return false;
     const currentQuestion = questions[currentQuestionIndex];
-    return currentQuestion.question_type === 'multiple_choice';
+    return currentQuestion.question_type === 'multiple_choice' || currentQuestion.question_type === 'true_false';
   }, [questions, currentQuestionIndex]);
 
   // Helper functions
@@ -158,10 +253,16 @@ export default function ModuleInterface({ moduleId, userId }: ModuleInterfacePro
   }, [randomizeOptions]);
 
   const getCorrectAnswer = useCallback((question: Question) => {
+    if (question.question_type === 'true_false') {
+      return question.correct_answer?.toLowerCase() === 'true' ? 'true' : 'false';
+    }
     return question.question_options?.find(opt => opt.is_correct)?.id || '';
   }, []);
 
   const getCorrectAnswerText = useCallback((question: Question) => {
+    if (question.question_type === 'true_false') {
+      return question.correct_answer?.toLowerCase() === 'true' ? 'True' : 'False';
+    }
     return question.question_options?.find(opt => opt.is_correct)?.option_text || '';
   }, []);
 
@@ -962,6 +1063,8 @@ public class Main {
                 onAnswerSelect={handleAnswerSelect}
                 selectedAnswer={selectedAnswer}
                 disabled={lockedQuestionIds.has(currentQuestion.id)}
+                typedAnswer={typedAnswer}
+                onTypedAnswerChange={setTypedAnswer}
               />
             </CardContent>
           </Card>
