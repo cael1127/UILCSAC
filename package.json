@@ -2,10 +2,8 @@
   "name": "uil-academy",
   "version": "0.1.0",
   "private": true,
-  "packageManager": "pnpm@9.9.0",
   "engines": {
-    "node": "20.18.0",
-    "pnpm": ">=9 <10"
+    "node": "20.18.0"
   },
   "scripts": {
     "build": "next build",
