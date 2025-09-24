@@ -199,7 +199,7 @@ export default function PracticeTestQuestionRenderer({
           </RadioGroup>
         )
 
-      case 'code':
+      case 'code_completion':
         return (
           <div className="border border-[var(--border)] rounded-lg overflow-hidden">
             <UnifiedJavaIDE
@@ -267,7 +267,7 @@ export default function PracticeTestQuestionRenderer({
       case 'multiple_choice': return <BookOpen className="h-5 w-5" />
       case 'short_answer': return <BookOpen className="h-5 w-5" />
       case 'calculation': return <Calculator className="h-5 w-5" />
-      case 'code': return <Code className="h-5 w-5" />
+      case 'code_completion': return <Code className="h-5 w-5" />
       case 'essay': return <BookOpen className="h-5 w-5" />
       case 'dictation': return <Volume2 className="h-5 w-5" />
       case 'text_analysis': return <BookOpen className="h-5 w-5" />
