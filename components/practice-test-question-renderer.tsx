@@ -217,7 +217,7 @@ export default function PracticeTestQuestionRenderer({
         return (
           <div className="space-y-4">
             <AudioPlayer 
-              src={question.media_url || ''} 
+              audioUrl={question.media_url || ''} 
               autoPlay={false}
             />
             <Input
