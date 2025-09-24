@@ -7,6 +7,7 @@ import { ArrowLeft, Code, Trophy, Clock, Target, BookOpen } from "lucide-react"
 import { signOut } from "@/lib/actions"
 import ProblemGrid from "@/components/problem-grid"
 import LearningPaths from "@/components/learning-paths"
+import ResourceViewer from "@/components/resource-viewer"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 // Force dynamic rendering for this page
@@ -210,7 +211,7 @@ export default async function ComputerScienceDashboard() {
 
         {/* Main Content Tabs */}
         <Tabs defaultValue="learning" className="space-y-8">
-          <TabsList className="grid w-full grid-cols-2 bg-[var(--card)] border border-[var(--border)] p-1 rounded-xl">
+          <TabsList className="grid w-full grid-cols-3 bg-[var(--card)] border border-[var(--border)] p-1 rounded-xl">
             <TabsTrigger 
               value="learning" 
               className="data-[state=active]:bg-[var(--primary)] data-[state=active]:text-[var(--primary-foreground)] rounded-lg transition-all duration-300"
@@ -222,6 +223,12 @@ export default async function ComputerScienceDashboard() {
               className="data-[state=active]:bg-[var(--primary)] data-[state=active]:text-[var(--primary-foreground)] rounded-lg transition-all duration-300"
             >
               Practice Problems
+            </TabsTrigger>
+            <TabsTrigger 
+              value="resources" 
+              className="data-[state=active]:bg-[var(--primary)] data-[state=active]:text-[var(--primary-foreground)] rounded-lg transition-all duration-300"
+            >
+              Resources
             </TabsTrigger>
           </TabsList>
 
@@ -243,6 +250,13 @@ export default async function ComputerScienceDashboard() {
               </Button>
             </div>
             <ProblemGrid userId={user.id} />
+          </TabsContent>
+
+          <TabsContent value="resources" className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h3 className="text-2xl font-bold text-[var(--foreground)]">CS Resources</h3>
+            </div>
+            <ResourceViewer subjectName="computer_science" />
           </TabsContent>
         </Tabs>
       </div>

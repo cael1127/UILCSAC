@@ -1089,7 +1089,12 @@ public class Main {
                   value={typedAnswer}
                   onChange={(e) => setTypedAnswer(e.target.value)}
                   placeholder="Type the exact output here"
-                  className="min-h-[120px]"
+                  className="min-h-[120px] w-full p-3 border border-[var(--border)] rounded-md bg-[var(--background)] text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-[var(--primary)]"
+                  style={{
+                    backgroundColor: 'var(--background)',
+                    color: 'var(--foreground)',
+                    borderColor: 'var(--border)'
+                  }}
                 />
               </CardContent>
             </Card>

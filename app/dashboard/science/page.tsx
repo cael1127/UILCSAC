@@ -7,6 +7,7 @@ import { ArrowLeft, Atom, Trophy, Clock, Target, BookOpen, Microscope, FlaskConi
 import { signOut } from "@/lib/actions"
 import LearningPaths from "@/components/learning-paths"
 import PracticeTestBrowser from "@/components/practice-test-browser"
+import ResourceViewer from "@/components/resource-viewer"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 // Force dynamic rendering for this page
@@ -239,41 +240,10 @@ export default async function ScienceDashboard() {
           </TabsContent>
 
           <TabsContent value="resources" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <FlaskConical className="h-5 w-5 text-[var(--primary)]" />
-                    Formula Reference
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-[var(--muted-foreground)] mb-4">
-                    Essential formulas for Physics, Chemistry, and Biology.
-                  </p>
-                  <Button variant="outline" className="w-full">
-                    View Formulas
-                  </Button>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Microscope className="h-5 w-5 text-[var(--primary)]" />
-                    Lab Simulations
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-[var(--muted-foreground)] mb-4">
-                    Interactive experiments and virtual lab activities.
-                  </p>
-                  <Button variant="outline" className="w-full">
-                    Start Lab
-                  </Button>
-                </CardContent>
-              </Card>
+            <div className="flex items-center justify-between">
+              <h3 className="text-2xl font-bold text-[var(--foreground)]">Science Resources</h3>
             </div>
+            <ResourceViewer subjectName="science" />
           </TabsContent>
         </Tabs>
       </div>

@@ -7,6 +7,7 @@ import { ArrowLeft, Calculator, Trophy, Clock, Target, BookOpen, Brain } from "l
 import { signOut } from "@/lib/actions"
 import LearningPaths from "@/components/learning-paths"
 import PracticeTestBrowser from "@/components/practice-test-browser"
+import ResourceViewer from "@/components/resource-viewer"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 // Force dynamic rendering for this page
@@ -239,41 +240,10 @@ export default async function MathematicsDashboard() {
           </TabsContent>
 
           <TabsContent value="resources" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Brain className="h-5 w-5 text-[var(--primary)]" />
-                    Mental Math Techniques
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-[var(--muted-foreground)] mb-4">
-                    Master quick calculation methods for Number Sense competitions.
-                  </p>
-                  <Button variant="outline" className="w-full">
-                    View Techniques
-                  </Button>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Calculator className="h-5 w-5 text-[var(--primary)]" />
-                    Formula Reference
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-[var(--muted-foreground)] mb-4">
-                    Essential formulas and shortcuts for UIL Math competitions.
-                  </p>
-                  <Button variant="outline" className="w-full">
-                    View Formulas
-                  </Button>
-                </CardContent>
-              </Card>
+            <div className="flex items-center justify-between">
+              <h3 className="text-2xl font-bold text-[var(--foreground)]">Math Resources</h3>
             </div>
+            <ResourceViewer subjectName="mathematics" />
           </TabsContent>
         </Tabs>
       </div>

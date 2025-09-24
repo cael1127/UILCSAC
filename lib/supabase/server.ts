@@ -49,13 +49,21 @@ export const createClient = cache(async (): Promise<any> => {
           get(name: string) {
             return cookieStore.get(name)?.value
           },
-          // No-ops in Server Components to comply with Next.js 15:
-          // Cookie writes must happen in Server Actions or Route Handlers.
-          set(_name: string, _value: string, _options: any) {
-            // intentionally empty
+          set(name: string, value: string, options: any) {
+            try {
+              cookieStore.set(name, value, options)
+            } catch (error) {
+              // Cookie setting might fail in some contexts, that's okay
+              console.warn('Could not set cookie in server component:', name)
+            }
           },
-          remove(_name: string, _options: any) {
-            // intentionally empty
+          remove(name: string, options: any) {
+            try {
+              cookieStore.set(name, '', { ...options, maxAge: 0 })
+            } catch (error) {
+              // Cookie removal might fail in some contexts, that's okay
+              console.warn('Could not remove cookie in server component:', name)
+            }
           },
         },
       }

@@ -7,6 +7,7 @@ import { ArrowLeft, SpellCheck, Trophy, Clock, Target, BookOpen, Volume2, Langua
 import { signOut } from "@/lib/actions"
 import LearningPaths from "@/components/learning-paths"
 import PracticeTestBrowser from "@/components/practice-test-browser"
+import ResourceViewer from "@/components/resource-viewer"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 // Force dynamic rendering for this page
@@ -239,41 +240,10 @@ export default async function SpellingDashboard() {
           </TabsContent>
 
           <TabsContent value="resources" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Volume2 className="h-5 w-5 text-[var(--primary)]" />
-                    Word Lists
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-[var(--muted-foreground)] mb-4">
-                    Official UIL spelling word lists with audio pronunciation.
-                  </p>
-                  <Button variant="outline" className="w-full">
-                    Practice Words
-                  </Button>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Languages className="h-5 w-5 text-[var(--primary)]" />
-                    Etymology Guide
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-[var(--muted-foreground)] mb-4">
-                    Learn word origins and roots to improve spelling accuracy.
-                  </p>
-                  <Button variant="outline" className="w-full">
-                    Study Roots
-                  </Button>
-                </CardContent>
-              </Card>
+            <div className="flex items-center justify-between">
+              <h3 className="text-2xl font-bold text-[var(--foreground)]">Spelling Resources</h3>
             </div>
+            <ResourceViewer subjectName="spelling" />
           </TabsContent>
         </Tabs>
       </div>

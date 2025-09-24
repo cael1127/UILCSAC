@@ -227,7 +227,12 @@ export default function EnhancedQuestionRenderer({
             onChange={(e) => setCurrentAnswer(e.target.value)}
             disabled={hasSubmitted}
             placeholder="Enter your answer..."
-            className="text-lg"
+            className="text-lg w-full p-3 border border-[var(--border)] rounded-md bg-[var(--background)] text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
+            style={{
+              backgroundColor: 'var(--background)',
+              color: 'var(--foreground)',
+              borderColor: 'var(--border)'
+            }}
           />
         )
 
@@ -239,7 +244,12 @@ export default function EnhancedQuestionRenderer({
             onChange={(e) => setCurrentAnswer(e.target.value)}
             disabled={hasSubmitted}
             placeholder="Write your response..."
-            className="min-h-[120px]"
+            className="min-h-[120px] w-full p-3 border border-[var(--border)] rounded-md bg-[var(--background)] text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
+            style={{
+              backgroundColor: 'var(--background)',
+              color: 'var(--foreground)',
+              borderColor: 'var(--border)'
+            }}
           />
         )
 
@@ -258,7 +268,12 @@ export default function EnhancedQuestionRenderer({
               onChange={(e) => setCurrentAnswer(e.target.value)}
               disabled={hasSubmitted}
               placeholder="Spell the word you heard..."
-              className="text-lg text-center"
+              className="text-lg text-center w-full p-3 border border-[var(--border)] rounded-md bg-[var(--background)] text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
+              style={{
+                backgroundColor: 'var(--background)',
+                color: 'var(--foreground)',
+                borderColor: 'var(--border)'
+              }}
             />
           </div>
         )
@@ -293,7 +308,12 @@ export default function EnhancedQuestionRenderer({
               onChange={(e) => setCurrentAnswer(e.target.value)}
               disabled={hasSubmitted}
               placeholder="Write your analysis..."
-              className="min-h-[120px]"
+              className="min-h-[120px] w-full p-3 border border-[var(--border)] rounded-md bg-[var(--background)] text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
+              style={{
+                backgroundColor: 'var(--background)',
+                color: 'var(--foreground)',
+                borderColor: 'var(--border)'
+              }}
             />
           </div>
         )
@@ -305,7 +325,12 @@ export default function EnhancedQuestionRenderer({
             onChange={(e) => setCurrentAnswer(e.target.value)}
             disabled={hasSubmitted}
             placeholder="Enter your answer..."
-            className="text-lg"
+            className="text-lg w-full p-3 border border-[var(--border)] rounded-md bg-[var(--background)] text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
+            style={{
+              backgroundColor: 'var(--background)',
+              color: 'var(--foreground)',
+              borderColor: 'var(--border)'
+            }}
           />
         )
     }

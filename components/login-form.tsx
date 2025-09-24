@@ -67,8 +67,9 @@ export default function LoginForm() {
           setError("Invalid email or password. Please check your credentials.")
         }
       } else {
-        // Redirect to success page
-        router.push("/auth/sign-in-success")
+        // Redirect directly to dashboard
+        router.push("/dashboard")
+        router.refresh() // Force a refresh to update auth state
       }
     } catch (error) {
       setError("An unexpected error occurred")
