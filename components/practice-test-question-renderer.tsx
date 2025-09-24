@@ -102,14 +102,14 @@ export default function PracticeTestQuestionRenderer({
       case 'chemistry':
         return (
           <MathJaxProvider>
-            <ChemistryRenderer content={content} className="text-lg" />
+            <ChemistryRenderer formula={content} className="text-lg" />
           </MathJaxProvider>
         )
       
       case 'physics':
         return (
           <MathJaxProvider>
-            <PhysicsEquation content={content} className="text-lg" />
+            <PhysicsEquation equation={content} className="text-lg" />
           </MathJaxProvider>
         )
       
