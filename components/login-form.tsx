@@ -19,27 +19,16 @@ export default function LoginForm() {
   const router = useRouter()
 
   useEffect(() => {
-    // Check if user is already logged in
+    // Check if user is already logged in and redirect if so
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession()
       if (session) {
-        // Auto-redirect to dashboard if already logged in
         router.push("/dashboard")
         router.refresh()
       }
     }
     
     checkSession()
-
-    // Listen for auth state changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event: string, session: any) => {
-      if (event === 'SIGNED_IN' && session) {
-        router.push("/dashboard")
-        router.refresh()
-      }
-    })
-
-    return () => subscription.unsubscribe()
   }, [router])
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -78,7 +67,8 @@ export default function LoginForm() {
           setError("Invalid email or password. Please check your credentials.")
         }
       } else {
-        // Redirect directly to dashboard
+        // Sign in successful - redirect to dashboard
+        console.log("Sign in successful, redirecting to dashboard")
         router.push("/dashboard")
         router.refresh() // Force a refresh to update auth state
       }

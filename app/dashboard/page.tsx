@@ -8,6 +8,7 @@ import { signOut } from "@/lib/actions"
 import SubjectSelector from "@/components/subject-selector"
 import TeacherDashboard from "@/components/teacher-dashboard"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import ClientAuthCheck from "@/components/client-auth-check"
 
 // Force dynamic rendering for this page
 export const dynamic = 'force-dynamic'
@@ -80,6 +81,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-[var(--background)] transition-colors duration-300">
+      <ClientAuthCheck />
       {/* Enhanced Header */}
       <header className="border-b border-[var(--border)] bg-[var(--card)] shadow-sm backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

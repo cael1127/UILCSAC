@@ -57,24 +57,7 @@ export async function updateSession(request: NextRequest) {
       return NextResponse.redirect(new URL("/dashboard", request.url))
     }
 
-    // Get the current session to check authentication
-    const { data: { session } } = await supabase.auth.getSession()
-
-    // Simple route protection
-    const protectedRoutes = ['/dashboard', '/learning', '/problems', '/practice-test']
-    const isProtectedRoute = protectedRoutes.some(route => url.pathname.startsWith(route))
-    
-    if (isProtectedRoute && !session) {
-      return NextResponse.redirect(new URL('/auth/login', request.url))
-    }
-
-    // Redirect authenticated users away from auth pages
-    const authRoutes = ['/auth/login', '/auth/sign-up']
-    const isAuthRoute = authRoutes.some(route => url.pathname.startsWith(route))
-    
-    if (isAuthRoute && session) {
-      return NextResponse.redirect(new URL('/dashboard', request.url))
-    }
+    // Let client-side handle authentication checks to avoid middleware issues
 
     return supabaseResponse
   } catch (error) {
