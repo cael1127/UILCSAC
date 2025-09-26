@@ -11,7 +11,8 @@ import { Separator } from '@/components/ui/separator';
 import { ArrowLeft, ArrowRight, CheckCircle, XCircle, Play, RotateCcw, Zap, Clock, Code } from 'lucide-react';
 import { UnifiedJavaIDE } from '@/components/unified-java-ide';
 import { supabase } from '@/lib/supabase/client';
-import { LoadingSpinner, Skeleton, ContentLoader } from '@/components/ui/loading-spinner';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { Skeleton } from '@/components/ui/skeleton';
 import EnhancedQuestionRenderer from '@/components/enhanced-question-renderer';
 import type { EnhancedQuestion } from '@/lib/types/subjects';
 
