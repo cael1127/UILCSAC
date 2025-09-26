@@ -9,7 +9,6 @@ const nextConfig = {
   // Performance optimizations
   experimental: {
     optimizePackageImports: ['@radix-ui/react-icons', 'lucide-react'],
-    serverComponentsExternalPackages: ['@supabase/supabase-js'],
     turbo: {
       rules: {
         '*.svg': {
@@ -19,6 +18,9 @@ const nextConfig = {
       },
     },
   },
+  
+  // External packages for server components (moved from experimental in Next.js 15.2.4)
+  serverExternalPackages: ['@supabase/supabase-js'],
   
   // Ensure proper environment variable handling
   env: {
