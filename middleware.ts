@@ -18,5 +18,5 @@ export const config = {
   ],
 }
 
-// Ensure Edge Runtime compatibility
-export const runtime = 'edge'
+// Note: Edge runtime removed as it's experimental and causes build failures on Netlify
+// The middleware will use the default Node.js runtime
