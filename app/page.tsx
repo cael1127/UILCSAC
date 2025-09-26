@@ -59,7 +59,7 @@ export default function HomePage() {
               <Button asChild variant="outline" size="lg" className="btn-outline hover-lift" style={{ color: 'var(--foreground)' }}>
                 <Link href="/auth/login" className="flex items-center px-8 py-4 text-lg">
                   <Play className="mr-2 h-5 w-5" />
-                  Start Learning
+                  Sign In
                 </Link>
               </Button>
             </div>

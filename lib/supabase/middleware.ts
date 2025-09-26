@@ -57,27 +57,23 @@ export async function updateSession(request: NextRequest) {
       return NextResponse.redirect(new URL("/dashboard", request.url))
     }
 
-    // Simple route protection without auth check to avoid Edge Runtime issues
+    // Get the current session to check authentication
+    const { data: { session } } = await supabase.auth.getSession()
+
+    // Simple route protection
     const protectedRoutes = ['/dashboard', '/learning', '/problems', '/practice-test']
     const isProtectedRoute = protectedRoutes.some(route => url.pathname.startsWith(route))
     
-    if (isProtectedRoute) {
-      // Check for auth token in cookies instead of making API call
-      const authToken = request.cookies.get('sb-access-token')?.value
-      if (!authToken) {
-        return NextResponse.redirect(new URL('/auth/login', request.url))
-      }
+    if (isProtectedRoute && !session) {
+      return NextResponse.redirect(new URL('/auth/login', request.url))
     }
 
     // Redirect authenticated users away from auth pages
     const authRoutes = ['/auth/login', '/auth/sign-up']
     const isAuthRoute = authRoutes.some(route => url.pathname.startsWith(route))
     
-    if (isAuthRoute) {
-      const authToken = request.cookies.get('sb-access-token')?.value
-      if (authToken) {
-        return NextResponse.redirect(new URL('/dashboard', request.url))
-      }
+    if (isAuthRoute && session) {
+      return NextResponse.redirect(new URL('/dashboard', request.url))
     }
 
     return supabaseResponse

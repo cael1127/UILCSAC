@@ -23,13 +23,24 @@ export default function LoginForm() {
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession()
       if (session) {
-        // Don't auto-redirect, let user choose to stay or go to dashboard
-        console.log("User already has an active session")
+        // Auto-redirect to dashboard if already logged in
+        router.push("/dashboard")
+        router.refresh()
       }
     }
     
     checkSession()
-  }, [])
+
+    // Listen for auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event: string, session: any) => {
+      if (event === 'SIGNED_IN' && session) {
+        router.push("/dashboard")
+        router.refresh()
+      }
+    })
+
+    return () => subscription.unsubscribe()
+  }, [router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
