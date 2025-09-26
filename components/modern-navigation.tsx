@@ -82,31 +82,35 @@ export default function ModernNavigation({ user, onLogout }: ModernNavigationPro
   ];
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60" role="navigation" aria-label="Primary">
+    <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-all duration-300" role="navigation" aria-label="Primary">
       <div className="container-modern">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <div className="flex items-center space-x-2">
-            <Link href="/" className="flex items-center space-x-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-                <Code className="h-5 w-5 text-primary-foreground" />
+            <Link href="/" className="flex items-center space-x-2 group transition-all duration-300 hover:scale-105">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary transition-all duration-300 group-hover:shadow-lg group-hover:shadow-primary/25 group-hover:rotate-3">
+                <Code className="h-5 w-5 text-primary-foreground transition-transform duration-300 group-hover:scale-110" />
               </div>
-              <span className="text-lg font-semibold text-foreground">UIL Academy</span>
+              <span className="text-lg font-semibold text-foreground transition-colors duration-300 group-hover:text-primary">UIL Academy</span>
             </Link>
           </div>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            {navigation.map((item) => {
+            {navigation.map((item, index) => {
               const Icon = item.icon;
               return (
                 <Link
                   key={item.name}
                   href={item.href}
-                  className="flex items-center space-x-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                  className="group flex items-center space-x-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-all duration-300 relative py-2 px-3 rounded-lg hover:bg-muted/50"
+                  style={{ animationDelay: `${index * 100}ms` }}
                 >
-                  <Icon className="h-4 w-4" />
-                  <span>{item.name}</span>
+                  <Icon className="h-4 w-4 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3" />
+                  <span className="relative">
+                    {item.name}
+                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+                  </span>
                 </Link>
               );
             })}
@@ -115,12 +119,12 @@ export default function ModernNavigation({ user, onLogout }: ModernNavigationPro
           {/* User Menu / Auth Buttons */}
           <div className="hidden md:flex items-center space-x-4">
             {authUser ? (
-              <div className="flex items-center space-x-4">
-                <div className="flex items-center space-x-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
-                    <User className="h-4 w-4 text-primary" />
+              <div className="flex items-center space-x-4 animate-fade-in">
+                <div className="flex items-center space-x-2 group">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 transition-all duration-300 group-hover:bg-primary/20 group-hover:scale-110">
+                    <User className="h-4 w-4 text-primary transition-transform duration-300 group-hover:rotate-12" />
                   </div>
-                  <span className="text-sm font-medium text-foreground">
+                  <span className="text-sm font-medium text-foreground transition-colors duration-300 group-hover:text-primary">
                     {authUser.name || authUser.email}
                   </span>
                 </div>
@@ -128,18 +132,18 @@ export default function ModernNavigation({ user, onLogout }: ModernNavigationPro
                   variant="outline"
                   size="sm"
                   onClick={handleLogout}
-                  className="btn-outline"
+                  className="btn-outline btn-interactive hover:bg-destructive/10 hover:border-destructive hover:text-destructive transition-all duration-300"
                 >
-                  <LogOut className="h-4 w-4 mr-2" />
+                  <LogOut className="h-4 w-4 mr-2 transition-transform duration-300 group-hover:rotate-12" />
                   Sign Out
                 </Button>
               </div>
             ) : (
-              <div className="flex items-center space-x-2">
-                <Button asChild variant="outline" size="sm" className="btn-outline">
+              <div className="flex items-center space-x-2 animate-fade-in">
+                <Button asChild variant="outline" size="sm" className="btn-outline btn-interactive">
                   <Link href="/auth/login">Sign In</Link>
                 </Button>
-                <Button asChild size="sm" className="btn-primary">
+                <Button asChild size="sm" className="btn-primary btn-interactive hover:shadow-lg hover:shadow-primary/25">
                   <Link href="/auth/sign-up">Get Started</Link>
                 </Button>
               </div>
@@ -168,18 +172,19 @@ export default function ModernNavigation({ user, onLogout }: ModernNavigationPro
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div id="mobile-menu" className="md:hidden border-t bg-background">
+          <div id="mobile-menu" className="md:hidden border-t bg-background animate-slide-up">
             <div className="space-y-1 px-2 pb-3 pt-2">
-              {navigation.map((item) => {
+              {navigation.map((item, index) => {
                 const Icon = item.icon;
                 return (
                   <Link
                     key={item.name}
                     href={item.href}
-                    className="flex items-center space-x-2 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
+                    className="group flex items-center space-x-2 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-all duration-300 animate-fade-in"
+                    style={{ animationDelay: `${index * 100}ms` }}
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    <Icon className="h-4 w-4" />
+                    <Icon className="h-4 w-4 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3" />
                     <span>{item.name}</span>
                   </Link>
                 );

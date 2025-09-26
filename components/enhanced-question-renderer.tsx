@@ -365,20 +365,22 @@ export default function EnhancedQuestionRenderer({
   }
 
   return (
-    <Card className={`enhanced-question-renderer ${className}`}>
-      <CardHeader>
+    <Card className={`enhanced-question-renderer ${className} animate-fade-in hover-lift`}>
+      <CardHeader className="relative">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            {getQuestionTypeIcon()}
-            <CardTitle className="text-xl">
+            <div className="p-2 rounded-lg bg-primary/10 transition-all duration-300 group-hover:scale-110 group-hover:rotate-3">
+              {getQuestionTypeIcon()}
+            </div>
+            <CardTitle className="text-xl transition-colors duration-300">
               Question {question.order_index}
             </CardTitle>
           </div>
           <div className="flex items-center gap-2">
-            <Badge className={getDifficultyColor()}>
+            <Badge className={`${getDifficultyColor()} transition-all duration-300 hover:scale-105`}>
               Level {question.difficulty_level}
             </Badge>
-            <Badge variant="outline">
+            <Badge variant="outline" className="transition-all duration-300 hover:scale-105">
               {question.points} point{question.points !== 1 ? 's' : ''}
             </Badge>
           </div>
@@ -386,12 +388,12 @@ export default function EnhancedQuestionRenderer({
         
         {/* Timer */}
         {timeLeft && timeLeft > 0 && !hasSubmitted && (
-          <div className="flex items-center gap-2 text-sm">
-            <Clock className="h-4 w-4" />
-            <span>Time remaining: {formatTime(timeLeft)}</span>
+          <div className="flex items-center gap-2 text-sm animate-pulse-glow">
+            <Clock className="h-4 w-4 text-warning animate-pulse" />
+            <span className="font-medium">Time remaining: {formatTime(timeLeft)}</span>
             <Progress 
               value={(timeLeft / (question.time_limit_seconds || 60)) * 100} 
-              className="flex-1 h-2"
+              className="flex-1 h-2 transition-all duration-1000"
             />
           </div>
         )}
@@ -413,25 +415,26 @@ export default function EnhancedQuestionRenderer({
           <Button 
             onClick={handleSubmit}
             disabled={!currentAnswer.trim()}
-            className="w-full"
+            className="w-full btn-interactive group"
             size="lg"
           >
             Submit Answer
+            <span className="ml-2 transition-transform duration-300 group-hover:translate-x-1">→</span>
           </Button>
         )}
 
         {/* Result Display */}
         {hasSubmitted && (
-          <div className="result-section">
-            <div className={`flex items-center gap-2 p-4 rounded-lg ${
+          <div className="result-section animate-bounce-in">
+            <div className={`flex items-center gap-2 p-4 rounded-lg transition-all duration-500 ${
               currentAnswer.trim() === question.correct_answer?.trim()
-                ? 'bg-green-100 text-green-800'
-                : 'bg-red-100 text-red-800'
+                ? 'bg-green-100 text-green-800 border border-green-200'
+                : 'bg-red-100 text-red-800 border border-red-200'
             }`}>
               {currentAnswer.trim() === question.correct_answer?.trim() ? (
-                <CheckCircle className="h-5 w-5" />
+                <CheckCircle className="h-5 w-5 animate-bounce-in" />
               ) : (
-                <XCircle className="h-5 w-5" />
+                <XCircle className="h-5 w-5 animate-bounce-in" />
               )}
               <span className="font-medium">
                 {currentAnswer.trim() === question.correct_answer?.trim() 
@@ -440,7 +443,7 @@ export default function EnhancedQuestionRenderer({
                 }
               </span>
               {currentAnswer.trim() !== question.correct_answer?.trim() && (
-                <span className="ml-2">
+                <span className="ml-2 animate-fade-in">
                   Correct answer: {question.correct_answer}
                 </span>
               )}

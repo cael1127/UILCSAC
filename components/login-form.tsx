@@ -79,17 +79,19 @@ export default function LoginForm() {
   }
 
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle style={{ color: 'var(--foreground)' }}>Sign In</CardTitle>
-        <CardDescription style={{ color: 'var(--muted-foreground)' }}>
+    <Card className="w-full max-w-md mx-auto animate-fade-in hover-lift">
+      <CardHeader className="text-center">
+        <CardTitle style={{ color: 'var(--foreground)' }} className="text-xl sm:text-2xl font-bold">
+          Welcome Back
+        </CardTitle>
+        <CardDescription style={{ color: 'var(--muted-foreground)' }} className="text-sm sm:text-base">
           Enter your credentials to access your account
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
+      <CardContent className="px-4 sm:px-6">
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
           {error && (
-            <Alert variant="destructive">
+            <Alert variant="destructive" className="animate-bounce-in">
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
@@ -97,7 +99,9 @@ export default function LoginForm() {
 
 
           <div className="space-y-2">
-            <Label htmlFor="email" style={{ color: 'var(--foreground)' }}>Email</Label>
+            <Label htmlFor="email" style={{ color: 'var(--foreground)' }} className="text-sm font-medium">
+              Email Address
+            </Label>
             <Input
               id="email"
               type="email"
@@ -106,11 +110,14 @@ export default function LoginForm() {
               onChange={(e) => setEmail(e.target.value)}
               required
               style={{ color: 'var(--foreground)' }}
+              className="transition-all duration-300 focus:ring-2 focus:ring-primary/20 focus:border-primary"
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password" style={{ color: 'var(--foreground)' }}>Password</Label>
+            <Label htmlFor="password" style={{ color: 'var(--foreground)' }} className="text-sm font-medium">
+              Password
+            </Label>
             <Input
               id="password"
               type="password"
@@ -119,23 +126,45 @@ export default function LoginForm() {
               onChange={(e) => setPassword(e.target.value)}
               required
               style={{ color: 'var(--foreground)' }}
+              className="transition-all duration-300 focus:ring-2 focus:ring-primary/20 focus:border-primary"
             />
           </div>
 
-          <Button type="submit" className="w-full" disabled={loading} style={{ backgroundColor: 'var(--primary)', color: 'var(--primary-foreground)' }}>
-            {loading ? "Signing in..." : "Sign In"}
+          <Button 
+            type="submit" 
+            className="w-full btn-interactive group" 
+            disabled={loading} 
+            style={{ backgroundColor: 'var(--primary)', color: 'var(--primary-foreground)' }}
+          >
+            {loading ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                Signing in...
+              </>
+            ) : (
+              <>
+                Sign In
+                <span className="ml-2 transition-transform duration-300 group-hover:translate-x-1">→</span>
+              </>
+            )}
           </Button>
 
-          <div className="text-center text-sm space-y-2">
+          <div className="text-center text-sm space-y-3">
             <div>
               <span style={{ color: 'var(--muted-foreground)' }}>Don't have an account? </span>
-              <Link href="/auth/sign-up" className="text-[var(--primary)] hover:underline">
+              <Link 
+                href="/auth/sign-up" 
+                className="text-[var(--primary)] hover:underline transition-all duration-300 hover:text-[var(--accent)]"
+              >
                 Sign up
               </Link>
             </div>
             <div>
               <span style={{ color: 'var(--muted-foreground)' }}>Already logged in? </span>
-              <Link href="/dashboard" className="text-[var(--primary)] hover:underline">
+              <Link 
+                href="/dashboard" 
+                className="text-[var(--primary)] hover:underline transition-all duration-300 hover:text-[var(--accent)]"
+              >
                 Go to Dashboard
               </Link>
             </div>

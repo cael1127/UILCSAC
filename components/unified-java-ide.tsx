@@ -650,24 +650,24 @@ export const UnifiedJavaIDE = React.memo(function UnifiedJavaIDE({
   };
 
   return (
-    <div className="space-modern">
+    <div className="space-modern animate-fade-in">
       {/* Modern Header */}
-      <div className="card-modern shadow-modern">
+      <div className="card-modern shadow-modern hover-lift">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-              <Code className="h-5 w-5 text-primary" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 transition-all duration-300 hover:scale-110 hover:rotate-3">
+              <Code className="h-5 w-5 text-primary transition-transform duration-300" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-foreground">Java IDE</h2>
+              <h2 className="text-lg font-semibold text-foreground transition-colors duration-300">Java IDE</h2>
               <p className="text-sm text-muted-foreground">
                 Enhanced runtime with advanced features • {questionTitle || 'Practice Problem'}
               </p>
             </div>
           </div>
           <div className="flex items-center space-x-2">
-            <div className="flex items-center space-x-2 rounded-full bg-success/10 px-3 py-1">
-              <div className="w-2 h-2 rounded-full bg-success"></div>
+            <div className="flex items-center space-x-2 rounded-full bg-success/10 px-3 py-1 animate-pulse-glow">
+              <div className="w-2 h-2 rounded-full bg-success animate-pulse"></div>
               <span className="text-xs font-medium text-success">Ready</span>
             </div>
           </div>
@@ -691,29 +691,29 @@ export const UnifiedJavaIDE = React.memo(function UnifiedJavaIDE({
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-2 flex-wrap justify-end">
+            <div className="flex items-center gap-2 flex-wrap justify-end flex-col sm:flex-row">
               <Button
                 onClick={copyCode}
                 variant="outline"
                 size="sm"
-                className="btn-outline"
+                className="btn-outline btn-interactive group w-full sm:w-auto"
               >
-                <Copy className="h-4 w-4 mr-2" />
+                <Copy className="h-4 w-4 mr-2 transition-transform duration-300 group-hover:scale-110" />
                 Copy
               </Button>
               <Button
                 onClick={resetCode}
                 variant="outline"
                 size="sm"
-                className="btn-outline"
+                className="btn-outline btn-interactive group w-full sm:w-auto"
               >
-                <RotateCcw className="h-4 w-4 mr-2" />
+                <RotateCcw className="h-4 w-4 mr-2 transition-transform duration-300 group-hover:rotate-180" />
                 Reset
               </Button>
               <Button
                 onClick={() => executeCode()}
                 disabled={isExecuting || !code.trim()}
-                className="btn-primary"
+                className="btn-primary btn-interactive group hover:shadow-lg hover:shadow-primary/25 w-full sm:w-auto"
               >
                 {isExecuting ? (
                   <>
@@ -722,7 +722,7 @@ export const UnifiedJavaIDE = React.memo(function UnifiedJavaIDE({
                   </>
                 ) : (
                   <>
-                    <Play className="h-4 w-4 mr-2" />
+                    <Play className="h-4 w-4 mr-2 transition-transform duration-300 group-hover:scale-110" />
                     Run Code
                   </>
                 )}
@@ -798,8 +798,14 @@ export const UnifiedJavaIDE = React.memo(function UnifiedJavaIDE({
                   className="min-h-[80px] font-mono text-sm"
                 />
               </div>
-              <Button onClick={runCustomTest} disabled={isExecuting || !code.trim()} aria-busy={isExecuting} aria-live="polite">
-                <Play className="h-4 w-4 mr-2" />
+              <Button 
+                onClick={runCustomTest} 
+                disabled={isExecuting || !code.trim()} 
+                aria-busy={isExecuting} 
+                aria-live="polite"
+                className="btn-interactive group"
+              >
+                <Play className="h-4 w-4 mr-2 transition-transform duration-300 group-hover:scale-110" />
                 {isExecuting ? 'Running...' : 'Run Custom Test'}
               </Button>
               {customOutput && (
@@ -813,8 +819,14 @@ export const UnifiedJavaIDE = React.memo(function UnifiedJavaIDE({
             </TabsContent>
 
             <TabsContent value="samples" className="space-y-4">
-              <Button onClick={runSampleTests} disabled={isExecuting || !code.trim()} aria-busy={isExecuting} aria-live="polite">
-                <Play className="h-4 w-4 mr-2" />
+              <Button 
+                onClick={runSampleTests} 
+                disabled={isExecuting || !code.trim()} 
+                aria-busy={isExecuting} 
+                aria-live="polite"
+                className="btn-interactive group"
+              >
+                <Play className="h-4 w-4 mr-2 transition-transform duration-300 group-hover:scale-110" />
                 {isExecuting ? 'Running...' : 'Run Sample Tests'}
               </Button>
               {testResults.length > 0 && (

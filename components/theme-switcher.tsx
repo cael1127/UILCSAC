@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Palette, Sun, Moon, Zap, Waves, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -68,8 +68,9 @@ export default function ThemeSwitcher() {
   const [currentTheme, setCurrentTheme] = useState('theme-ut-orange')
   const [isVisible, setIsVisible] = useState(false)
   const [isChanging, setIsChanging] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
 
-    useEffect(() => {
+  useEffect(() => {
     // Load saved theme from localStorage
     const savedTheme = localStorage.getItem('selected-theme')
     if (savedTheme && themes.some(theme => theme.id === savedTheme)) {
@@ -80,6 +81,20 @@ export default function ThemeSwitcher() {
       applyTheme('theme-ut-orange')
     }
   }, [])
+
+  // Handle click outside to close
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setIsVisible(false)
+      }
+    }
+
+    if (isVisible) {
+      document.addEventListener('mousedown', handleClickOutside)
+      return () => document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [isVisible])
 
   const applyTheme = (themeId: string) => {
     try {
@@ -117,12 +132,12 @@ export default function ThemeSwitcher() {
 
 
   return (
-    <div className="fixed bottom-6 right-6 z-50">
+    <div ref={containerRef} className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50">
       {/* Enhanced Toggle Button */}
       <Button
         onClick={toggleVisibility}
         className={`
-          relative overflow-hidden rounded-full w-14 h-14 shadow-xl
+          relative overflow-hidden rounded-full w-12 h-12 sm:w-14 sm:h-14 shadow-xl
           ${currentTheme === 'theme-ut-orange' ? 'bg-ut-orange hover:bg-ut-orange/90' : 
             currentTheme === 'theme-maroon' ? 'bg-falu-red hover:bg-falu-red/90' :
             currentTheme === 'theme-warm-sunset' ? 'bg-bittersweet hover:bg-bittersweet/90' :
@@ -132,7 +147,7 @@ export default function ThemeSwitcher() {
         `}
         title="Switch Theme"
       >
-        <Palette className="w-6 h-6" />
+        <Palette className="w-5 h-5 sm:w-6 sm:h-6" />
         {isChanging && (
           <div className="absolute inset-0 bg-[var(--muted)]/20 rounded-full animate-pulse" />
         )}
@@ -140,17 +155,18 @@ export default function ThemeSwitcher() {
 
       {/* Enhanced Theme Selection Panel */}
       {isVisible && (
-        <div className="absolute bottom-20 right-0 w-96 animate-slide-up">
+        <div className="absolute bottom-16 right-[-1rem] sm:right-0 w-80 sm:w-96 max-w-[calc(100vw-2rem)] animate-slide-up">
           <Card className="w-full shadow-2xl border-0 bg-[var(--card)]/95 backdrop-blur-sm">
             <CardHeader className="pb-4">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-xl flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500">
-                    <Palette className="w-5 h-5 text-smoky-black" />
+                <CardTitle className="text-lg sm:text-xl flex items-center gap-2 sm:gap-3">
+                  <div className="p-1.5 sm:p-2 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500">
+                    <Palette className="w-4 h-4 sm:w-5 sm:h-5 text-smoky-black" />
                   </div>
-                  Choose Your Theme
+                  <span className="hidden sm:inline">Choose Your Theme</span>
+                  <span className="sm:hidden">Themes</span>
                   {isChanging && (
-                    <Badge variant="secondary" className="animate-pulse">
+                    <Badge variant="secondary" className="animate-pulse text-xs">
                       Changing...
                     </Badge>
                   )}
@@ -165,7 +181,7 @@ export default function ThemeSwitcher() {
                   ×
                 </Button>
               </div>
-              <div className="text-sm text-[var(--muted-foreground)] mt-2">
+              <div className="text-xs sm:text-sm text-[var(--muted-foreground)] mt-2">
                 Current: <span className="font-medium">{themes.find(t => t.id === currentTheme)?.name}</span>
               </div>
             </CardHeader>
@@ -181,27 +197,27 @@ export default function ThemeSwitcher() {
                     onClick={() => changeTheme(theme.id)}
                     variant="ghost"
                     className={`
-                      w-full justify-start h-auto p-4 rounded-xl transition-all duration-300
+                      w-full justify-start h-auto p-3 sm:p-4 rounded-xl transition-all duration-300
                       ${isActive 
                         ? 'bg-gradient-to-r from-[var(--muted)] to-[var(--muted)] border-2 border-[var(--border)] shadow-md' 
                         : 'hover:bg-[var(--muted)] border-2 border-transparent hover:border-[var(--border)]'
                       }
                     `}
                   >
-                    <div className="flex items-center gap-4 w-full">
+                    <div className="flex items-center gap-3 sm:gap-4 w-full">
                       {/* Theme Preview Circle */}
                       <div 
-                        className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg"
+                        className="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center shadow-lg flex-shrink-0"
                         style={{ background: theme.preview }}
                       >
-                        <IconComponent className="w-6 h-6 text-smoky-black drop-shadow-sm" />
+                        <IconComponent className="w-5 h-5 sm:w-6 sm:h-6 text-smoky-black drop-shadow-sm" />
                       </div>
                       
-                      <div className="flex-1 text-left">
-                        <div className="flex items-center gap-2">
-                          <div className="font-semibold text-[var(--foreground)]">{theme.name}</div>
+                      <div className="flex-1 text-left min-w-0">
+                        <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
+                          <div className="font-semibold text-[var(--foreground)] text-sm sm:text-base truncate">{theme.name}</div>
                           {theme.isDefault && (
-                            <Badge variant="secondary" className="text-xs">
+                            <Badge variant="secondary" className="text-xs hidden sm:inline-flex">
                               Default
                             </Badge>
                           )}
@@ -211,11 +227,11 @@ export default function ThemeSwitcher() {
                             </Badge>
                           )}
                         </div>
-                        <div className="text-sm text-[var(--muted-foreground)] mt-1 line-clamp-2">{theme.description}</div>
+                        <div className="text-xs sm:text-sm text-[var(--muted-foreground)] mt-1 line-clamp-2 hidden sm:block">{theme.description}</div>
                       </div>
                       
                       {isActive && (
-                        <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse" />
+                        <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-green-500 animate-pulse flex-shrink-0" />
                       )}
                     </div>
                   </Button>
@@ -223,9 +239,10 @@ export default function ThemeSwitcher() {
               })}
               
               {/* Theme Info */}
-              <div className="mt-6 p-4 bg-[var(--muted)] rounded-lg">
-                <div className="text-sm text-[var(--muted-foreground)]">
-                  <strong>💡 Tip:</strong> Your theme preference is saved automatically and will persist across sessions.
+              <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-[var(--muted)] rounded-lg">
+                <div className="text-xs sm:text-sm text-[var(--muted-foreground)]">
+                  <strong>💡 Tip:</strong> <span className="hidden sm:inline">Your theme preference is saved automatically and will persist across sessions.</span>
+                  <span className="sm:hidden">Theme saved automatically.</span>
                 </div>
               </div>
             </CardContent>

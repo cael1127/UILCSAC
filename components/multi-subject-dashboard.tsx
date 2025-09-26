@@ -147,17 +147,32 @@ export default function MultiSubjectDashboard({ userId }: MultiSubjectDashboardP
 
   if (loading) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-8 animate-fade-in">
+        {/* Header Skeleton */}
+        <div className="text-center space-y-4">
+          <div className="skeleton skeleton-text mx-auto w-96 h-12"></div>
+          <div className="skeleton skeleton-text mx-auto w-2/3 h-6"></div>
+        </div>
+        
+        {/* Subject Cards Skeleton */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[1, 2, 3, 4, 5].map((i) => (
             <Card key={i} className="animate-pulse">
-              <CardHeader>
-                <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <div className="skeleton skeleton-avatar"></div>
+                  <div className="skeleton skeleton-text w-20 h-6"></div>
+                </div>
+                <div className="skeleton skeleton-text w-3/4 h-6"></div>
+                <div className="skeleton skeleton-text w-1/2 h-4"></div>
               </CardHeader>
-              <CardContent>
-                <div className="h-2 bg-gray-200 rounded w-full mb-4"></div>
-                <div className="h-8 bg-gray-200 rounded w-full"></div>
+              <CardContent className="space-y-4">
+                <div className="skeleton skeleton-text w-full h-2"></div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="skeleton skeleton-text w-full h-16"></div>
+                  <div className="skeleton skeleton-text w-full h-16"></div>
+                </div>
+                <div className="skeleton skeleton-button"></div>
               </CardContent>
             </Card>
           ))}
@@ -167,38 +182,45 @@ export default function MultiSubjectDashboard({ userId }: MultiSubjectDashboardP
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 animate-fade-in">
       {/* Header */}
-      <div className="text-center space-y-4">
-        <h1 className="text-4xl font-bold text-[var(--foreground)]">
+      <div className="text-center space-y-4 animate-slide-up">
+        <h1 className="text-4xl font-bold text-[var(--foreground)] bg-gradient-to-r from-[var(--primary)] to-[var(--accent)] bg-clip-text text-transparent">
           UIL Academy Dashboard
         </h1>
-        <p className="text-xl text-[var(--muted-foreground)] max-w-3xl mx-auto">
+        <p className="text-xl text-[var(--muted-foreground)] max-w-3xl mx-auto leading-relaxed">
           Master all UIL subjects with comprehensive learning paths, practice tests, and progress tracking
         </p>
       </div>
 
       {/* Subject Overview Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {subjectStats.map((stats) => {
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        {subjectStats.map((stats, index) => {
           const IconComponent = getSubjectIcon(stats.subject.name)
           const progress = calculateOverallProgress(stats)
           
           return (
-            <Card key={stats.subject.id} className="hover:shadow-lg transition-all duration-300 group cursor-pointer">
+            <Card 
+              key={stats.subject.id} 
+              className="hover-lift group cursor-pointer animate-scale-in"
+              style={{ animationDelay: `${index * 150}ms` }}
+            >
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
-                  <div className={`p-3 rounded-xl ${getSubjectColorClass(stats.subject.color_theme)}`}>
-                    <IconComponent className="h-6 w-6" />
+                  <div className={`p-3 rounded-xl ${getSubjectColorClass(stats.subject.color_theme)} transition-all duration-300 group-hover:scale-110 group-hover:rotate-3`}>
+                    <IconComponent className="h-6 w-6 transition-transform duration-300" />
                   </div>
-                  <Badge variant="secondary" className="text-xs">
+                  <Badge 
+                    variant="secondary" 
+                    className="text-xs transition-all duration-300 group-hover:scale-105"
+                  >
                     {progress}% Complete
                   </Badge>
                 </div>
-                <CardTitle className="text-xl group-hover:text-[var(--primary)] transition-colors">
+                <CardTitle className="text-xl group-hover:text-[var(--primary)] transition-colors duration-300">
                   {stats.subject.display_name}
                 </CardTitle>
-                <CardDescription className="text-sm">
+                <CardDescription className="text-sm leading-relaxed">
                   {stats.subject.description}
                 </CardDescription>
               </CardHeader>
@@ -233,17 +255,22 @@ export default function MultiSubjectDashboard({ userId }: MultiSubjectDashboardP
                 <div className="flex gap-2 pt-2">
                   <Button 
                     asChild 
-                    className="flex-1" 
+                    className="flex-1 btn-interactive group" 
                     variant={progress > 0 ? "default" : "outline"}
                   >
                     <Link href={`/learning?subject=${stats.subject.name}`}>
                       {progress > 0 ? "Continue" : "Start Learning"}
-                      <ChevronRight className="ml-2 h-4 w-4" />
+                      <ChevronRight className="ml-2 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
                     </Link>
                   </Button>
-                  <Button asChild variant="ghost" size="sm">
+                  <Button 
+                    asChild 
+                    variant="ghost" 
+                    size="sm"
+                    className="btn-interactive group hover:bg-primary/10 hover:text-primary"
+                  >
                     <Link href={`/practice?subject=${stats.subject.name}`}>
-                      <Play className="h-4 w-4" />
+                      <Play className="h-4 w-4 transition-transform duration-300 group-hover:scale-110" />
                     </Link>
                   </Button>
                 </div>
@@ -254,38 +281,49 @@ export default function MultiSubjectDashboard({ userId }: MultiSubjectDashboardP
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="text-center p-6">
-          <Trophy className="h-8 w-8 text-[var(--primary)] mx-auto mb-2" />
-          <div className="text-2xl font-bold text-[var(--foreground)]">
-            {subjectStats.reduce((sum, stats) => sum + stats.achievements.completed_paths, 0)}
-          </div>
-          <div className="text-sm text-[var(--muted-foreground)]">Paths Completed</div>
-        </Card>
-        
-        <Card className="text-center p-6">
-          <Target className="h-8 w-8 text-[var(--accent)] mx-auto mb-2" />
-          <div className="text-2xl font-bold text-[var(--foreground)]">
-            {Math.round(subjectStats.reduce((sum, stats) => sum + stats.progress.average_score, 0) / subjectStats.length || 0)}%
-          </div>
-          <div className="text-sm text-[var(--muted-foreground)]">Overall Average</div>
-        </Card>
-        
-        <Card className="text-center p-6">
-          <Clock className="h-8 w-8 text-[var(--warning)] mx-auto mb-2" />
-          <div className="text-2xl font-bold text-[var(--foreground)]">
-            {Math.round(subjectStats.reduce((sum, stats) => sum + stats.progress.time_spent_minutes, 0) / 60)}h
-          </div>
-          <div className="text-sm text-[var(--muted-foreground)]">Time Studied</div>
-        </Card>
-        
-        <Card className="text-center p-6">
-          <TrendingUp className="h-8 w-8 text-[var(--success)] mx-auto mb-2" />
-          <div className="text-2xl font-bold text-[var(--foreground)]">
-            {subjectStats.filter(stats => calculateOverallProgress(stats) > 0).length}
-          </div>
-          <div className="text-sm text-[var(--muted-foreground)]">Active Subjects</div>
-        </Card>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+        {[
+          {
+            icon: Trophy,
+            value: subjectStats.reduce((sum, stats) => sum + stats.achievements.completed_paths, 0),
+            label: "Paths Completed",
+            color: "text-[var(--primary)]",
+            delay: 0
+          },
+          {
+            icon: Target,
+            value: `${Math.round(subjectStats.reduce((sum, stats) => sum + stats.progress.average_score, 0) / subjectStats.length || 0)}%`,
+            label: "Overall Average",
+            color: "text-[var(--accent)]",
+            delay: 100
+          },
+          {
+            icon: Clock,
+            value: `${Math.round(subjectStats.reduce((sum, stats) => sum + stats.progress.time_spent_minutes, 0) / 60)}h`,
+            label: "Time Studied",
+            color: "text-[var(--warning)]",
+            delay: 200
+          },
+          {
+            icon: TrendingUp,
+            value: subjectStats.filter(stats => calculateOverallProgress(stats) > 0).length,
+            label: "Active Subjects",
+            color: "text-[var(--success)]",
+            delay: 300
+          }
+        ].map((stat, index) => (
+          <Card 
+            key={stat.label}
+            className="text-center p-4 sm:p-6 hover-lift group animate-scale-in"
+            style={{ animationDelay: `${stat.delay}ms` }}
+          >
+            <stat.icon className={`h-6 w-6 sm:h-8 sm:w-8 ${stat.color} mx-auto mb-2 transition-all duration-300 group-hover:scale-110 group-hover:rotate-3`} />
+            <div className="text-lg sm:text-2xl font-bold text-[var(--foreground)] transition-colors duration-300 group-hover:text-[var(--primary)]">
+              {stat.value}
+            </div>
+            <div className="text-xs sm:text-sm text-[var(--muted-foreground)]">{stat.label}</div>
+          </Card>
+        ))}
       </div>
 
       {/* Recent Activity */}
