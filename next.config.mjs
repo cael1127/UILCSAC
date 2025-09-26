@@ -9,6 +9,7 @@ const nextConfig = {
   // Performance optimizations
   experimental: {
     optimizePackageImports: ['@radix-ui/react-icons', 'lucide-react'],
+    serverComponentsExternalPackages: ['@supabase/supabase-js'],
     turbo: {
       rules: {
         '*.svg': {
