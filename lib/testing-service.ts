@@ -28,8 +28,8 @@ export class TestingService {
     try {
       // Use real Java executor when language is Java; otherwise fall back to mock executor
       if ((language || '').toLowerCase() === 'java') {
-        const supaUrlHeader = (process.env.NEXT_PUBLIC_SUPABASE_URL || (typeof window !== 'undefined' ? (localStorage.getItem('NEXT_PUBLIC_SUPABASE_URL') || '') : '')) as string
-        const supaAnonHeader = (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || (typeof window !== 'undefined' ? (localStorage.getItem('NEXT_PUBLIC_SUPABASE_ANON_KEY') || '') : '')) as string
+        const supaUrlHeader = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+        const supaAnonHeader = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
 
         const webExecResponse = await fetch("/api/web-execute", {
           method: "POST",

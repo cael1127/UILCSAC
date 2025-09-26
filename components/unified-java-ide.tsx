@@ -400,8 +400,8 @@ export const UnifiedJavaIDE = React.memo(function UnifiedJavaIDE({
     try {
       console.log('🚀 Executing Java code...', { code, input, questionId, userId });
       
-      const supaUrlHeader = (process.env.NEXT_PUBLIC_SUPABASE_URL || (typeof window !== 'undefined' ? (localStorage.getItem('NEXT_PUBLIC_SUPABASE_URL') || '') : '')) as string;
-      const supaAnonHeader = (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || (typeof window !== 'undefined' ? (localStorage.getItem('NEXT_PUBLIC_SUPABASE_ANON_KEY') || '') : '')) as string;
+      const supaUrlHeader = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+      const supaAnonHeader = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
       const response = await fetch('/api/web-execute', {
         method: 'POST',
@@ -503,8 +503,8 @@ export const UnifiedJavaIDE = React.memo(function UnifiedJavaIDE({
       for (const testCase of sampleTests) {
         console.log('🧪 Running test case:', testCase);
         
-        const supaUrlHeader2 = (process.env.NEXT_PUBLIC_SUPABASE_URL || (typeof window !== 'undefined' ? (localStorage.getItem('NEXT_PUBLIC_SUPABASE_URL') || '') : '')) as string;
-        const supaAnonHeader2 = (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || (typeof window !== 'undefined' ? (localStorage.getItem('NEXT_PUBLIC_SUPABASE_ANON_KEY') || '') : '')) as string;
+        const supaUrlHeader2 = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+        const supaAnonHeader2 = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
         const response = await fetch('/api/web-execute', {
           method: 'POST',
