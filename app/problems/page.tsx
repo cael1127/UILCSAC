@@ -6,6 +6,8 @@ import { ArrowLeft, Code, Trophy } from "lucide-react"
 import Link from "next/link"
 import ProblemGrid from "@/components/problem-grid"
 import PracticeTestBrowser from "@/components/practice-test-browser"
+import FloatingBackground from "@/components/3d/FloatingBackground"
+import Card3D from "@/components/3d/Card3D"
 
 // Force dynamic rendering for this page
 export const dynamic = 'force-dynamic'
@@ -23,9 +25,11 @@ export default async function ProblemsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--background)]">
+    <div className="min-h-screen bg-[var(--background)] relative overflow-hidden">
+      <FloatingBackground theme="ut-orange" intensity={8} />
+      
       {/* Header */}
-      <header className="border-b border-[var(--border)] bg-[var(--card)] shadow-sm">
+      <header className="border-b border-[var(--border)] bg-[var(--card)]/95 backdrop-blur-sm shadow-sm relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
@@ -41,15 +45,21 @@ export default async function ProblemsPage() {
         </div>
       </header>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
         {/* Page Header */}
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-[var(--foreground)] mb-4">
-            Practice & Tests
-          </h2>
-          <p className="text-xl text-[var(--muted-foreground)] max-w-2xl mx-auto">
-            Practice with individual problems or take comprehensive UIL-style practice tests.
-          </p>
+                 <Card3D className="p-8" hoverScale={1.02} glowColor="var(--primary)">
+                   <div className="flex items-center justify-center mb-4">
+                     <Code className="w-12 h-12 text-[var(--primary)] mr-4" />
+                     <Trophy className="w-12 h-12 text-[var(--accent)]" />
+                   </div>
+                   <h2 className="text-4xl font-bold text-[var(--foreground)] mb-4">
+                     Practice & Tests
+                   </h2>
+                   <p className="text-xl text-[var(--muted-foreground)] max-w-2xl mx-auto">
+                     Practice with individual problems or take comprehensive UIL-style practice tests.
+                   </p>
+                 </Card3D>
         </div>
 
         {/* Tabbed Interface */}

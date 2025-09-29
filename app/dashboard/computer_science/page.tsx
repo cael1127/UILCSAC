@@ -9,6 +9,9 @@ import ProblemGrid from "@/components/problem-grid"
 import LearningPaths from "@/components/learning-paths"
 import ResourceViewer from "@/components/resource-viewer"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import FloatingBackground from "@/components/3d/FloatingBackground"
+import Card3D from "@/components/3d/Card3D"
+import ProgressRing3D from "@/components/3d/ProgressRing3D"
 
 // Force dynamic rendering for this page
 export const dynamic = 'force-dynamic'
@@ -92,9 +95,11 @@ export default async function ComputerScienceDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--background)]">
+    <div className="min-h-screen bg-[var(--background)] relative overflow-hidden">
+      <FloatingBackground theme="ut-orange" intensity={10} />
+      
       {/* Header */}
-      <header className="border-b border-[var(--border)] bg-[var(--card)] shadow-sm">
+      <header className="border-b border-[var(--border)] bg-[var(--card)]/95 backdrop-blur-sm shadow-sm relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
@@ -104,12 +109,12 @@ export default async function ComputerScienceDashboard() {
                   All Subjects
                 </Link>
               </Button>
-              <div className="flex items-center space-x-3">
-                <div className="p-2 rounded-lg bg-[var(--primary)]/10">
-                  <Code className="h-6 w-6 text-[var(--primary)]" />
-                </div>
-                <h1 className="text-xl font-bold text-[var(--foreground)]">Computer Science</h1>
-              </div>
+                     <div className="flex items-center space-x-3">
+                       <div className="p-2 rounded-lg bg-[var(--primary)]/10">
+                         <Code className="w-6 h-6 text-[var(--primary)]" />
+                       </div>
+                       <h1 className="text-xl font-bold text-[var(--foreground)]">Computer Science</h1>
+                     </div>
             </div>
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2 text-sm text-[var(--muted-foreground)] bg-[var(--muted)]/50 px-3 py-2 rounded-lg">
@@ -125,28 +130,35 @@ export default async function ComputerScienceDashboard() {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
         {/* Welcome Section */}
         <div className="mb-12">
-          <div className="bg-gradient-to-r from-[var(--primary)]/10 to-[var(--accent)]/10 rounded-2xl p-8">
-            <h2 className="text-4xl font-bold text-[var(--foreground)] mb-3">
-              Computer Science Dashboard 💻
-            </h2>
-            <p className="text-[var(--muted-foreground)] text-lg">
-              Master Java programming, algorithms, and data structures for UIL Computer Science competitions.
-            </p>
-          </div>
+                 <Card3D className="p-8" hoverScale={1.02} glowColor="var(--primary)">
+                   <div className="flex items-center mb-4">
+                     <div className="mr-4 w-16 h-16 flex items-center justify-center">
+                       <Code className="w-16 h-16 text-[var(--primary)]" />
+                     </div>
+                     <div>
+                       <h2 className="text-4xl font-bold text-[var(--foreground)] mb-3">
+                         Computer Science Dashboard 💻
+                       </h2>
+                       <p className="text-[var(--muted-foreground)] text-lg">
+                         Master Java programming, algorithms, and data structures for UIL Computer Science competitions.
+                       </p>
+                     </div>
+                   </div>
+                 </Card3D>
         </div>
 
         {/* CS-Specific Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-[var(--foreground)]">Learning Paths</CardTitle>
-              <div className="p-2 rounded-lg bg-[var(--primary)]/10">
-                <BookOpen className="h-5 w-5 text-[var(--primary)]" />
-              </div>
-            </CardHeader>
+          <Card3D className="h-full" hoverScale={1.05} glowColor="var(--primary)">
+                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                     <CardTitle className="text-sm font-medium text-[var(--foreground)]">Learning Paths</CardTitle>
+                     <div className="p-2 rounded-lg bg-[var(--primary)]/10 group-hover:bg-[var(--primary)]/20 transition-colors">
+                       <BookOpen className="w-5 h-5 text-[var(--primary)]" />
+                     </div>
+                   </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-[var(--foreground)] mb-1">
                 {csStats?.learning_paths_completed || 0}
@@ -155,15 +167,15 @@ export default async function ComputerScienceDashboard() {
                 Completed paths
               </p>
             </CardContent>
-          </Card>
+          </Card3D>
 
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-[var(--foreground)]">Problems Solved</CardTitle>
-              <div className="p-2 rounded-lg bg-[var(--primary)]/10">
-                <Code className="h-5 w-5 text-[var(--primary)]" />
-              </div>
-            </CardHeader>
+          <Card3D className="h-full" hoverScale={1.05} glowColor="var(--accent)">
+                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                     <CardTitle className="text-sm font-medium text-[var(--foreground)]">Problems Solved</CardTitle>
+                     <div className="p-2 rounded-lg bg-[var(--accent)]/10 group-hover:bg-[var(--accent)]/20 transition-colors">
+                       <Code className="w-5 h-5 text-[var(--accent)]" />
+                     </div>
+                   </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-[var(--foreground)] mb-1">
                 {csStats?.problems_solved || 0}
@@ -172,15 +184,15 @@ export default async function ComputerScienceDashboard() {
                 Total problems
               </p>
             </CardContent>
-          </Card>
+          </Card3D>
 
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-[var(--foreground)]">Average Score</CardTitle>
-              <div className="p-2 rounded-lg bg-[var(--primary)]/10">
-                <Trophy className="h-5 w-5 text-[var(--primary)]" />
-              </div>
-            </CardHeader>
+          <Card3D className="h-full" hoverScale={1.05} glowColor="var(--warning)">
+                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                     <CardTitle className="text-sm font-medium text-[var(--foreground)]">Average Score</CardTitle>
+                     <div className="p-2 rounded-lg bg-[var(--warning)]/10 group-hover:bg-[var(--warning)]/20 transition-colors">
+                       <Trophy className="w-5 h-5 text-[var(--warning)]" />
+                     </div>
+                   </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-[var(--foreground)] mb-1">
                 {Math.round(csStats?.average_score || 0)}%
@@ -189,15 +201,15 @@ export default async function ComputerScienceDashboard() {
                 Across all problems
               </p>
             </CardContent>
-          </Card>
+          </Card3D>
 
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-[var(--foreground)]">Study Time</CardTitle>
-              <div className="p-2 rounded-lg bg-[var(--primary)]/10">
-                <Clock className="h-5 w-5 text-[var(--primary)]" />
-              </div>
-            </CardHeader>
+          <Card3D className="h-full" hoverScale={1.05} glowColor="var(--success)">
+                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                     <CardTitle className="text-sm font-medium text-[var(--foreground)]">Study Time</CardTitle>
+                     <div className="p-2 rounded-lg bg-[var(--success)]/10 group-hover:bg-[var(--success)]/20 transition-colors">
+                       <Clock className="w-5 h-5 text-[var(--success)]" />
+                     </div>
+                   </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-[var(--foreground)] mb-1">
                 {Math.round((csStats?.total_time_minutes || 0) / 60)}h
@@ -206,7 +218,7 @@ export default async function ComputerScienceDashboard() {
                 Total time spent
               </p>
             </CardContent>
-          </Card>
+          </Card3D>
         </div>
 
         {/* Main Content Tabs */}

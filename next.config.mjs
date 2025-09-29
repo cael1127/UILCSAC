@@ -5,6 +5,12 @@ const nextConfig = {
   
   // Netlify configuration
   trailingSlash: false,
+  output: 'standalone',
+  
+  // Netlify specific optimizations
+  generateBuildId: async () => {
+    return 'build-' + Date.now()
+  },
   
   // Performance optimizations
   experimental: {

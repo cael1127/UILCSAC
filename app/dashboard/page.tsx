@@ -9,6 +9,8 @@ import SubjectSelector from "@/components/subject-selector"
 import TeacherDashboard from "@/components/teacher-dashboard"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import ClientAuthCheck from "@/components/client-auth-check"
+import Card3D from "@/components/3d/Card3D"
+import ProgressRing3D from "@/components/3d/ProgressRing3D"
 
 // Force dynamic rendering for this page
 export const dynamic = 'force-dynamic'
@@ -127,7 +129,7 @@ export default async function DashboardPage() {
 
         {/* Enhanced Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
-          <Card className="card-modern hover-lift group">
+          <Card3D className="h-full" hoverScale={1.05} glowColor="var(--primary)">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-[var(--foreground)]">Learning Paths</CardTitle>
               <div className="p-2 rounded-lg bg-[var(--primary)]/10 group-hover:bg-[var(--primary)]/20 transition-colors">
@@ -140,9 +142,9 @@ export default async function DashboardPage() {
                 Active paths
               </p>
             </CardContent>
-          </Card>
+          </Card3D>
 
-          <Card className="card-modern hover-lift group">
+          <Card3D className="h-full" hoverScale={1.05} glowColor="var(--success)">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-[var(--foreground)]">Modules Completed</CardTitle>
               <div className="p-2 rounded-lg bg-[var(--success)]/10 group-hover:bg-[var(--success)]/20 transition-colors">
@@ -155,9 +157,9 @@ export default async function DashboardPage() {
                 Total completed
               </p>
             </CardContent>
-          </Card>
+          </Card3D>
 
-          <Card className="card-modern hover-lift group">
+          <Card3D className="h-full" hoverScale={1.05} glowColor="var(--warning)">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-[var(--foreground)]">Total Score</CardTitle>
               <div className="p-2 rounded-lg bg-[var(--warning)]/10 group-hover:bg-[var(--warning)]/20 transition-colors">
@@ -170,9 +172,9 @@ export default async function DashboardPage() {
                 Points earned
               </p>
             </CardContent>
-          </Card>
+          </Card3D>
 
-          <Card className="card-modern hover-lift group">
+          <Card3D className="h-full" hoverScale={1.05} glowColor="var(--accent)">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-[var(--foreground)]">Progress</CardTitle>
               <div className="p-2 rounded-lg bg-[var(--accent)]/10 group-hover:bg-[var(--accent)]/20 transition-colors">
@@ -180,14 +182,27 @@ export default async function DashboardPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-[var(--foreground)] mb-1">
-                {totalPaths > 0 ? Math.round((totalModules / (totalPaths * 3)) * 100) : 0}%
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                  <div className="text-3xl font-bold text-[var(--foreground)] mb-1">
+                    {totalPaths > 0 ? Math.round((totalModules / (totalPaths * 3)) * 100) : 0}%
+                  </div>
+                  <p className="text-sm text-[var(--muted-foreground)]">
+                    Overall completion
+                  </p>
+                </div>
+                <div className="flex items-center justify-center ml-4">
+                  <ProgressRing3D 
+                    progress={totalPaths > 0 ? Math.round((totalModules / (totalPaths * 3)) * 100) : 0}
+                    size={60}
+                    thickness={6}
+                    color="var(--accent)"
+                    showText={false}
+                  />
+                </div>
               </div>
-              <p className="text-sm text-[var(--muted-foreground)]">
-                Overall completion
-              </p>
             </CardContent>
-          </Card>
+          </Card3D>
         </div>
 
         {/* Main Content */}

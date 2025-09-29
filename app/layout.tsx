@@ -4,9 +4,10 @@ import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/sonner"
 import ThemeSwitcher from "@/components/theme-switcher"
-import ModernNavigation from "@/components/modern-navigation"
+import Navigation3D from "@/components/3d/Navigation3D"
 import { MathJaxProvider } from "@/components/tools/math-renderer"
 import { getSiteUrl } from "@/lib/site-url"
+import AuthErrorBoundary from "@/components/auth/AuthErrorBoundary"
 
 const inter = Inter({ 
   subsets: ["latin"],
@@ -129,14 +130,16 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <MathJaxProvider>
-            <ModernNavigation />
-            <main id="main-content" role="main">
-              {children}
-            </main>
-            <ThemeSwitcher />
-            <Toaster />
-          </MathJaxProvider>
+          <AuthErrorBoundary>
+            <MathJaxProvider>
+              <Navigation3D />
+              <main id="main-content" role="main">
+                {children}
+              </main>
+              <ThemeSwitcher />
+              <Toaster />
+            </MathJaxProvider>
+          </AuthErrorBoundary>
         </ThemeProvider>
       </body>
     </html>

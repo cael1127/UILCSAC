@@ -2,6 +2,8 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import AutoLogout from "@/components/auto-logout"
+import FloatingBackground from "@/components/3d/FloatingBackground"
+import Card3D from "@/components/3d/Card3D"
 import { 
   Code, 
   BookOpen, 
@@ -21,10 +23,13 @@ export default function HomePage() {
       
       {/* Enhanced Hero Section */}
       <section className="relative overflow-hidden">
+        {/* 3D Floating Background */}
+        <FloatingBackground theme="ut-orange" intensity={12} />
+        
         {/* Dynamic Background Gradient */}
         <div className="absolute inset-0 bg-gradient-to-br from-[var(--primary)]/10 via-[var(--background)] to-[var(--accent)]/10" />
         
-        {/* Floating Elements */}
+        {/* Enhanced Floating Elements */}
         <div className="absolute top-20 left-10 w-20 h-20 bg-[var(--primary)]/20 rounded-full blur-xl animate-pulse" />
         <div className="absolute top-40 right-20 w-32 h-32 bg-[var(--accent)]/20 rounded-full blur-xl animate-pulse delay-1000" />
         <div className="absolute bottom-20 left-1/4 w-16 h-16 bg-[var(--secondary)]/20 rounded-full blur-xl animate-pulse delay-2000" />
@@ -80,7 +85,7 @@ export default function HomePage() {
           </div>
           
           <div className="grid-modern grid-modern-3">
-            <Card className="card-modern shadow-modern hover-lift group">
+            <Card3D className="h-full" hoverScale={1.08} glowColor="var(--primary)">
               <CardHeader className="space-modern-sm">
                 <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--primary)]/10 group-hover:bg-[var(--primary)]/20 transition-colors duration-300">
                   <Code className="h-8 w-8 text-[var(--primary)]" />
@@ -106,9 +111,9 @@ export default function HomePage() {
                   </li>
                 </ul>
               </CardContent>
-            </Card>
+            </Card3D>
 
-            <Card className="card-modern shadow-modern hover-lift group">
+            <Card3D className="h-full" hoverScale={1.08} glowColor="var(--accent)">
               <CardHeader className="space-modern-sm">
                 <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--accent)]/10 group-hover:bg-[var(--accent)]/20 transition-colors duration-300">
                   <BookOpen className="h-8 w-8 text-[var(--accent)]" />
@@ -134,9 +139,9 @@ export default function HomePage() {
                   </li>
                 </ul>
               </CardContent>
-            </Card>
+            </Card3D>
 
-            <Card className="card-modern shadow-modern hover-lift group">
+            <Card3D className="h-full" hoverScale={1.08} glowColor="var(--warning)">
               <CardHeader className="space-modern-sm">
                 <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--warning)]/10 group-hover:bg-[var(--warning)]/20 transition-colors duration-300">
                   <Trophy className="h-8 w-8 text-[var(--warning)]" />
@@ -162,7 +167,7 @@ export default function HomePage() {
                   </li>
                 </ul>
               </CardContent>
-            </Card>
+            </Card3D>
           </div>
         </div>
       </section>

@@ -1,6 +1,7 @@
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import { Suspense } from "react"
+import React from "react"
 import LearningPaths from "@/components/learning-paths"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -15,6 +16,8 @@ import {
   Filter
 } from "lucide-react"
 import Link from "next/link"
+import FloatingBackground from "@/components/3d/FloatingBackground"
+import Card3D from "@/components/3d/Card3D"
 
 // Force dynamic rendering for this page
 export const dynamic = 'force-dynamic'
@@ -98,26 +101,26 @@ export default async function LearningPage({ searchParams }: LearningPageProps) 
   }
 
   return (
-    <div className="min-h-screen bg-[var(--background)]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="min-h-screen bg-[var(--background)] relative overflow-hidden">
+      <FloatingBackground theme="ut-orange" intensity={10} />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-4">
-              <Button asChild variant="ghost" size="sm">
-                <Link href="/dashboard" className="flex items-center gap-2">
-                  <ArrowLeft className="h-4 w-4" />
-                  Back to Dashboard
-                </Link>
-              </Button>
+                     <Button asChild variant="ghost" size="sm">
+                       <Link href="/dashboard" className="flex items-center gap-2">
+                         <ArrowLeft className="h-4 w-4" />
+                         Back to Dashboard
+                       </Link>
+                     </Button>
               
               {currentSubject && (
-                <div className="flex items-center gap-3">
-                  <div className={`p-2 rounded-lg ${getSubjectColorClass(currentSubject.color_theme)}`}>
-                    {(() => {
-                      const IconComponent = getSubjectIcon(currentSubject.name)
-                      return <IconComponent className="h-5 w-5" />
-                    })()}
+                <Card3D className="flex items-center gap-3 p-4" hoverScale={1.02} glowColor="var(--primary)">
+                  <div className="flex-shrink-0 w-12 h-12 flex items-center justify-center">
+                    {React.createElement(getSubjectIcon(currentSubject.name), { 
+                      className: "w-12 h-12 text-[var(--primary)]" 
+                    })}
                   </div>
                   <div>
                     <h1 className="text-2xl font-bold text-[var(--foreground)]">
@@ -127,7 +130,7 @@ export default async function LearningPage({ searchParams }: LearningPageProps) 
                       {currentSubject.description}
                     </p>
                   </div>
-                </div>
+                </Card3D>
               )}
               
               {!currentSubject && (
@@ -145,12 +148,12 @@ export default async function LearningPage({ searchParams }: LearningPageProps) 
 
           {/* Subject Filter */}
           {!currentSubject && allSubjects && allSubjects.length > 0 && (
-            <Card className="mb-8">
+            <Card3D className="mb-8" hoverScale={1.01} glowColor="var(--accent)">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Filter className="h-5 w-5" />
-                  Choose Your Subject
-                </CardTitle>
+                     <CardTitle className="flex items-center gap-2">
+                       <Filter className="w-5 h-5 text-[var(--accent)]" />
+                       Choose Your Subject
+                     </CardTitle>
                 <CardDescription>
                   Select a UIL subject to view its learning paths
                 </CardDescription>
@@ -165,32 +168,32 @@ export default async function LearningPage({ searchParams }: LearningPageProps) 
                         href={`/learning?subject=${subject.name}`}
                         className="block"
                       >
-                        <Card className="hover:shadow-lg transition-all duration-300 group cursor-pointer">
-                          <CardContent className="p-6">
-                            <div className="flex items-center gap-3 mb-3">
-                              <div className={`p-3 rounded-xl ${getSubjectColorClass(subject.color_theme)}`}>
-                                <IconComponent className="h-6 w-6" />
-                              </div>
-                              <div>
-                                <h3 className="font-semibold text-[var(--foreground)] group-hover:text-[var(--primary)] transition-colors">
-                                  {subject.display_name}
-                                </h3>
-                                <Badge variant="secondary" className="text-xs">
-                                  {subject.name.replace('_', ' ')}
-                                </Badge>
-                              </div>
-                            </div>
-                            <p className="text-sm text-[var(--muted-foreground)]">
-                              {subject.description}
-                            </p>
-                          </CardContent>
-                        </Card>
+                        <Card3D className="group cursor-pointer" hoverScale={1.05} glowColor="var(--primary)">
+                                 <CardContent className="p-6">
+                                   <div className="flex items-center gap-3 mb-3">
+                                     <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center">
+                                       <IconComponent className="w-8 h-8 text-[var(--primary)]" />
+                                     </div>
+                                     <div>
+                                       <h3 className="font-semibold text-[var(--foreground)] group-hover:text-[var(--primary)] transition-colors">
+                                         {subject.display_name}
+                                       </h3>
+                                       <Badge variant="secondary" className="text-xs">
+                                         {subject.name.replace('_', ' ')}
+                                       </Badge>
+                                     </div>
+                                   </div>
+                                   <p className="text-sm text-[var(--muted-foreground)]">
+                                     {subject.description}
+                                   </p>
+                                 </CardContent>
+                        </Card3D>
                       </Link>
                     )
                   })}
                 </div>
               </CardContent>
-            </Card>
+            </Card3D>
           )}
         </div>
 
