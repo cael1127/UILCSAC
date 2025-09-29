@@ -12,7 +12,7 @@ import ClientAuthCheck from "@/components/client-auth-check"
 import Card3D from "@/components/3d/Card3D"
 import ProgressRing3D from "@/components/3d/ProgressRing3D"
 
-// Force dynamic rendering for this page
+// Force dynamic rendering for this page to avoid React Three Fiber SSR issues
 export const dynamic = 'force-dynamic'
 
 export default async function DashboardPage() {

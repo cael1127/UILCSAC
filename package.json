@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "engines": {
-    "node": ">=18.17.0 <21.0.0",
-    "npm": ">=8.0.0"
+    "node": ">=20.0.0 <21.0.0",
+    "npm": ">=10.0.0"
   },
   "scripts": {
     "build": "next build",
@@ -45,8 +45,8 @@
     "@radix-ui/react-toggle": "1.1.1",
     "@radix-ui/react-toggle-group": "1.1.1",
     "@radix-ui/react-tooltip": "1.1.6",
-    "@react-three/drei": "^9.105.4",
-    "@react-three/fiber": "^8.16.2",
+    "@react-three/drei": "^9.88.13",
+    "@react-three/fiber": "^8.15.11",
     "@supabase/ssr": "^0.1.0",
     "@supabase/supabase-js": "^2.45.0",
     "@types/react": "^18",

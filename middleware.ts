@@ -8,15 +8,11 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * Feel free to modify this pattern to include more paths.
+     * Temporarily disable middleware to avoid build issues
+     * Only match auth callback for now
      */
-    "/((?!_next/static|_next/image|favicon.ico|.*.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/auth/callback",
   ],
 }
 
-// Note: Edge runtime removed as it's experimental and causes build failures on Netlify
-// The middleware will use the default Node.js runtime
+// Note: Using default runtime to avoid Edge Runtime issues with Supabase

@@ -27,6 +27,9 @@ import {
   Rocket
 } from 'lucide-react'
 
+// Force dynamic rendering to avoid React Three Fiber SSR issues
+export const dynamic = 'force-dynamic'
+
 export default function Demo3DPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [selectedTheme, setSelectedTheme] = useState('ut-orange')

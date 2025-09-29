@@ -4,6 +4,9 @@ import FloatingBackground from "@/components/3d/FloatingBackground"
 import Card3D from "@/components/3d/Card3D"
 import { GraduationCap, AlertTriangle } from "lucide-react"
 
+// Force dynamic rendering to avoid React Three Fiber SSR issues
+export const dynamic = 'force-dynamic'
+
 export default async function LoginPage() {
   // If Supabase is not configured, show setup message
   if (!isSupabaseConfigured) {
