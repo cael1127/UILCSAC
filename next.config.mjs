@@ -12,18 +12,18 @@ const nextConfig = {
     return 'build-' + Date.now()
   },
   
-         // Performance optimizations
-         experimental: {
-           optimizePackageImports: ['@radix-ui/react-icons', 'lucide-react'],
-           turbo: {
-             rules: {
-               '*.svg': {
-                 loaders: ['@svgr/webpack'],
-                 as: '*.js',
-               },
-             },
-           },
-         },
+  // Performance optimizations
+  experimental: {
+    optimizePackageImports: ['@radix-ui/react-icons', 'lucide-react'],
+    turbo: {
+      rules: {
+        '*.svg': {
+          loaders: ['@svgr/webpack'],
+          as: '*.js',
+        },
+      },
+    },
+  },
   
   // External packages for server components (moved from experimental in Next.js 15.2.4)
   serverExternalPackages: ['@supabase/supabase-js', '@supabase/ssr'],
