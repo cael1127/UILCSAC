@@ -17,8 +17,5 @@ export { default as Badge3D, StatusBadge3D, NotificationBadge3D } from './Badge3
 // Simple 3D Components (CSS-based fallbacks)
 export { default as SimpleLoading3D, AuthLoadingSpinner } from './SimpleLoading3D'
 
-// Re-export types for convenience
-export type { Icon3DProps } from './Icon3D'
-export type { Button3DProps, IconButton3DProps, FloatingActionButton3DProps } from './Button3D'
-export type { Input3DProps, Textarea3DProps } from './Input3D'
-export type { Badge3DProps, StatusBadge3DProps, NotificationBadge3DProps } from './Badge3D'
+// Re-export types for convenience (only export types that exist)
+// Note: Most types are internal to components

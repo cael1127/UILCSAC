@@ -87,7 +87,7 @@ interface StatusBadge3DProps extends Omit<Badge3DProps, 'children'> {
   children: React.ReactNode
 }
 
-export function StatusBadge3D({
+function StatusBadge3D({
   status,
   className,
   ...props
@@ -135,7 +135,7 @@ interface NotificationBadge3DProps extends Omit<Badge3DProps, 'children'> {
   showZero?: boolean
 }
 
-export function NotificationBadge3D({
+function NotificationBadge3D({
   count,
   max = 99,
   showZero = false,
@@ -162,5 +162,5 @@ export function NotificationBadge3D({
   )
 }
 
-export { Badge3D, NotificationBadge3D }
+export { Badge3D, StatusBadge3D, NotificationBadge3D }
 export default Badge3D
