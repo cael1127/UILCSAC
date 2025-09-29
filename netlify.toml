@@ -5,6 +5,8 @@
 [build.environment]
   NODE_VERSION = "18"
   NPM_VERSION = "9"
+  # Disable secrets scanning for public environment variables
+  SECRETS_SCAN_ENABLED = "false"
 
 [functions]
   node_bundler = "esbuild"

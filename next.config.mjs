@@ -28,12 +28,8 @@ const nextConfig = {
   // External packages for server components (moved from experimental in Next.js 15.2.4)
   serverExternalPackages: ['@supabase/supabase-js', '@supabase/ssr'],
   
-  // Ensure proper environment variable handling
-  env: {
-    NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
-    NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-    NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
-  },
+  // Environment variables are automatically available to client-side code
+  // when prefixed with NEXT_PUBLIC_ - no need to explicitly expose them
   
   // Bundle optimization
   webpack: (config, { dev, isServer }) => {

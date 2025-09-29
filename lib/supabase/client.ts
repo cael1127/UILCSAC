@@ -22,6 +22,6 @@ if (process.env.NODE_ENV === 'development') {
   })
   
   if (isSupabaseConfigured) {
-    console.log('Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL)
+    console.log('Supabase configured successfully')
   }
 }
