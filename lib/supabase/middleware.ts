@@ -8,6 +8,7 @@ export async function updateSession(request: NextRequest) {
     const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
     
     if (!supabaseUrl || !supabaseAnonKey) {
+      console.log('Supabase not configured, skipping middleware')
       return NextResponse.next()
     }
 
@@ -61,7 +62,8 @@ export async function updateSession(request: NextRequest) {
 
     return supabaseResponse
   } catch (error) {
-    // Return next response on any error to avoid breaking the app
+    // Log error for debugging but don't break the app
+    console.error('Middleware error:', error)
     return NextResponse.next()
   }
 }

@@ -8,11 +8,11 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     /*
-     * Temporarily disable middleware to avoid build issues
-     * Only match auth callback for now
+     * Only match auth callback to avoid Edge Runtime issues with Supabase
      */
     "/auth/callback",
   ],
 }
 
-// Note: Using default runtime to avoid Edge Runtime issues with Supabase
+// Explicitly use Node.js runtime instead of Edge Runtime
+export const runtime = 'nodejs'

@@ -1,10 +1,13 @@
 "use client"
 
-import { useState } from 'react'
+import { useState, Suspense, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+
+// Import 3D components with client-only wrapper
+import ClientOnly3D from '@/components/3d/ClientOnly3D'
 import FloatingBackground from '@/components/3d/FloatingBackground'
 import Card3D from '@/components/3d/Card3D'
 import { Icon3D } from '@/components/3d/Card3D'
@@ -29,10 +32,16 @@ import {
 
 // Force dynamic rendering to avoid React Three Fiber SSR issues
 export const dynamic = 'force-dynamic'
+export const ssr = false
 
 export default function Demo3DPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [selectedTheme, setSelectedTheme] = useState('ut-orange')
+  const [isClient, setIsClient] = useState(false)
+
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
 
   const themes = [
     { id: 'ut-orange', name: 'UT Orange', color: '#fb8b24' },
@@ -47,10 +56,25 @@ export default function Demo3DPage() {
     setTimeout(() => setIsLoading(false), 3000)
   }
 
+  if (!isClient) {
+    return (
+      <div className="min-h-screen bg-[var(--background)] transition-colors duration-300">
+        <div className="flex items-center justify-center h-screen">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--primary)] mx-auto mb-4"></div>
+            <p className="text-[var(--muted-foreground)]">Loading 3D Demo...</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-[var(--background)] transition-colors duration-300">
       {/* 3D Floating Background */}
-      <FloatingBackground theme={selectedTheme} intensity={15} />
+      <ClientOnly3D>
+        <FloatingBackground theme={selectedTheme} intensity={15} />
+      </ClientOnly3D>
       
       <div className="relative z-10">
         {/* Header */}
@@ -90,7 +114,8 @@ export default function Demo3DPage() {
 
             {/* 3D Cards Demo */}
             <TabsContent value="cards" className="space-y-8">
-              <PageTransition3D>
+              <ClientOnly3D>
+                <PageTransition3D>
                 <div className="text-center space-y-4">
                   <h2 className="text-3xl font-bold text-[var(--foreground)]">3D Card Components</h2>
                   <p className="text-[var(--muted-foreground)] max-w-2xl mx-auto">
@@ -184,12 +209,14 @@ export default function Demo3DPage() {
                     </CardContent>
                   </Card3D>
                 </div>
-              </PageTransition3D>
+                </PageTransition3D>
+              </ClientOnly3D>
             </TabsContent>
 
             {/* Progress Rings Demo */}
             <TabsContent value="progress" className="space-y-8">
-              <PageTransition3D>
+              <ClientOnly3D>
+                <PageTransition3D>
                 <div className="text-center space-y-4">
                   <h2 className="text-3xl font-bold text-[var(--foreground)]">3D Progress Visualization</h2>
                   <p className="text-[var(--muted-foreground)] max-w-2xl mx-auto">
@@ -250,12 +277,14 @@ export default function Demo3DPage() {
                     </div>
                   </div>
                 </div>
-              </PageTransition3D>
+                </PageTransition3D>
+              </ClientOnly3D>
             </TabsContent>
 
             {/* Loading States Demo */}
             <TabsContent value="loading" className="space-y-8">
-              <PageTransition3D>
+              <ClientOnly3D>
+                <PageTransition3D>
                 <div className="text-center space-y-4">
                   <h2 className="text-3xl font-bold text-[var(--foreground)]">3D Loading Animations</h2>
                   <p className="text-[var(--muted-foreground)] max-w-2xl mx-auto">
@@ -287,12 +316,14 @@ export default function Demo3DPage() {
                     <CardSkeleton3D />
                   </div>
                 </div>
-              </PageTransition3D>
+                </PageTransition3D>
+              </ClientOnly3D>
             </TabsContent>
 
             {/* Interactions Demo */}
             <TabsContent value="interactions" className="space-y-8">
-              <PageTransition3D>
+              <ClientOnly3D>
+                <PageTransition3D>
                 <div className="text-center space-y-4">
                   <h2 className="text-3xl font-bold text-[var(--foreground)]">Interactive 3D Elements</h2>
                   <p className="text-[var(--muted-foreground)] max-w-2xl mx-auto">
@@ -349,7 +380,8 @@ export default function Demo3DPage() {
                     </Card3D>
                   ))}
                 </div>
-              </PageTransition3D>
+                </PageTransition3D>
+              </ClientOnly3D>
             </TabsContent>
           </Tabs>
         </div>

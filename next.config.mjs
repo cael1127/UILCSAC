@@ -26,7 +26,7 @@ const nextConfig = {
          },
   
   // External packages for server components (moved from experimental in Next.js 15.2.4)
-  serverExternalPackages: ['@supabase/supabase-js'],
+  serverExternalPackages: ['@supabase/supabase-js', '@supabase/ssr'],
   
   // Ensure proper environment variable handling
   env: {
@@ -37,6 +37,15 @@ const nextConfig = {
   
   // Bundle optimization
   webpack: (config, { dev, isServer }) => {
+    // Handle Edge Runtime compatibility issues
+    if (isServer) {
+      config.externals = config.externals || []
+      config.externals.push({
+        '@supabase/supabase-js': 'commonjs @supabase/supabase-js',
+        '@supabase/ssr': 'commonjs @supabase/ssr',
+      })
+    }
+    
     // Optimize bundle size
     if (!dev && !isServer) {
       config.optimization.splitChunks = {
