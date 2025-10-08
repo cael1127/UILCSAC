@@ -26,7 +26,13 @@ const nextConfig = {
   },
   
   // External packages for server components (moved from experimental in Next.js 15.2.4)
-  serverExternalPackages: ['@supabase/supabase-js', '@supabase/ssr'],
+  serverExternalPackages: [
+    '@supabase/supabase-js', 
+    '@supabase/ssr',
+    '@react-three/fiber',
+    '@react-three/drei',
+    'three'
+  ],
   
   // Environment variables are automatically available to client-side code
   // when prefixed with NEXT_PUBLIC_ - no need to explicitly expose them
@@ -39,6 +45,10 @@ const nextConfig = {
       config.externals.push({
         '@supabase/supabase-js': 'commonjs @supabase/supabase-js',
         '@supabase/ssr': 'commonjs @supabase/ssr',
+        // Externalize 3D libraries for server-side builds to prevent bundling issues
+        '@react-three/fiber': 'commonjs @react-three/fiber',
+        '@react-three/drei': 'commonjs @react-three/drei',
+        'three': 'commonjs three',
       })
     }
     
