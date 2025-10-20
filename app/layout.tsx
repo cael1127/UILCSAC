@@ -4,7 +4,7 @@ import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/sonner"
 import ThemeSwitcher from "@/components/theme-switcher"
-import Navigation3D from "@/components/3d/Navigation3D"
+import ModernNavigation from "@/components/modern-navigation"
 import { MathJaxProvider } from "@/components/tools/math-renderer"
 import { getSiteUrl } from "@/lib/site-url"
 import AuthErrorBoundary from "@/components/auth/AuthErrorBoundary"
@@ -80,40 +80,6 @@ export default function RootLayout({
         {process.env.NEXT_PUBLIC_SUPABASE_URL && (
           <link rel="dns-prefetch" href={`//${new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname}`} />
         )}
-        
-        {/* Performance monitoring for A/B testing */}
-        {process.env.NODE_ENV === 'production' && (
-          <script
-            dangerouslySetInnerHTML={{
-              __html: `
-                // A/B Testing Performance Monitoring
-                window.addEventListener('load', () => {
-                  if ('performance' in window) {
-                    const perfData = performance.getEntriesByType('navigation')[0];
-                    if (perfData) {
-                      // Core Web Vitals for A/B testing
-                      const loadTime = perfData.loadEventEnd - perfData.loadEventStart;
-                      const domReady = perfData.domContentLoadedEventEnd - perfData.domContentLoadedEventStart;
-                      
-                      // Log performance metrics
-                      console.log('A/B Test - Page Load Time:', loadTime, 'ms');
-                      console.log('A/B Test - DOM Ready:', domReady, 'ms');
-                      
-                      // Send to analytics if available
-                      if (window.gtag) {
-                        window.gtag('event', 'performance_metric', {
-                          'event_category': 'A/B Testing',
-                          'event_label': 'Page Load',
-                          'value': Math.round(loadTime)
-                        });
-                      }
-                    }
-                  }
-                });
-              `,
-            }}
-          />
-        )}
       </head>
       <body className={inter.className}>
         {/* Skip to content for keyboard users */}
@@ -126,7 +92,7 @@ export default function RootLayout({
         >
           <AuthErrorBoundary>
             <MathJaxProvider>
-              <Navigation3D />
+              <ModernNavigation />
               <main id="main-content" role="main">
                 {children}
               </main>

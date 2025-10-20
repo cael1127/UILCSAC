@@ -9,10 +9,9 @@ import SubjectSelector from "@/components/subject-selector"
 import TeacherDashboard from "@/components/teacher-dashboard"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import ClientAuthCheck from "@/components/client-auth-check"
-import Card3D from "@/components/3d/Card3D"
-import ProgressRing3D from "@/components/3d/ProgressRing3D"
+import { Progress } from "@/components/ui/progress"
 
-// Force dynamic rendering for this page to avoid React Three Fiber SSR issues
+// Force dynamic rendering
 export const dynamic = 'force-dynamic'
 
 export default async function DashboardPage() {
@@ -129,7 +128,7 @@ export default async function DashboardPage() {
 
         {/* Enhanced Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
-          <Card3D className="h-full" hoverScale={1.05} glowColor="var(--primary)">
+          <Card className="h-full hover:shadow-lg transition-shadow duration-300">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-[var(--foreground)]">Learning Paths</CardTitle>
               <div className="p-2 rounded-lg bg-[var(--primary)]/10 group-hover:bg-[var(--primary)]/20 transition-colors">
@@ -142,9 +141,9 @@ export default async function DashboardPage() {
                 Active paths
               </p>
             </CardContent>
-          </Card3D>
+          </Card>
 
-          <Card3D className="h-full" hoverScale={1.05} glowColor="var(--success)">
+          <Card className="h-full hover:shadow-lg transition-shadow duration-300">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-[var(--foreground)]">Modules Completed</CardTitle>
               <div className="p-2 rounded-lg bg-[var(--success)]/10 group-hover:bg-[var(--success)]/20 transition-colors">
@@ -157,9 +156,9 @@ export default async function DashboardPage() {
                 Total completed
               </p>
             </CardContent>
-          </Card3D>
+          </Card>
 
-          <Card3D className="h-full" hoverScale={1.05} glowColor="var(--warning)">
+          <Card className="h-full hover:shadow-lg transition-shadow duration-300">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-[var(--foreground)]">Total Score</CardTitle>
               <div className="p-2 rounded-lg bg-[var(--warning)]/10 group-hover:bg-[var(--warning)]/20 transition-colors">
@@ -172,9 +171,9 @@ export default async function DashboardPage() {
                 Points earned
               </p>
             </CardContent>
-          </Card3D>
+          </Card>
 
-          <Card3D className="h-full" hoverScale={1.05} glowColor="var(--accent)">
+          <Card className="h-full hover:shadow-lg transition-shadow duration-300">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-[var(--foreground)]">Progress</CardTitle>
               <div className="p-2 rounded-lg bg-[var(--accent)]/10 group-hover:bg-[var(--accent)]/20 transition-colors">
@@ -192,17 +191,35 @@ export default async function DashboardPage() {
                   </p>
                 </div>
                 <div className="flex items-center justify-center ml-4">
-                  <ProgressRing3D 
-                    progress={totalPaths > 0 ? Math.round((totalModules / (totalPaths * 3)) * 100) : 0}
-                    size={60}
-                    thickness={6}
-                    color="var(--accent)"
-                    showText={false}
-                  />
+                  <div className="relative w-16 h-16">
+                    <svg className="transform -rotate-90" width="64" height="64">
+                      <circle
+                        cx="32"
+                        cy="32"
+                        r="28"
+                        stroke="currentColor"
+                        strokeWidth="6"
+                        fill="none"
+                        className="text-muted opacity-20"
+                      />
+                      <circle
+                        cx="32"
+                        cy="32"
+                        r="28"
+                        stroke="var(--accent)"
+                        strokeWidth="6"
+                        fill="none"
+                        strokeDasharray={`${2 * Math.PI * 28}`}
+                        strokeDashoffset={`${2 * Math.PI * 28 * (1 - (totalPaths > 0 ? (totalModules / (totalPaths * 3)) : 0))}`}
+                        className="transition-all duration-500"
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                  </div>
                 </div>
               </div>
             </CardContent>
-          </Card3D>
+          </Card>
         </div>
 
         {/* Main Content */}

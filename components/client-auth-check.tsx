@@ -6,7 +6,13 @@ import { supabase } from '@/lib/supabase/client'
 import { AuthError } from '@supabase/supabase-js'
 import { handleAuthErrorWithRecovery, clearAuthSession } from '@/lib/auth-error-handler'
 import { useAuthErrorHandler } from './auth/AuthErrorBoundary'
-import { AuthLoadingSpinner } from './3d/SimpleLoading3D'
+
+// Simple CSS loading spinner
+const AuthLoadingSpinner = () => (
+  <div className="flex items-center justify-center">
+    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--primary)]"></div>
+  </div>
+)
 
 export default function ClientAuthCheck() {
   const router = useRouter()

@@ -16,8 +16,7 @@ import {
   Filter
 } from "lucide-react"
 import Link from "next/link"
-import FloatingBackground from "@/components/3d/FloatingBackground"
-import Card3D from "@/components/3d/Card3D"
+// Using regular Card components with CSS animations
 
 // Force dynamic rendering for this page
 export const dynamic = 'force-dynamic'
@@ -102,7 +101,9 @@ export default async function LearningPage({ searchParams }: LearningPageProps) 
 
   return (
     <div className="min-h-screen bg-[var(--background)] relative overflow-hidden">
-      <FloatingBackground theme="ut-orange" intensity={10} />
+      {/* Animated background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[var(--primary)]/10 via-[var(--background)] to-[var(--accent)]/10" />
+      <div className="absolute top-20 left-10 w-20 h-20 bg-[var(--primary)]/20 rounded-full blur-xl animate-pulse" />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
         {/* Header */}
         <div className="mb-8">
@@ -116,7 +117,7 @@ export default async function LearningPage({ searchParams }: LearningPageProps) 
                      </Button>
               
               {currentSubject && (
-                <Card3D className="flex items-center gap-3 p-4" hoverScale={1.02} glowColor="var(--primary)">
+                <Card className="flex items-center gap-3 p-4" >
                   <div className="flex-shrink-0 w-12 h-12 flex items-center justify-center">
                     {React.createElement(getSubjectIcon(currentSubject.name), { 
                       className: "w-12 h-12 text-[var(--primary)]" 
@@ -130,7 +131,7 @@ export default async function LearningPage({ searchParams }: LearningPageProps) 
                       {currentSubject.description}
                     </p>
                   </div>
-                </Card3D>
+                </Card>
               )}
               
               {!currentSubject && (
@@ -148,7 +149,7 @@ export default async function LearningPage({ searchParams }: LearningPageProps) 
 
           {/* Subject Filter */}
           {!currentSubject && allSubjects && allSubjects.length > 0 && (
-            <Card3D className="mb-8" hoverScale={1.01} glowColor="var(--accent)">
+            <Card className="mb-8" >
               <CardHeader>
                      <CardTitle className="flex items-center gap-2">
                        <Filter className="w-5 h-5 text-[var(--accent)]" />
@@ -168,7 +169,7 @@ export default async function LearningPage({ searchParams }: LearningPageProps) 
                         href={`/learning?subject=${subject.name}`}
                         className="block"
                       >
-                        <Card3D className="group cursor-pointer" hoverScale={1.05} glowColor="var(--primary)">
+                        <Card className="group cursor-pointer" >
                                  <CardContent className="p-6">
                                    <div className="flex items-center gap-3 mb-3">
                                      <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center">
@@ -187,13 +188,13 @@ export default async function LearningPage({ searchParams }: LearningPageProps) 
                                      {subject.description}
                                    </p>
                                  </CardContent>
-                        </Card3D>
+                        </Card>
                       </Link>
                     )
                   })}
                 </div>
               </CardContent>
-            </Card3D>
+            </Card>
           )}
         </div>
 

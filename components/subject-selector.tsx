@@ -6,9 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
-import Card3D from '@/components/3d/Card3D'
-import { Icon3D } from '@/components/3d/Card3D'
-import ProgressRing3D from '@/components/3d/ProgressRing3D'
+// Using regular Card components with CSS animations
 import { 
   Code, 
   Calculator, 
@@ -201,22 +199,15 @@ export default function SubjectSelector({ userId, className = '' }: SubjectSelec
           const hasStarted = stats.completedPaths > 0 || stats.timeSpent > 0
 
           return (
-            <Card3D 
+            <Card 
               key={subject.id} 
-              className="group cursor-pointer h-full"
-              hoverScale={1.08}
-              glowColor="var(--primary)"
+              className="group cursor-pointer h-full hover:shadow-xl transition-all duration-300"
               onClick={() => navigateToSubject(subject.name)}
             >
               <CardHeader className="pb-4">
                 {/* Subject Icon and Header */}
                 <div className={`w-full h-32 rounded-xl bg-gradient-to-br ${SUBJECT_COLORS[subject.color_theme as keyof typeof SUBJECT_COLORS]} flex items-center justify-center mb-4 group-hover:scale-105 transition-transform duration-300`}>
-                  <Icon3D 
-                    icon={IconComponent} 
-                    className="h-16 w-16 text-[var(--primary-foreground)] drop-shadow-lg"
-                    color="var(--primary-foreground)"
-                    size={64}
-                  />
+                  <IconComponent className="h-16 w-16 text-[var(--primary-foreground)] drop-shadow-lg" />
                 </div>
                 
                 <div className="space-y-2">
@@ -252,13 +243,31 @@ export default function SubjectSelector({ userId, className = '' }: SubjectSelec
                     <div className="flex items-center space-x-4">
                       <Progress value={progress} className="h-3 flex-1" />
                       <div className="flex items-center justify-center">
-                        <ProgressRing3D 
-                          progress={progress}
-                          size={40}
-                          thickness={4}
-                          color="var(--primary)"
-                          showText={false}
-                        />
+                        <div className="relative w-10 h-10">
+                          <svg className="transform -rotate-90" width="40" height="40">
+                            <circle
+                              cx="20"
+                              cy="20"
+                              r="16"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                              fill="none"
+                              className="text-muted opacity-20"
+                            />
+                            <circle
+                              cx="20"
+                              cy="20"
+                              r="16"
+                              stroke="var(--primary)"
+                              strokeWidth="4"
+                              fill="none"
+                              strokeDasharray={`${2 * Math.PI * 16}`}
+                              strokeDashoffset={`${2 * Math.PI * 16 * (1 - progress / 100)}`}
+                              className="transition-all duration-500"
+                              strokeLinecap="round"
+                            />
+                          </svg>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -312,7 +321,7 @@ export default function SubjectSelector({ userId, className = '' }: SubjectSelec
                   )}
                 </Button>
               </CardContent>
-            </Card3D>
+            </Card>
           )
         })}
       </div>

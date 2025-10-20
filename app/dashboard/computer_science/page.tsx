@@ -9,9 +9,7 @@ import ProblemGrid from "@/components/problem-grid"
 import LearningPaths from "@/components/learning-paths"
 import ResourceViewer from "@/components/resource-viewer"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import FloatingBackground from "@/components/3d/FloatingBackground"
-import Card3D from "@/components/3d/Card3D"
-import ProgressRing3D from "@/components/3d/ProgressRing3D"
+// Using regular Card components with CSS animations
 
 // Force dynamic rendering for this page
 export const dynamic = 'force-dynamic'
@@ -96,7 +94,10 @@ export default async function ComputerScienceDashboard() {
 
   return (
     <div className="min-h-screen bg-[var(--background)] relative overflow-hidden">
-      <FloatingBackground theme="ut-orange" intensity={10} />
+      {/* Animated background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[var(--primary)]/10 via-[var(--background)] to-[var(--accent)]/10" />
+      <div className="absolute top-20 left-10 w-20 h-20 bg-[var(--primary)]/20 rounded-full blur-xl animate-pulse" />
+      <div className="absolute top-40 right-20 w-32 h-32 bg-[var(--accent)]/20 rounded-full blur-xl animate-pulse" style={{ animationDelay: '1s' }} />
       
       {/* Header */}
       <header className="border-b border-[var(--border)] bg-[var(--card)]/95 backdrop-blur-sm shadow-sm relative z-10">
@@ -133,7 +134,7 @@ export default async function ComputerScienceDashboard() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
         {/* Welcome Section */}
         <div className="mb-12">
-                 <Card3D className="p-8" hoverScale={1.02} glowColor="var(--primary)">
+                 <Card className="p-8" >
                    <div className="flex items-center mb-4">
                      <div className="mr-4 w-16 h-16 flex items-center justify-center">
                        <Code className="w-16 h-16 text-[var(--primary)]" />
@@ -147,12 +148,12 @@ export default async function ComputerScienceDashboard() {
                        </p>
                      </div>
                    </div>
-                 </Card3D>
+                 </Card>
         </div>
 
         {/* CS-Specific Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
-          <Card3D className="h-full" hoverScale={1.05} glowColor="var(--primary)">
+          <Card className="h-full" >
                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                      <CardTitle className="text-sm font-medium text-[var(--foreground)]">Learning Paths</CardTitle>
                      <div className="p-2 rounded-lg bg-[var(--primary)]/10 group-hover:bg-[var(--primary)]/20 transition-colors">
@@ -167,9 +168,9 @@ export default async function ComputerScienceDashboard() {
                 Completed paths
               </p>
             </CardContent>
-          </Card3D>
+          </Card>
 
-          <Card3D className="h-full" hoverScale={1.05} glowColor="var(--accent)">
+          <Card className="h-full" >
                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                      <CardTitle className="text-sm font-medium text-[var(--foreground)]">Problems Solved</CardTitle>
                      <div className="p-2 rounded-lg bg-[var(--accent)]/10 group-hover:bg-[var(--accent)]/20 transition-colors">
@@ -184,9 +185,9 @@ export default async function ComputerScienceDashboard() {
                 Total problems
               </p>
             </CardContent>
-          </Card3D>
+          </Card>
 
-          <Card3D className="h-full" hoverScale={1.05} glowColor="var(--warning)">
+          <Card className="h-full" >
                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                      <CardTitle className="text-sm font-medium text-[var(--foreground)]">Average Score</CardTitle>
                      <div className="p-2 rounded-lg bg-[var(--warning)]/10 group-hover:bg-[var(--warning)]/20 transition-colors">
@@ -201,9 +202,9 @@ export default async function ComputerScienceDashboard() {
                 Across all problems
               </p>
             </CardContent>
-          </Card3D>
+          </Card>
 
-          <Card3D className="h-full" hoverScale={1.05} glowColor="var(--success)">
+          <Card className="h-full" >
                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                      <CardTitle className="text-sm font-medium text-[var(--foreground)]">Study Time</CardTitle>
                      <div className="p-2 rounded-lg bg-[var(--success)]/10 group-hover:bg-[var(--success)]/20 transition-colors">
@@ -218,7 +219,7 @@ export default async function ComputerScienceDashboard() {
                 Total time spent
               </p>
             </CardContent>
-          </Card3D>
+          </Card>
         </div>
 
         {/* Main Content Tabs */}

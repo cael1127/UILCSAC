@@ -6,8 +6,7 @@ import { ArrowLeft, Code, Trophy } from "lucide-react"
 import Link from "next/link"
 import ProblemGrid from "@/components/problem-grid"
 import PracticeTestBrowser from "@/components/practice-test-browser"
-import FloatingBackground from "@/components/3d/FloatingBackground"
-import Card3D from "@/components/3d/Card3D"
+// Using regular Card components with CSS animations
 
 // Force dynamic rendering for this page
 export const dynamic = 'force-dynamic'
@@ -26,7 +25,9 @@ export default async function ProblemsPage() {
 
   return (
     <div className="min-h-screen bg-[var(--background)] relative overflow-hidden">
-      <FloatingBackground theme="ut-orange" intensity={8} />
+      {/* Animated background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[var(--primary)]/10 via-[var(--background)] to-[var(--accent)]/10" />
+      <div className="absolute top-20 left-10 w-20 h-20 bg-[var(--primary)]/20 rounded-full blur-xl animate-pulse" />
       
       {/* Header */}
       <header className="border-b border-[var(--border)] bg-[var(--card)]/95 backdrop-blur-sm shadow-sm relative z-10">
@@ -48,7 +49,7 @@ export default async function ProblemsPage() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
         {/* Page Header */}
         <div className="text-center mb-12">
-                 <Card3D className="p-8" hoverScale={1.02} glowColor="var(--primary)">
+                 <Card className="p-8" >
                    <div className="flex items-center justify-center mb-4">
                      <Code className="w-12 h-12 text-[var(--primary)] mr-4" />
                      <Trophy className="w-12 h-12 text-[var(--accent)]" />
@@ -59,7 +60,7 @@ export default async function ProblemsPage() {
                    <p className="text-xl text-[var(--muted-foreground)] max-w-2xl mx-auto">
                      Practice with individual problems or take comprehensive UIL-style practice tests.
                    </p>
-                 </Card3D>
+                 </Card>
         </div>
 
         {/* Tabbed Interface */}
