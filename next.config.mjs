@@ -15,6 +15,10 @@ const nextConfig = {
   // Performance optimizations
   experimental: {
     optimizePackageImports: ['@radix-ui/react-icons', 'lucide-react'],
+    // Enable Node.js runtime for middleware (required for Supabase)
+    serverActions: {
+      bodySizeLimit: '2mb',
+    },
     turbo: {
       rules: {
         '*.svg': {

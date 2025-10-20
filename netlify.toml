@@ -10,12 +10,8 @@
 
 [functions]
   node_bundler = "esbuild"
-
-# Next.js specific redirects for SPA routing
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+  # Use Node.js runtime for functions
+  directory = ".netlify/functions"
 
 # Security headers
 [[headers]]
