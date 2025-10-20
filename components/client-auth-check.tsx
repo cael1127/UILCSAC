@@ -8,9 +8,10 @@ import { handleAuthErrorWithRecovery, clearAuthSession } from '@/lib/auth-error-
 import { useAuthErrorHandler } from './auth/AuthErrorBoundary'
 
 // Simple CSS loading spinner
-const AuthLoadingSpinner = () => (
-  <div className="flex items-center justify-center">
+const AuthLoadingSpinner = ({ message }: { message?: string }) => (
+  <div className="flex flex-col items-center justify-center gap-3">
     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--primary)]"></div>
+    {message && <p className="text-sm text-[var(--muted-foreground)]">{message}</p>}
   </div>
 )
 
